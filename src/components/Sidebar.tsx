@@ -10,6 +10,11 @@ interface SidebarProps {
 
 const levels = [
   {
+    id: 0,
+    title: "Playground (All Motions)",
+    description: "Practice all Vim motions in a free environment",
+  },
+  {
     id: 1,
     title: "Basic Movement (h, j, k, l)",
     description: "Learn the fundamental vim motions",

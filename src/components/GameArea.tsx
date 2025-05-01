@@ -27,6 +27,18 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
   const [charPosition, setCharPosition] = useState<number>(0);
   const [charTarget, setCharTarget] = useState<number>(5);
 
+  const [editableText, setEditableText] = useState<string>(
+    "This is a Vim playground. Practice your motions here!\n\nYou can use h, j, k, l for movement.\nTry w, e, b for word navigation.\nUse i to enter insert mode, Escape to exit.\nPress x to delete characters."
+  );
+  const [cursorPosition, setCursorPosition] = useState<number>(0);
+  const [mode, setMode] = useState<'normal' | 'insert'>('normal');
+  const [lines, setLines] = useState<string[]>(editableText.split('\n'));
+
+  const updateLines = (text: string) => {
+    setEditableText(text);
+    setLines(text.split('\n'));
+  };
+
   const sampleText =
     "The quick brown fox jumps over the lazy dog. Vim is a highly efficient text editor that uses keyboard shortcuts to speed up editing."
   // Process text to handle punctuation as separate words (like in Vim)
@@ -87,7 +99,130 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
         setLastKeyPressed(null)
       }, 150)
 
-      if (level === 1) {
+      if (level === 0) {
+        // Playground mode with all Vim motions
+        if (mode === 'normal') {
+          let newPos = cursorPosition;
+          let newText = editableText;
+          
+          switch (e.key) {
+            case "h": // Move left
+              if (newPos > 0) {
+                newPos--;
+              }
+              break;
+            case "l": // Move right
+              if (newPos < editableText.length - 1) {
+                newPos++;
+              }
+              break;
+            case "j": // Move down
+              const currentLineStart = editableText.lastIndexOf('\n', newPos) + 1;
+              const currentLineEnd = editableText.indexOf('\n', newPos);
+              const currentLineLength = (currentLineEnd === -1 ? editableText.length : currentLineEnd) - currentLineStart;
+              const currentCol = newPos - currentLineStart;
+              
+              if (currentLineEnd !== -1) {
+                const nextLineStart = currentLineEnd + 1;
+                const nextLineEnd = editableText.indexOf('\n', nextLineStart);
+                const nextLineLength = (nextLineEnd === -1 ? editableText.length : nextLineEnd) - nextLineStart;
+                
+                // Move to the same column in the next line, or the end of the next line if it's shorter
+                newPos = nextLineStart + Math.min(currentCol, nextLineLength);
+              }
+              break;
+            case "k": // Move up
+              const lineStart = editableText.lastIndexOf('\n', Math.max(0, newPos - 1));
+              const col = newPos - (lineStart + 1);
+              
+              if (lineStart > 0) {
+                const prevLineStart = editableText.lastIndexOf('\n', lineStart - 1) + 1;
+                const prevLineLength = lineStart - prevLineStart;
+                
+                // Move to the same column in the previous line, or the end of the previous line if it's shorter
+                newPos = prevLineStart + Math.min(col, prevLineLength);
+              }
+              break;
+            case "w": // Move to start of next word
+              for (let i = newPos + 1; i < editableText.length; i++) {
+                if (isWordBoundary(i)) {
+                  newPos = i;
+                  break;
+                }
+              }
+              break;
+            case "e": // Move to end of current/next word
+              for (let i = newPos + 1; i < editableText.length - 1; i++) {
+                if (isWordEnd(i)) {
+                  newPos = i;
+                  break;
+                }
+              }
+              break;
+            case "b": // Move to start of previous word
+              for (let i = newPos - 1; i > 0; i--) {
+                if (isWordBoundary(i)) {
+                  newPos = i;
+                  break;
+                }
+              }
+              break;
+            case "0": // Move to start of line
+              newPos = editableText.lastIndexOf('\n', newPos) + 1;
+              if (newPos === 0 && editableText.charAt(0) === '\n') newPos = 1;
+              break;
+            case "$": // Move to end of line
+              const endOfLine = editableText.indexOf('\n', newPos);
+              newPos = endOfLine === -1 ? editableText.length - 1 : endOfLine - 1;
+              break;
+            case "i": // Enter insert mode
+              setMode('insert');
+              break;
+            case "x": // Delete character under cursor
+              if (newPos < editableText.length) {
+                newText = editableText.substring(0, newPos) + editableText.substring(newPos + 1);
+                updateLines(newText);
+              }
+              break;
+            case "Escape": // Ensure we're in normal mode
+              setMode('normal');
+              break;
+          }
+          
+          setCursorPosition(newPos);
+        } else if (mode === 'insert') {
+          let newText = editableText;
+          let newPos = cursorPosition;
+          
+          switch (e.key) {
+            case "Escape": // Exit insert mode
+              setMode('normal');
+              break;
+            case "Backspace": // Delete character before cursor
+              if (newPos > 0) {
+                newText = editableText.substring(0, newPos - 1) + editableText.substring(newPos);
+                newPos--;
+                updateLines(newText);
+              }
+              break;
+            case "Enter": // Insert new line
+              newText = editableText.substring(0, newPos) + '\n' + editableText.substring(newPos);
+              newPos++;
+              updateLines(newText);
+              break;
+            default:
+              // Insert the typed character if it's a single character
+              if (e.key.length === 1) {
+                newText = editableText.substring(0, newPos) + e.key + editableText.substring(newPos);
+                newPos++;
+                updateLines(newText);
+              }
+              break;
+          }
+          
+          setCursorPosition(newPos);
+        }
+      } else if (level === 1) {
         let newPos = { ...position }
 
         switch (e.key) {
@@ -198,7 +333,7 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
         }
       }
     },
-    [position, target, score, isMuted, level, charPosition, charTarget, characters]
+    [position, target, score, isMuted, level, charPosition, charTarget, characters, mode, cursorPosition, editableText]
   )
 
   useEffect(() => {
@@ -210,7 +345,11 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
     <div className="flex flex-col items-center gap-8">
       <div className="text-center">
         <h2 className="text-3xl font-bold mb-2">Level {level}</h2>
-        {level === 1 ? (
+        {level === 0 ? (
+          <p className="text-zinc-400">
+            Vim Playground - {mode === 'normal' ? 'Normal Mode' : 'Insert Mode'}
+          </p>
+        ) : level === 1 ? (
           <p className="text-zinc-400">
             Use h, j, k, l to move the cursor to the target
           </p>
@@ -218,11 +357,50 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
           <p className="text-zinc-400">Use w, b, e to navigate between words</p>
         )}
         <div className="mt-4 flex items-center justify-center gap-4">
-          <div className="bg-zinc-800 px-4 py-2 rounded-lg">Score: {score}</div>
+          {level !== 0 && (
+            <div className="bg-zinc-800 px-4 py-2 rounded-lg">Score: {score}</div>
+          )}
         </div>
       </div>
 
-      {level === 1 ? (
+      {level === 0 ? (
+        <div className="relative w-full max-w-2xl bg-zinc-800 p-6 rounded-lg">
+          <div className="text-lg leading-relaxed font-mono whitespace-pre-wrap break-words overflow-hidden">
+            {lines.map((line, lineIdx) => (
+              <div key={lineIdx} className="min-h-[1.5em]">
+                {line.split('').map((char, charIdx) => {
+                  const absoluteIdx = editableText.indexOf(line) + charIdx;
+                  const isCursorPosition = absoluteIdx === cursorPosition;
+                  
+                  return (
+                    <span
+                      key={charIdx}
+                      className={`${
+                        isCursorPosition
+                          ? mode === 'normal' 
+                            ? "bg-emerald-500 text-white rounded" 
+                            : "bg-amber-500 text-white rounded"
+                          : ""
+                      }`}
+                    >
+                      {char === ' ' ? '\u00A0' : char}
+                    </span>
+                  );
+                })}
+                {line.length === 0 && cursorPosition === editableText.indexOf('\n', editableText.indexOf(line)) && (
+                  <span className={mode === 'normal' ? "bg-emerald-500 text-white rounded" : "bg-amber-500 text-white rounded"}>
+                    {'\u00A0'}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 text-sm text-zinc-400">
+            <p>Normal mode: h,j,k,l (movement), w,e,b (word nav), 0,$ (line nav), i (insert), x (delete)</p>
+            <p>Insert mode: Type to insert text, Escape to exit</p>
+          </div>
+        </div>
+      ) : level === 1 ? (
         <div className="relative">
           <div
             className="grid gap-1"
@@ -278,7 +456,20 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
       )}
 
       <div className="flex gap-4 text-zinc-400">
-        {level === 1 ? (
+        {level === 0 ? (
+          mode === 'normal' ? (
+            <>
+              <kbd className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${lastKeyPressed === "h" ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110" : ""}`}>h</kbd>
+              <kbd className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${lastKeyPressed === "j" ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110" : ""}`}>j</kbd>
+              <kbd className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${lastKeyPressed === "k" ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110" : ""}`}>k</kbd>
+              <kbd className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${lastKeyPressed === "l" ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110" : ""}`}>l</kbd>
+              <kbd className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${lastKeyPressed === "i" ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110" : ""}`}>i</kbd>
+              <kbd className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${lastKeyPressed === "x" ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110" : ""}`}>x</kbd>
+            </>
+          ) : (
+            <kbd className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${lastKeyPressed === "Escape" ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110" : ""}`}>Esc</kbd>
+          )
+        ) : level === 1 ? (
           <>
             <kbd
               className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
