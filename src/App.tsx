@@ -8,6 +8,14 @@ function App() {
   const [currentLevel, setCurrentLevel] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
 
+  const onCloseSidebar = () => {
+    setIsSidebarOpen(false);
+  };
+
+  const onToggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <div className="min-h-screen bg-zinc-900 text-zinc-100 flex">
       {/* Sidebar */}
@@ -21,6 +29,7 @@ function App() {
           setCurrentLevel={setCurrentLevel}
           isMuted={isMuted}
           setIsMuted={setIsMuted}
+          onClose={onCloseSidebar}
         />
       </div>
 
@@ -32,8 +41,10 @@ function App() {
         }
       >
         <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="fixed top-4 left-4 z-50 p-2 bg-zinc-700 rounded-md hover:bg-zinc-600 transition-colors"
+          onClick={onToggleSidebar}
+          className={`fixed top-4 left-4 z-50 p-2 bg-zinc-700 rounded-md hover:bg-zinc-600 transition-all duration-500 ease-in-out ${
+            !isSidebarOpen ? "translate-x-0" : "-translate-x-24"
+          }`}
         >
           {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
