@@ -34,7 +34,13 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
   })
   const sampleText =
     "The quick brown fox jumps over the lazy dog. Vim is a highly efficient text editor that uses keyboard shortcuts to speed up editing."
-  const words = sampleText.split(" ")
+  // Process text to handle punctuation as separate words (like in Vim)
+  const processTextForVim = (text: string) => {
+    // Replace punctuation with spaces around them to treat them as separate words
+    const processedText = text.replace(/([.,;:!?])/g, ' $1 ').replace(/\s+/g, ' ').trim();
+    return processedText.split(' ').filter(word => word.length > 0);
+  };
+  const words = processTextForVim(sampleText)
 
   const [lastKeyPressed, setLastKeyPressed] = useState<string | null>(null)
 
