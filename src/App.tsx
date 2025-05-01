@@ -5,7 +5,7 @@ import GameArea from "./components/GameArea";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [currentLevel, setCurrentLevel] = useState(1);
+  const [currentLevel, setCurrentLevel] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
 
   const onCloseSidebar = () => {
@@ -58,4 +58,3 @@ function App() {
 }
 
 export default App;
-
