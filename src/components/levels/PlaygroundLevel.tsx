@@ -24,10 +24,30 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
   const [cursorPosition, setCursorPosition] = useState<number>(0);
   const [mode, setMode] = useState<"normal" | "insert">("normal");
   const [lines, setLines] = useState<string[]>(editableText.split("\n"));
+  // Store the "virtual" column for j/k navigation
+  const [virtualColumn, setVirtualColumn] = useState<number>(0);
 
   const updateLines = (text: string) => {
     setEditableText(text);
     setLines(text.split("\n"));
+  };
+
+  // Helper to get the current column position
+  const getCurrentColumn = () => {
+    const lineStart = findLineStart(editableText, cursorPosition);
+    return cursorPosition - lineStart;
+  };
+
+  // Helper to set cursor based on line and virtual column
+  const setCursorToLineAndColumn = (lineStart: number, targetColumn: number, lineLength: number) => {
+    // For empty lines or if target column exceeds line length, place at line start or end
+    if (lineLength === 0) {
+      setCursorPosition(lineStart);
+    } else {
+      // Calculate actual column (bounded by line length)
+      const actualColumn = Math.min(targetColumn, lineLength > 0 ? lineLength - 1 : 0);
+      setCursorPosition(lineStart + actualColumn);
+    }
   };
 
   // Define normal mode key actions
@@ -37,6 +57,8 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
       const lineStart = findLineStart(editableText, cursorPosition);
       if (cursorPosition > lineStart) {
         setCursorPosition(cursorPosition - 1);
+        // Update virtual column when moving horizontally
+        setVirtualColumn(getCurrentColumn() - 1);
       }
     },
     l: () => {
@@ -44,27 +66,53 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
       const lineEnd = findLineEnd(editableText, cursorPosition);
       if (cursorPosition < lineEnd) {
         setCursorPosition(cursorPosition + 1);
+        // Update virtual column when moving horizontally
+        setVirtualColumn(getCurrentColumn() + 1);
       }
     },
     j: () => {
-      // For debugging purposes, display the position information 
-      const currentPos = cursorPosition;
-      const nextPos = moveToNextLine(editableText, cursorPosition);
+      // Get current line start and column
+      const currentLineStart = findLineStart(editableText, cursorPosition);
+      const currentColumn = cursorPosition - currentLineStart;
       
-      // Always force update cursor position
-      setCursorPosition(nextPos);
+      // Remember this column if it's not already saved
+      // or if horizontal movement has changed it
+      if (currentColumn > virtualColumn) {
+        setVirtualColumn(currentColumn);
+      }
       
-      // Add debug log
-      console.log({
-        action: 'j key',
-        cursorBefore: currentPos,
-        cursorAfter: nextPos,
-        linesBefore: editableText.substring(Math.max(0, currentPos - 10), currentPos + 10),
-        linesAfter: editableText.substring(Math.max(0, nextPos - 10), nextPos + 10)
-      });
+      // Find the next line boundaries
+      const currentLineEnd = editableText.indexOf('\n', cursorPosition);
+      if (currentLineEnd === -1) return; // Already at the last line
+      
+      const nextLineStart = currentLineEnd + 1;
+      const nextLineEnd = editableText.indexOf('\n', nextLineStart);
+      const nextLineLength = (nextLineEnd === -1 ? editableText.length : nextLineEnd) - nextLineStart;
+      
+      // Set cursor to appropriate position in next line based on virtual column
+      setCursorToLineAndColumn(nextLineStart, virtualColumn, nextLineLength);
     },
     k: () => {
-      setCursorPosition(moveToPrevLine(editableText, cursorPosition));
+      // Get current line start and column
+      const currentLineStart = findLineStart(editableText, cursorPosition);
+      const currentColumn = cursorPosition - currentLineStart;
+      
+      // Remember this column if it's not already saved
+      // or if horizontal movement has changed it
+      if (currentColumn > virtualColumn) {
+        setVirtualColumn(currentColumn);
+      }
+      
+      // Cannot go up if already at first line
+      if (currentLineStart <= 0) return;
+      
+      // Find the previous line boundaries
+      const prevLineEnd = currentLineStart - 1;
+      const prevLineStart = editableText.lastIndexOf('\n', prevLineEnd - 1) + 1;
+      const prevLineLength = prevLineEnd - prevLineStart;
+      
+      // Set cursor to appropriate position in previous line based on virtual column
+      setCursorToLineAndColumn(prevLineStart, virtualColumn, prevLineLength);
     },
     w: () => {
       setCursorPosition(
