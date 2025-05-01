@@ -1,0 +1,44 @@
+import React, { useState } from 'react'
+import { Menu, X } from 'lucide-react'
+import Sidebar from './components/Sidebar'
+import GameArea from './components/GameArea'
+
+function App() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [currentLevel, setCurrentLevel] = useState(1)
+  const [isMuted, setIsMuted] = useState(false)
+
+  return (
+    <div className="min-h-screen bg-zinc-900 text-zinc-100 flex">
+      {/* Sidebar */}
+      <div 
+        className={`fixed lg:static lg:flex h-full bg-zinc-800 transition-all duration-300 ease-in-out z-50 ${
+          isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-0 lg:w-64 lg:translate-x-0'
+        }`}
+      >
+        <Sidebar 
+          currentLevel={currentLevel} 
+          setCurrentLevel={setCurrentLevel}
+          isMuted={isMuted}
+          setIsMuted={setIsMuted}
+        />
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1">
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-zinc-700 rounded-md hover:bg-zinc-600 transition-colors"
+        >
+          {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        <main className="container mx-auto px-4 py-8">
+          <GameArea level={currentLevel} isMuted={isMuted} />
+        </main>
+      </div>
+    </div>
+  )
+}
+
+export default App
