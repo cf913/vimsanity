@@ -304,20 +304,36 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
                   {line.split("").map((char, charIdx) => {
                     const absoluteIdx = lineStartPosition + charIdx;
                     const isCursorPosition = absoluteIdx === cursorPosition;
+                    const isCursorOnLastChar =
+                      absoluteIdx + 1 === cursorPosition;
+
+                    const isInsertMode = mode === "insert";
+
+                    const isCursorOnLastCharInInsertMode =
+                      isInsertMode &&
+                      isCursorOnLastChar &&
+                      charIdx === line.length - 1;
 
                     return (
-                      <span
-                        key={charIdx}
-                        ref={isCursorPosition ? cursorRef : null}
-                        className={`${isCursorPosition
-                            ? mode === "normal"
-                              ? "bg-emerald-500 text-white rounded"
-                              : "bg-amber-500 text-white rounded"
-                            : ""
-                          }`}
-                      >
-                        {char === " " ? "\u00A0" : char}
-                      </span>
+                      <>
+                        <span
+                          key={charIdx}
+                          ref={isCursorPosition ? cursorRef : null}
+                          className={`${isCursorPosition
+                              ? mode === "normal"
+                                ? "bg-emerald-500 text-white rounded"
+                                : "bg-amber-500 text-white rounded"
+                              : ""
+                            }`}
+                        >
+                          {char === " " ? "\u00A0" : char}
+                        </span>
+                        {isCursorOnLastCharInInsertMode && (
+                          <span className="bg-amber-500 text-white rounded">
+                            {"\u00A0"}
+                          </span>
+                        )}
+                      </>
                     );
                   })}
                   {/* empty line */}
