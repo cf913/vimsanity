@@ -10,7 +10,7 @@ interface SidebarProps {
 
 const levels = [
   { id: 1, title: 'Basic Movement (h, j, k, l)', description: 'Learn the fundamental vim motions' },
-  { id: 2, title: 'Word Movement (w, b, e)', description: 'Navigate through words efficiently', locked: true },
+  { id: 2, title: 'Word Movement (w, b, e)', description: 'Navigate through words efficiently' },
   { id: 3, title: 'Line Operations (0, $)', description: 'Move to start and end of lines', locked: true },
   { id: 4, title: 'Find Characters (f, t)', description: 'Jump to specific characters', locked: true },
 ]
