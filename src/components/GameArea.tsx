@@ -91,10 +91,22 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
               }
             }
             break
-          case "e": // Move to end of current word
-            newWordPos = {
-              wordIndex: wordPosition.wordIndex,
-              charIndex: words[wordPosition.wordIndex].length - 1,
+          case "e": // Move to end of current word or next word
+            if (
+              wordPosition.charIndex === words[wordPosition.wordIndex].length - 1 &&
+              wordPosition.wordIndex < words.length - 1
+            ) {
+              // If already at the end of current word, move to end of next word
+              newWordPos = {
+                wordIndex: wordPosition.wordIndex + 1,
+                charIndex: words[wordPosition.wordIndex + 1].length - 1,
+              }
+            } else if (wordPosition.charIndex < words[wordPosition.wordIndex].length - 1) {
+              // Move to end of current word
+              newWordPos = {
+                wordIndex: wordPosition.wordIndex,
+                charIndex: words[wordPosition.wordIndex].length - 1,
+              }
             }
             break
           case "b": // Move to start of current/previous word
