@@ -24,23 +24,56 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
   const [score, setScore] = useState(0)
   const gridSize = 10
 
-  const [wordPosition, setWordPosition] = useState<WordPosition>({
-    wordIndex: 0,
-    charIndex: 0,
-  })
-  const [wordTarget, setWordTarget] = useState<WordPosition>({
-    wordIndex: 2,
-    charIndex: 0,
-  })
+  const [charPosition, setCharPosition] = useState<number>(0);
+  const [charTarget, setCharTarget] = useState<number>(5);
+
   const sampleText =
     "The quick brown fox jumps over the lazy dog. Vim is a highly efficient text editor that uses keyboard shortcuts to speed up editing."
   // Process text to handle punctuation as separate words (like in Vim)
   const processTextForVim = (text: string) => {
-    // Replace punctuation with spaces around them to treat them as separate words
-    const processedText = text.replace(/([.,;:!?])/g, ' $1 ').replace(/\s+/g, ' ').trim();
-    return processedText.split(' ').filter(word => word.length > 0);
+    // Just split the text into characters - we'll handle word boundaries in the navigation functions
+    return text.split('');
   };
-  const words = processTextForVim(sampleText)
+  const characters = processTextForVim(sampleText)
+
+  // For word-based navigation (w, b, e)
+  const isWordBoundary = (index: number) => {
+    if (index <= 0 || index >= characters.length) return false;
+    const current = characters[index];
+    const prev = characters[index - 1];
+    
+    // Word boundary conditions
+    const isPrevSpace = /\s/.test(prev);
+    const isPrevPunctuation = /[.,;:!?()[\]{}'"<>\/\\|+=\-*&^%$#@!~`]/.test(prev) && prev !== '_';
+    const isCurrentPunctuation = /[.,;:!?()[\]{}'"<>\/\\|+=\-*&^%$#@!~`]/.test(current) && current !== '_';
+    
+    // Start of a word is:
+    // 1. After a space
+    // 2. A punctuation after a non-punctuation
+    // 3. A non-punctuation after a punctuation
+    return (isPrevSpace && !isCurrentPunctuation) || 
+           (isCurrentPunctuation && !isPrevPunctuation) || 
+           (!isCurrentPunctuation && isPrevPunctuation);
+  };
+
+  const isWordEnd = (index: number) => {
+    if (index >= characters.length - 1 || index < 0) return false;
+    const current = characters[index];
+    const next = characters[index + 1];
+    
+    // Word end conditions
+    const isNextSpace = /\s/.test(next);
+    const isCurrentPunctuation = /[.,;:!?()[\]{}'"<>\/\\|+=\-*&^%$#@!~`]/.test(current) && current !== '_';
+    const isNextPunctuation = /[.,;:!?()[\]{}'"<>\/\\|+=\-*&^%$#@!~`]/.test(next) && next !== '_';
+    
+    // End of a word is:
+    // 1. Before a space
+    // 2. A punctuation before a non-punctuation
+    // 3. A non-punctuation before a punctuation
+    return (isNextSpace && !isCurrentPunctuation) || 
+           (!isNextPunctuation && isCurrentPunctuation) || 
+           (isNextPunctuation && !isCurrentPunctuation);
+  };
 
   const [lastKeyPressed, setLastKeyPressed] = useState<string | null>(null)
 
@@ -86,106 +119,86 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
           })
         }
       } else if (level === 2) {
-        let newWordPos = { ...wordPosition }
+        let newPos = charPosition;
 
         switch (e.key) {
+          case "h": // Move one character left
+            if (newPos > 0) {
+              newPos--;
+            }
+            break;
+          case "l": // Move one character right
+            if (newPos < characters.length - 1) {
+              newPos++;
+            }
+            break;
           case "w": // Move to start of next word
-            if (wordPosition.wordIndex < words.length - 1) {
-              newWordPos = {
-                wordIndex: wordPosition.wordIndex + 1,
-                charIndex: 0,
+            for (let i = newPos + 1; i < characters.length; i++) {
+              if (isWordBoundary(i)) {
+                newPos = i;
+                break;
               }
             }
-            break
-          case "e": // Move to end of current word or next word
-            if (
-              wordPosition.charIndex === words[wordPosition.wordIndex].length - 1 &&
-              wordPosition.wordIndex < words.length - 1
-            ) {
-              // If already at the end of current word, move to end of next word
-              newWordPos = {
-                wordIndex: wordPosition.wordIndex + 1,
-                charIndex: words[wordPosition.wordIndex + 1].length - 1,
-              }
-            } else if (wordPosition.charIndex < words[wordPosition.wordIndex].length - 1) {
-              // Move to end of current word
-              newWordPos = {
-                wordIndex: wordPosition.wordIndex,
-                charIndex: words[wordPosition.wordIndex].length - 1,
+            break;
+          case "e": // Move to end of current/next word
+            // First try to find end of current word
+            let foundEnd = false;
+            for (let i = newPos + 1; i < characters.length - 1; i++) {
+              if (isWordEnd(i)) {
+                newPos = i;
+                foundEnd = true;
+                break;
               }
             }
-            break
+            
+            // If couldn't find word end ahead, stay at current position
+            if (!foundEnd && newPos < characters.length - 1) {
+              for (let i = newPos + 1; i < characters.length - 1; i++) {
+                if (isWordEnd(i)) {
+                  newPos = i;
+                  break;
+                }
+              }
+            }
+            break;
           case "b": // Move to start of current/previous word
-            if (wordPosition.charIndex > 0) {
-              newWordPos = { wordIndex: wordPosition.wordIndex, charIndex: 0 }
-            } else if (wordPosition.wordIndex > 0) {
-              newWordPos = {
-                wordIndex: wordPosition.wordIndex - 1,
-                charIndex: 0,
+            // First try to go to previous word boundary
+            let foundPrev = false;
+            for (let i = newPos - 1; i > 0; i--) {
+              if (isWordBoundary(i)) {
+                newPos = i;
+                foundPrev = true;
+                break;
               }
             }
-            break
-          case "l": // Move one character right (additional movement for fine control)
-            if (
-              wordPosition.charIndex <
-              words[wordPosition.wordIndex].length - 1
-            ) {
-              newWordPos = {
-                wordIndex: wordPosition.wordIndex,
-                charIndex: wordPosition.charIndex + 1,
-              }
-            } else if (wordPosition.wordIndex < words.length - 1) {
-              // Move to the start of the next word if at the end of current word
-              newWordPos = {
-                wordIndex: wordPosition.wordIndex + 1,
-                charIndex: 0,
-              }
+            
+            // If at beginning of text or couldn't find previous word, stay at position 0
+            if (!foundPrev && newPos > 0) {
+              newPos = 0;
             }
-            break
-          case "h": // Move one character left (additional movement for fine control)
-            if (wordPosition.charIndex > 0) {
-              newWordPos = {
-                wordIndex: wordPosition.wordIndex,
-                charIndex: wordPosition.charIndex - 1,
-              }
-            } else if (wordPosition.wordIndex > 0) {
-              // Move to the end of the previous word if at the start of current word
-              newWordPos = {
-                wordIndex: wordPosition.wordIndex - 1,
-                charIndex: words[wordPosition.wordIndex - 1].length - 1,
-              }
-            }
-            break
+            break;
         }
 
-        setWordPosition(newWordPos)
+        setCharPosition(newPos);
 
-        if (
-          newWordPos.wordIndex === wordTarget.wordIndex &&
-          newWordPos.charIndex === wordTarget.charIndex
-        ) {
+        if (newPos === charTarget) {
           if (!isMuted) {
             // successSound.currentTime = 0
             // successSound.play()
           }
-          setScore(score + 1)
-
-          // Set a new random target
-          const randomWordIndex = Math.floor(Math.random() * words.length)
-          const randomWord = words[randomWordIndex]
-          const randomCharIndex = Math.floor(Math.random() * randomWord.length)
-
-          // Make sure the target is at the beginning or end of a word to be reachable with w, b, e commands
-          const targetPosition = Math.random() < 0.5 ? 0 : randomWord.length - 1
-
-          setWordTarget({
-            wordIndex: randomWordIndex,
-            charIndex: targetPosition,
-          })
+          setScore(score + 1);
+          
+          // Set a new random target that isn't a space
+          let newTarget;
+          do {
+            newTarget = Math.floor(Math.random() * characters.length);
+          } while (characters[newTarget] === ' ');
+          
+          setCharTarget(newTarget);
         }
       }
     },
-    [position, target, score, isMuted, level, wordPosition, wordTarget, words]
+    [position, target, score, isMuted, level, charPosition, charTarget, characters]
   )
 
   useEffect(() => {
@@ -241,33 +254,25 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
       ) : (
         <div className="relative w-full max-w-2xl bg-zinc-800 p-6 rounded-lg">
           <div className="text-lg leading-relaxed font-mono whitespace-pre-wrap break-words overflow-hidden">
-            {words.map((word, wordIdx) => (
-              <span key={wordIdx} className="relative mr-2 inline-block">
-                {word.split("").map((char, charIdx) => {
-                  const isPlayerPosition =
-                    wordIdx === wordPosition.wordIndex &&
-                    charIdx === wordPosition.charIndex
-                  const isTargetPosition =
-                    wordIdx === wordTarget.wordIndex &&
-                    charIdx === wordTarget.charIndex
-
-                  return (
-                    <span
-                      key={charIdx}
-                      className={`${
-                        isPlayerPosition
-                          ? "bg-emerald-500 text-white rounded"
-                          : isTargetPosition
-                          ? "bg-purple-500 text-white rounded"
-                          : ""
-                      }`}
-                    >
-                      {char}
-                    </span>
-                  )
-                })}
-              </span>
-            ))}
+            {characters.map((char, idx) => {
+              const isPlayerPosition = idx === charPosition;
+              const isTargetPosition = idx === charTarget;
+              
+              return (
+                <span
+                  key={idx}
+                  className={`${
+                    isPlayerPosition
+                      ? "bg-emerald-500 text-white rounded"
+                      : isTargetPosition
+                      ? "bg-purple-500 text-white rounded"
+                      : ""
+                  }`}
+                >
+                  {char === ' ' ? '\u00A0' : char}
+                </span>
+              );
+            })}
           </div>
         </div>
       )}
