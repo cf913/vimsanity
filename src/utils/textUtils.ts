@@ -108,31 +108,55 @@ export const findLineEnd = (text: string, currentPos: number): number => {
  * Move to the next line at the same column
  */
 export const moveToNextLine = (text: string, currentPos: number): number => {
-  const currentLineStart = text.lastIndexOf('\n', currentPos) + 1;
+  // First find the current line's newline character
   const currentLineEnd = text.indexOf('\n', currentPos);
   
+  // If we're at the last line, return current position
   if (currentLineEnd === -1) return currentPos;
   
-  const currentCol = currentPos - currentLineStart;
+  // Get the next line start (character after the newline)
   const nextLineStart = currentLineEnd + 1;
+  
+  // Calculate our current column
+  const currentLineStart = text.lastIndexOf('\n', currentPos - 1) + 1;
+  const currentCol = currentPos - currentLineStart;
+  
+  // Find the end of the next line
   const nextLineEnd = text.indexOf('\n', nextLineStart);
   const nextLineLength = (nextLineEnd === -1 ? text.length : nextLineEnd) - nextLineStart;
   
-  // Move to the same column in the next line, or the end of the next line if it's shorter
-  return nextLineStart + Math.min(currentCol, nextLineLength);
+  // Handle special case for empty lines
+  if (currentCol === 0 && nextLineLength === 0) {
+    return nextLineStart;
+  }
+
+  // Otherwise, follow standard vim rules
+  return nextLineStart + Math.min(currentCol, nextLineLength > 0 ? nextLineLength - 1 : 0);
 };
 
 /**
  * Move to the previous line at the same column
  */
 export const moveToPrevLine = (text: string, currentPos: number): number => {
-  const lineStart = text.lastIndexOf('\n', Math.max(0, currentPos - 1));
-  if (lineStart <= 0) return currentPos;
+  // Find the current line start
+  const currentLineStart = text.lastIndexOf('\n', currentPos) + 1;
   
-  const col = currentPos - (lineStart + 1);
-  const prevLineStart = text.lastIndexOf('\n', lineStart - 1) + 1;
-  const prevLineLength = lineStart - prevLineStart;
+  // If we're on the first line, stay put
+  if (currentLineStart <= 0) return currentPos;
   
-  // Move to the same column in the previous line, or the end of the previous line if it's shorter
-  return prevLineStart + Math.min(col, prevLineLength);
+  // Calculate our current column
+  const currentCol = currentPos - currentLineStart;
+  
+  // Find the start of the previous line
+  const prevLineStart = text.lastIndexOf('\n', currentLineStart - 2) + 1;
+  const prevLineEnd = currentLineStart - 1;
+  const prevLineLength = prevLineEnd - prevLineStart;
+  
+  // Handle special case for empty lines
+  if (currentCol === 0 && prevLineLength === 0) {
+    return prevLineStart;
+  }
+  
+  // Otherwise use standard vim rules
+  return prevLineStart + Math.min(currentCol, prevLineLength > 0 ? prevLineLength - 1 : 0);
 };

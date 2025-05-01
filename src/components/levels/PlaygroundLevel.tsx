@@ -47,7 +47,21 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
       }
     },
     j: () => {
-      setCursorPosition(moveToNextLine(editableText, cursorPosition));
+      // For debugging purposes, display the position information 
+      const currentPos = cursorPosition;
+      const nextPos = moveToNextLine(editableText, cursorPosition);
+      
+      // Always force update cursor position
+      setCursorPosition(nextPos);
+      
+      // Add debug log
+      console.log({
+        action: 'j key',
+        cursorBefore: currentPos,
+        cursorAfter: nextPos,
+        linesBefore: editableText.substring(Math.max(0, currentPos - 10), currentPos + 10),
+        linesAfter: editableText.substring(Math.max(0, nextPos - 10), nextPos + 10)
+      });
     },
     k: () => {
       setCursorPosition(moveToPrevLine(editableText, cursorPosition));
@@ -144,10 +158,17 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
 
       <div className="relative w-full max-w-2xl bg-zinc-800 p-6 rounded-lg">
         <div className="text-lg leading-relaxed font-mono overflow-auto">
-          {lines.map((line, lineIdx) => (
+          {lines.map((line, lineIdx) => {
+            // Calculate line start position in the entire text
+            const lineStartPosition = editableText.split('\n').slice(0, lineIdx).join('\n').length + (lineIdx > 0 ? 1 : 0);
+            // Calculate if cursor is on this line
+            const isCursorOnThisLine = cursorPosition >= lineStartPosition && 
+              (lineIdx === lines.length - 1 || cursorPosition < lineStartPosition + line.length + 1);
+            
+            return (
             <div key={lineIdx} className="min-h-[1.5em]">
               {line.split("").map((char, charIdx) => {
-                const absoluteIdx = editableText.indexOf(line) + charIdx;
+                const absoluteIdx = lineStartPosition + charIdx;
                 const isCursorPosition = absoluteIdx === cursorPosition;
 
                 return (
@@ -164,21 +185,20 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
                   </span>
                 );
               })}
-              {line.length === 0 &&
-                cursorPosition ===
-                editableText.indexOf("\n", editableText.indexOf(line)) && (
-                  <span
-                    className={
-                      mode === "normal"
-                        ? "bg-emerald-500 text-white rounded"
-                        : "bg-amber-500 text-white rounded"
-                    }
-                  >
-                    {"\u00A0"}
-                  </span>
-                )}
+              {/* Display cursor on empty line */}
+              {line.length === 0 && isCursorOnThisLine && (
+                <span
+                  className={
+                    mode === "normal"
+                      ? "bg-emerald-500 text-white rounded"
+                      : "bg-amber-500 text-white rounded"
+                  }
+                >
+                  {"\u00A0"}
+                </span>
+              )}
             </div>
-          ))}
+          )})}
         </div>
         <div className="mt-4 text-sm text-zinc-400">
           <p>
