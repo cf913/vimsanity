@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import {
   useKeyboardHandler,
   KeyActionMap,
@@ -26,6 +26,32 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
   const [lines, setLines] = useState<string[]>(editableText.split("\n"))
   // Store the "virtual" column for j/k navigation
   const [virtualColumn, setVirtualColumn] = useState<number>(0)
+
+  // Refs for auto-scrolling
+  const editorRef = useRef<HTMLDivElement>(null)
+  const cursorRef = useRef<HTMLSpanElement>(null)
+
+  // Effect to scroll to cursor when position changes
+  useEffect(() => {
+    if (cursorRef.current && editorRef.current) {
+      // Get cursor and container positions
+      const cursor = cursorRef.current
+      const container = editorRef.current
+
+      // Calculate if cursor is in view
+      const cursorRect = cursor.getBoundingClientRect()
+      const containerRect = container.getBoundingClientRect()
+
+      // Handle horizontal scrolling
+      if (cursorRect.left < containerRect.left) {
+        // Cursor is to the left of visible area
+        container.scrollLeft -= (containerRect.left - cursorRect.left + 10)
+      } else if (cursorRect.right > containerRect.right) {
+        // Cursor is to the right of visible area
+        container.scrollLeft += (cursorRect.right - containerRect.right + 10)
+      }
+    }
+  }, [cursorPosition])
 
   const updateLines = (text: string) => {
     setEditableText(text)
@@ -227,7 +253,10 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
           </div>
 
           {/* Text content - scrollable */}
-          <div className="flex-1 overflow-x-auto text-lg leading-relaxed font-mono">
+          <div
+            ref={editorRef}
+            className="flex-1 overflow-x-auto text-lg leading-relaxed font-mono"
+          >
             {lines.map((line, lineIdx) => {
               // Calculate line start position in the entire text
               const lineStartPosition =
@@ -248,6 +277,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
                     return (
                       <span
                         key={charIdx}
+                        ref={isCursorPosition ? cursorRef : null}
                         className={`${
                           isCursorPosition
                             ? mode === "normal"
@@ -263,6 +293,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
                   {/* Display cursor on empty line */}
                   {line.length === 0 && isCursorOnThisLine && (
                     <span
+                      ref={cursorRef}
                       className={
                         mode === "normal"
                           ? "bg-emerald-500 text-white rounded"
