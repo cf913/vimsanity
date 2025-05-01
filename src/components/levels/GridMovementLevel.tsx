@@ -24,32 +24,48 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
     y: 0,
   })
   const [showConfetti, setShowConfetti] = useState(false)
-  const [trail, setTrail] = useState<Array<{ x: number; y: number; age: number }>>([])
+  const [trail, setTrail] = useState<
+    Array<{ x: number; y: number; age: number }>
+  >([])
   const [isMoving, setIsMoving] = useState(false)
+  const [targetEaten, setTargetEaten] = useState<{
+    x: number
+    y: number
+  } | null>(null)
   const gridSize = 10
 
   // Update trail effect
   useEffect(() => {
     const timer = setInterval(() => {
-      setTrail(prev => 
+      setTrail((prev) =>
         prev
-          .map(pos => ({ ...pos, age: pos.age - 1 }))
-          .filter(pos => pos.age > 0)
-      );
-    }, 100);
-    
-    return () => clearInterval(timer);
-  }, []);
+          .map((pos) => ({ ...pos, age: pos.age - 1 }))
+          .filter((pos) => pos.age > 0)
+      )
+    }, 100)
+
+    return () => clearInterval(timer)
+  }, [])
 
   // Reset movement animation after a short delay
   useEffect(() => {
     if (isMoving) {
       const timer = setTimeout(() => {
-        setIsMoving(false);
-      }, 200);
-      return () => clearTimeout(timer);
+        setIsMoving(false)
+      }, 200)
+      return () => clearTimeout(timer)
     }
-  }, [isMoving]);
+  }, [isMoving])
+
+  // Reset target eaten animation after delay
+  useEffect(() => {
+    if (targetEaten) {
+      const timer = setTimeout(() => {
+        setTargetEaten(null)
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [targetEaten])
 
   // Define key actions for the grid movement level
   const keyActions: KeyActionMap = {
@@ -58,7 +74,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
       setIsMoving(true)
       const newPos = { ...position, x: Math.max(0, position.x - 1) }
       if (newPos.x !== position.x) {
-        setTrail(prev => [...prev, { x: position.x, y: position.y, age: 5 }])
+        setTrail((prev) => [...prev, { x: position.x, y: position.y, age: 5 }])
         setPosition(newPos)
         checkTarget(newPos)
       }
@@ -68,7 +84,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
       setIsMoving(true)
       const newPos = { ...position, x: Math.min(gridSize - 1, position.x + 1) }
       if (newPos.x !== position.x) {
-        setTrail(prev => [...prev, { x: position.x, y: position.y, age: 5 }])
+        setTrail((prev) => [...prev, { x: position.x, y: position.y, age: 5 }])
         setPosition(newPos)
         checkTarget(newPos)
       }
@@ -78,7 +94,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
       setIsMoving(true)
       const newPos = { ...position, y: Math.min(gridSize - 1, position.y + 1) }
       if (newPos.y !== position.y) {
-        setTrail(prev => [...prev, { x: position.x, y: position.y, age: 5 }])
+        setTrail((prev) => [...prev, { x: position.x, y: position.y, age: 5 }])
         setPosition(newPos)
         checkTarget(newPos)
       }
@@ -88,7 +104,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
       setIsMoving(true)
       const newPos = { ...position, y: Math.max(0, position.y - 1) }
       if (newPos.y !== position.y) {
-        setTrail(prev => [...prev, { x: position.x, y: position.y, age: 5 }])
+        setTrail((prev) => [...prev, { x: position.x, y: position.y, age: 5 }])
         setPosition(newPos)
         checkTarget(newPos)
       }
@@ -103,10 +119,13 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
         // You can add sound here if needed
       }
 
+      // Set target eaten position for animation
+      setTargetEaten({ ...target })
+
       // Animate score and show confetti
       setScoreAnimation(true)
       setShowConfetti(true)
-      
+
       setTimeout(() => {
         setScoreAnimation(false)
         setShowConfetti(false)
@@ -136,9 +155,13 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
           Use h, j, k, l to move the cursor to the target
         </p>
         <div className="mt-4 flex items-center justify-center gap-4">
-          <div className={`bg-zinc-800 px-4 py-2 rounded-lg transition-all duration-300 ${
-            scoreAnimation ? 'scale-125 bg-emerald-500 text-white' : ''
-          }`}>
+          <div
+            className={`bg-zinc-800 px-4 py-2 rounded-lg transition-all duration-300 ${
+              scoreAnimation
+                ? "scale-125 bg-emerald-500 text-white shadow-xl shadow-emerald-500/60"
+                : ""
+            }`}
+          >
             Score: {score}
             {showConfetti && (
               <div className="absolute left-1/2 transform -translate-x-1/2">
@@ -151,9 +174,18 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
                       top: `${Math.random() * 10}px`,
                       width: `${Math.random() * 8 + 2}px`,
                       height: `${Math.random() * 8 + 2}px`,
-                      borderRadius: '50%',
-                      background: ['#FF5555', '#55FF55', '#5555FF', '#FFFF55', '#FF55FF', '#55FFFF'][Math.floor(Math.random() * 6)],
-                      animation: `confetti-fall ${Math.random() * 2 + 1}s linear forwards`,
+                      borderRadius: "50%",
+                      background: [
+                        "#FF5555",
+                        "#55FF55",
+                        "#5555FF",
+                        "#FFFF55",
+                        "#FF55FF",
+                        "#55FFFF",
+                      ][Math.floor(Math.random() * 6)],
+                      animation: `confetti-fall ${
+                        Math.random() * 2 + 1
+                      }s linear forwards`,
                       transform: `rotate(${Math.random() * 360}deg)`,
                     }}
                   />
@@ -176,33 +208,70 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
             const y = Math.floor(index / gridSize)
             const isPlayer = x === position.x && y === position.y
             const isTarget = x === target.x && y === target.y
-            const trailCell = trail.find(pos => pos.x === x && pos.y === y);
-            const trailOpacity = trailCell ? trailCell.age / 5 : 0;
+            const isTargetEaten =
+              targetEaten && x === targetEaten.x && y === targetEaten.y
+            const trailCell = trail.find((pos) => pos.x === x && pos.y === y)
+            const trailOpacity = trailCell ? trailCell.age / 5 : 0
 
             return (
               <div
                 key={index}
                 className={`aspect-square w-full rounded-md flex items-center justify-center relative ${
                   isPlayer
-                    ? `bg-emerald-500 shadow-lg shadow-emerald-500/50 scale-110 z-10 ${isMoving ? "animate-fade-in" : ""}`
+                    ? `bg-emerald-500 shadow-lg shadow-emerald-500/60 scale-110 z-10 ${
+                        isMoving ? "animate-fade-in" : ""
+                      }`
                     : isTarget
-                    ? "bg-purple-500 shadow-lg shadow-purple-500/50 animate-pulse"
+                    ? "bg-purple-500 shadow-lg shadow-purple-500/60 animate-pulse"
                     : "bg-zinc-800"
                 }`}
                 style={{
-                  boxShadow: isPlayer ? '0 0 15px rgba(16, 185, 129, 0.6)' : (isTarget ? '0 0 15px rgba(168, 85, 247, 0.6)' : ''),
+                  boxShadow: isPlayer
+                    ? "0 0 20px rgba(16, 185, 129, 0.7)"
+                    : isTarget
+                    ? "0 0 20px rgba(168, 85, 247, 0.7)"
+                    : "",
                 }}
               >
                 {trailCell && !isPlayer && !isTarget && (
-                  <div 
+                  <div
                     className="absolute inset-0 rounded-md bg-emerald-500/40"
-                    style={{ 
+                    style={{
                       opacity: trailOpacity,
+                      boxShadow: "inset 0 0 10px rgba(16, 185, 129, 0.5)",
                     }}
                   />
                 )}
                 {isTarget && (
                   <div className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30" />
+                )}
+                {isTargetEaten && (
+                  <div className="absolute inset-0 z-20">
+                    <div
+                      className="absolute inset-0 rounded-md bg-white"
+                      style={{
+                        animation: "explosion-ring 0.3s forwards ease-out",
+                      }}
+                    />
+                    <div
+                      className="absolute inset-0 rounded-md bg-purple-500"
+                      style={{
+                        animation: "explosion-glow 0.3s forwards ease-out",
+                      }}
+                    />
+                    {/* {Array.from({ length: 8 }).map((_, i) => (
+                      <div 
+                        key={i}
+                        className="absolute w-2 h-2 bg-white rounded-full"
+                        style={{
+                          left: '50%',
+                          top: '50%',
+                          transform: `translate(-50%, -50%) rotate(${i * 45}deg) translateY(-15px)`,
+                          animation: 'explosion-particle 0.3s forwards ease-out',
+                        }}
+                      />
+                    ))} */}
+                  </div>
                 )}
               </div>
             )
@@ -214,7 +283,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
         <kbd
           className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
             lastKeyPressed === "h"
-              ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110"
+              ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110"
               : ""
           }`}
         >
@@ -223,7 +292,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
         <kbd
           className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
             lastKeyPressed === "j"
-              ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110"
+              ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110"
               : ""
           }`}
         >
@@ -232,7 +301,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
         <kbd
           className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
             lastKeyPressed === "k"
-              ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110"
+              ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110"
               : ""
           }`}
         >
@@ -241,7 +310,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
         <kbd
           className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
             lastKeyPressed === "l"
-              ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110"
+              ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110"
               : ""
           }`}
         >
@@ -259,10 +328,57 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
             opacity: 0;
           }
         }
-        
+
         @keyframes fade-in {
-          0% { opacity: 0.7; transform: scale(1.05); }
-          100% { opacity: 1; transform: scale(1.1); }
+          0% {
+            opacity: 0.7;
+            transform: scale(1.05);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1.1);
+          }
+        }
+
+        @keyframes explosion-ring {
+          0% {
+            transform: scale(0.8);
+            opacity: 0.9;
+          }
+          60% {
+            transform: scale(1.8);
+            opacity: 0.7;
+          }
+          100% {
+            transform: scale(2.5);
+            opacity: 0;
+          }
+        }
+
+        @keyframes explosion-glow {
+          0% {
+            transform: scale(0.8);
+            opacity: 0.9;
+            box-shadow: 0 0 30px 20px rgba(168, 85, 247, 0.8);
+          }
+          100% {
+            transform: scale(1.5);
+            opacity: 0;
+            box-shadow: 0 0 0 0 rgba(168, 85, 247, 0);
+          }
+        }
+
+        @keyframes explosion-particle {
+          0% {
+            opacity: 1;
+            transform: translate(-50%, -50%) rotate(inherit) translateY(-15px)
+              scale(1);
+          }
+          100% {
+            opacity: 0;
+            transform: translate(-50%, -50%) rotate(inherit) translateY(-40px)
+              scale(0);
+          }
         }
       `}</style>
     </div>
