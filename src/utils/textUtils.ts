@@ -118,6 +118,27 @@ export const findLineEnd = (text: string, currentPos: number): number => {
   return endOfLine === -1 ? text.length - 1 : endOfLine - 1;
 };
 
+export const findLineEndColumn = (text: string, currentPos: number): number => {
+  const endOfLine = text.indexOf("\n", currentPos);
+  const trueEndOfLine = endOfLine === -1 ? text.length - 1 : endOfLine - 1;
+  const lineStart = text.lastIndexOf("\n", currentPos - 1) + 1;
+  return trueEndOfLine - lineStart;
+};
+
+export const findLineLength = (text: string, currentPos: number): number => {
+  const lineEnd = text.indexOf("\n", currentPos);
+  const trueLineEnd = lineEnd === -1 ? text.length - 1 : lineEnd - 1;
+  const lineStart = text.lastIndexOf("\n", currentPos - 1) + 1;
+  return trueLineEnd - lineStart;
+};
+
+export const isLineEmpty = (text: string, currentPos: number): boolean => {
+  const lineEnd = findLineEnd(text, currentPos) + 1;
+  const lineStart = findLineStart(text, currentPos);
+  console.log({ lineEnd, lineStart });
+  return lineEnd - lineStart === 0;
+};
+
 /**
  * Move to the next line at the same column
  */

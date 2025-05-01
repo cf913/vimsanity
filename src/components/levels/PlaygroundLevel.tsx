@@ -5,7 +5,10 @@ import {
 } from "../../hooks/useKeyboardHandler";
 import {
   findLineEnd,
+  findLineEndColumn,
+  findLineLength,
   findLineStart,
+  isLineEmpty,
   moveToNextLine,
   moveToNextWordBoundary,
   moveToPrevLine,
@@ -143,21 +146,10 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
       // Cannot go up if already at first line
       if (currentLineStart <= 0) return;
 
-      // Handle special case for empty line
-      console.log("======= can go up");
-      console.log("current line start", currentLineStart);
-      console.log("current column", currentColumn);
-
       // Find the previous line boundaries
       const prevLineEnd = currentLineStart - 1;
       const prevLineStart = editableText.lastIndexOf("\n", prevLineEnd - 1) + 1;
       const prevLineLength = prevLineEnd - prevLineStart;
-
-      console.log("prev line end", prevLineEnd);
-      console.log("prev line start", prevLineStart);
-      console.log("prev line length", prevLineLength);
-
-      console.log("next position", virtualColumn);
 
       // Set cursor to appropriate position in previous line based on virtual column
       setCursorToLineAndColumn(prevLineStart, virtualColumn, prevLineLength);
@@ -177,11 +169,31 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
     },
     "0": () => {
       setCursorPosition(findLineStart(editableText, cursorPosition));
+      setVirtualColumn(0);
     },
     $: () => {
       setCursorPosition(findLineEnd(editableText, cursorPosition));
+      // Update virtual column when moving horizontally
+      setVirtualColumn(findLineEndColumn(editableText, cursorPosition));
     },
     i: () => {
+      setMode("insert");
+    },
+    I: () => {
+      setCursorPosition(findLineStart(editableText, cursorPosition));
+      setVirtualColumn(0);
+      setMode("insert");
+    },
+    a: () => {
+      if (!isLineEmpty(editableText, cursorPosition)) {
+        setCursorPosition(cursorPosition + 1);
+      }
+      // Update virtual column when moving horizontally
+      setMode("insert");
+    },
+    A: () => {
+      setCursorPosition(findLineEnd(editableText, cursorPosition) + 1);
+      setVirtualColumn(findLineEndColumn(editableText, cursorPosition));
       setMode("insert");
     },
     x: () => {
@@ -193,13 +205,18 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
       }
     },
     Escape: () => {
-      setMode("normal");
+      // setMode("normal");
     },
   };
 
   // Define insert mode key actions
   const insertModeActions: KeyActionMap = {
     Escape: () => {
+      // if cursor is at the end of the line move one character to the left
+      const lineStart = findLineStart(editableText, cursorPosition);
+      const nextCursorPosition = Math.max(lineStart, cursorPosition - 1);
+      setCursorPosition(nextCursorPosition);
+      setVirtualColumn(nextCursorPosition - lineStart);
       setMode("normal");
     },
     Backspace: () => {
