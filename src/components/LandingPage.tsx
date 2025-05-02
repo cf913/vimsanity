@@ -1,73 +1,206 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { ArrowRight } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface LandingPageProps {
   onGetStarted: () => void
 }
 
 const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
+  const [isLoaded, setIsLoaded] = useState(false)
+
+  useEffect(() => {
+    // Immediate loading for snappier experience
+    setIsLoaded(true)
+  }, [])
+
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1, // Faster staggering
+        delayChildren: 0.1, // Reduced delay
+        duration: 0.3, // Faster overall animation
+      }
+    }
+  }
+
+  const item = {
+    hidden: { y: 10, opacity: 0 }, // Reduced distance for snappier feel
+    show: { 
+      y: 0, 
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 200, // Increased stiffness for snappier motion
+        damping: 12, // Adjusted damping for quick but controlled motion
+        duration: 0.3 // Faster duration
+      }
+    }
+  }
+
+  const buttonVariants = {
+    initial: { scale: 1 },
+    hover: { 
+      scale: 1.03, // Reduced scale for snappier feel
+      boxShadow: "0px 5px 15px rgba(16, 185, 129, 0.4)",
+      transition: { duration: 0.2 } // Faster transition
+    },
+    tap: { 
+      scale: 0.97, // Less dramatic scale for quicker return
+      transition: { duration: 0.1 } // Very fast tap response
+    }
+  }
+
+  const featureCardVariants = {
+    hover: {
+      y: -5, // Reduced movement for snappier feel
+      boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.3)",
+      backgroundColor: "rgb(39, 39, 42)",
+      transition: {
+        type: "spring",
+        stiffness: 400, // Higher stiffness for snappier motion
+        damping: 15, // Adjusted damping
+        duration: 0.2 // Faster duration
+      }
+    }
+  }
+
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-zinc-900 text-zinc-100 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl w-full text-center space-y-8">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight">
-          <span className="block">Welcome to</span>
-          <span className="block text-emerald-400 mt-2">VimSanity</span>
-        </h1>
-
-        <p className="text-xl sm:text-2xl text-zinc-300 mt-6 max-w-2xl mx-auto">
-          Master Vim motions through interactive gameplay and become a text
-          editing ninja.
-        </p>
-
-        <div className="mt-8 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-            <div className="bg-zinc-800 p-5 rounded-lg">
-              <h3 className="text-lg font-medium text-emerald-400">
-                Learn by Doing
-              </h3>
-              <p className="mt-2 text-zinc-400">
-                Practice Vim motions in a fun, interactive environment
-              </p>
-            </div>
-            <div className="bg-zinc-800 p-5 rounded-lg">
-              <h3 className="text-lg font-medium text-emerald-400">
-                Progressive Challenges
-              </h3>
-              <p className="mt-2 text-zinc-400">
-                Start with basics and advance to complex movement patterns
-              </p>
-            </div>
-            <div className="bg-zinc-800 p-5 rounded-lg">
-              <h3 className="text-lg font-medium text-emerald-400">
-                Instant Feedback
-              </h3>
-              <p className="mt-2 text-zinc-400">
-                See your progress and improve with each session
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-10">
-          <button
-            onClick={onGetStarted}
-            className="inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-md text-black bg-emerald-400 hover:bg-emerald-500 transition-colors duration-300"
-            aria-label="Get started with VimSanity"
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-zinc-900 to-zinc-800 text-zinc-100 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <div 
+        className="absolute inset-0 w-full h-full overflow-hidden z-0"
+        style={{ 
+          backgroundImage: "radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.05) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(16, 185, 129, 0.05) 0%, transparent 50%)"
+        }}
+      />
+      
+      <AnimatePresence>
+        {isLoaded && (
+          <motion.div 
+            className="max-w-3xl w-full text-center space-y-8 relative z-10"
+            initial="hidden"
+            animate="show"
+            variants={container}
           >
-            Get Started <ArrowRight className="ml-2" size={20} />
-          </button>
-        </div>
-      </div>
+            <motion.div variants={item} layout>
+              <motion.h1 
+                className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, type: "spring", stiffness: 200 }}
+              >
+                <span className="block bg-clip-text text-transparent bg-gradient-to-r from-zinc-100 to-zinc-300">Welcome to</span>
+                <motion.span 
+                  className="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600 mt-2"
+                  whileHover={{ scale: 1.01 }}
+                  transition={{ type: "spring", stiffness: 400, duration: 0.2 }}
+                >
+                  VimSanity
+                </motion.span>
+              </motion.h1>
+            </motion.div>
+
+            <motion.p 
+              className="text-xl sm:text-2xl text-zinc-300 mt-4 max-w-2xl mx-auto leading-relaxed"
+              variants={item}
+            >
+              Master Vim motions through interactive gameplay and become a text
+              editing ninja.
+            </motion.p>
+
+            <motion.div 
+              className="mt-8 space-y-6"
+              variants={item}
+            >
+              <motion.div 
+                className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left"
+                variants={container}
+              >
+                {[
+                  {
+                    title: "Learn by Doing",
+                    description: "Practice Vim motions in a fun, interactive environment"
+                  },
+                  {
+                    title: "Progressive Challenges",
+                    description: "Start with basics and advance to complex movement patterns"
+                  },
+                  {
+                    title: "Instant Feedback",
+                    description: "See your progress and improve with each session"
+                  }
+                ].map((feature, index) => (
+                  <motion.div
+                    key={index}
+                    className="bg-zinc-800/80 backdrop-blur-sm p-5 rounded-xl border border-zinc-700/50 shadow-lg transform transition-all"
+                    variants={item}
+                    whileHover={featureCardVariants.hover}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ 
+                      delay: index * 0.05, // Very slight staggering
+                      duration: 0.2 
+                    }}
+                  >
+                    <h3 className="text-lg font-medium text-emerald-400 mb-2">
+                      {feature.title}
+                    </h3>
+                    <p className="text-zinc-400">
+                      {feature.description}
+                    </p>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </motion.div>
+
+            <motion.div 
+              className="mt-8"
+              variants={item}
+            >
+              <motion.button
+                onClick={onGetStarted}
+                className="inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-black bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 shadow-lg"
+                aria-label="Get started with VimSanity"
+                initial="initial"
+                whileHover="hover"
+                whileTap="tap"
+                variants={buttonVariants}
+              >
+                <span>Get Started</span>
+                <motion.div
+                  className="ml-2"
+                  animate={{ x: [0, 4, 0] }}
+                  transition={{ 
+                    repeat: Infinity, 
+                    repeatDelay: 1, 
+                    duration: 0.5, 
+                    ease: "easeInOut" 
+                  }}
+                >
+                  <ArrowRight size={20} />
+                </motion.div>
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* SEO-friendly footer with additional info */}
-      <footer className="fixed bottom-0 left-0 right-0 py-6 w-full">
+      <motion.footer 
+        className="fixed bottom-0 left-0 right-0 py-5 w-full backdrop-blur-sm bg-zinc-900/30"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         <div className="text-center text-zinc-500 text-sm">
           <p>VimSanity - The interactive way to master Vim motions</p>
           <p className="mt-1">
             Improve your productivity with keyboard-driven text editing
           </p>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   )
 }
