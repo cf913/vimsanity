@@ -1,14 +1,14 @@
-import React from "react";
-import { BookOpen, Lock, Volume2, VolumeX, X, ChevronRight } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import React from "react"
+import { BookOpen, Lock, Volume2, VolumeX, X, ChevronRight } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface SidebarProps {
-  currentLevel: number;
-  setCurrentLevel: (level: number) => void;
-  isMuted: boolean;
-  setIsMuted: (muted: boolean) => void;
-  onClose: () => void;
-  onReturnToLanding: () => void;
+  currentLevel: number
+  setCurrentLevel: (level: number) => void
+  isMuted: boolean
+  setIsMuted: (muted: boolean) => void
+  onClose: () => void
+  onReturnToLanding: () => void
 }
 
 const levels = [
@@ -39,7 +39,7 @@ const levels = [
     description: "Jump to specific characters",
     locked: true,
   },
-];
+]
 
 const Sidebar: React.FC<SidebarProps> = ({
   currentLevel,
@@ -52,72 +52,71 @@ const Sidebar: React.FC<SidebarProps> = ({
   // Animation variants
   const sidebarVariants = {
     hidden: { opacity: 0, x: -20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       x: 0,
-      transition: { 
+      transition: {
         duration: 0.3,
         staggerChildren: 0.07,
-        when: "beforeChildren" 
-      }
-    }
-  };
+        when: "beforeChildren",
+      },
+    },
+  }
 
   const itemVariants = {
     hidden: { opacity: 0, x: -10 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       x: 0,
-      transition: { 
-        type: "spring", 
-        stiffness: 300, 
-        damping: 24 
-      }
-    }
-  };
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 24,
+      },
+    },
+  }
 
   const buttonVariants = {
     initial: { scale: 1 },
-    hover: { 
-      scale: 1.02,
-      transition: { duration: 0.2 }
+    hover: {
+      transition: { duration: 0.2 },
     },
-    tap: { scale: 0.98 }
-  };
+    tap: { scale: 1 },
+  }
 
   const levelButtonVariants = {
-    initial: (locked: boolean) => ({ 
+    initial: (locked: boolean) => ({
       scale: 1,
-      opacity: locked ? 0.7 : 1
+      opacity: locked ? 0.7 : 1,
     }),
-    hover: (locked: boolean) => ({ 
-      scale: locked ? 1 : 1.02,
-      y: locked ? 0 : -2,
+    hover: (locked: boolean) => ({
+      scale: locked ? 1 : 1,
+      y: locked ? 0 : 0,
       opacity: locked ? 0.8 : 1,
-      transition: { duration: 0.2 }
+      transition: { duration: 0 },
     }),
-    tap: (locked: boolean) => ({ 
+    tap: (locked: boolean) => ({
       scale: locked ? 1 : 0.98,
-      transition: { duration: 0.1 }
+      transition: { duration: 0 },
     }),
-    active: { 
+    active: {
       scale: 1.03,
-      boxShadow: "0px 4px 8px rgba(16, 185, 129, 0.25)"
-    }
-  };
+      boxShadow: "0px 4px 8px rgba(16, 185, 129, 0.25)",
+    },
+  }
 
   return (
-    <motion.div 
+    <motion.div
       className="w-64 h-full bg-zinc-800 p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-600 scrollbar-track-zinc-800"
       initial="hidden"
       animate="visible"
       variants={sidebarVariants}
     >
-      <motion.div 
+      <motion.div
         className="flex items-center justify-between mb-8"
         variants={itemVariants}
       >
-        <motion.div 
+        <motion.div
           className="flex items-center gap-2 cursor-pointer group"
           onClick={onReturnToLanding}
           whileHover={{ scale: 1.03 }}
@@ -133,7 +132,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             VimSanity
           </h1>
         </motion.div>
-        
+
         <motion.button
           onClick={onClose}
           className="p-2 hover:bg-zinc-700 rounded-lg transition-colors"
@@ -145,14 +144,8 @@ const Sidebar: React.FC<SidebarProps> = ({
         </motion.button>
       </motion.div>
 
-      <motion.div 
-        className="space-y-3"
-        variants={itemVariants}
-      >
-        <motion.div 
-          className="mb-4 px-1"
-          variants={itemVariants}
-        >
+      <motion.div className="space-y-3" variants={itemVariants}>
+        <motion.div className="mb-4 px-1" variants={itemVariants}>
           <h2 className="text-sm uppercase tracking-wider text-zinc-400 font-semibold mb-2">
             Levels
           </h2>
@@ -173,8 +166,8 @@ const Sidebar: React.FC<SidebarProps> = ({
               currentLevel === level.id
                 ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-emerald-400"
                 : level.locked
-                  ? "bg-zinc-700/50 text-zinc-500 cursor-not-allowed border-zinc-700"
-                  : "bg-zinc-700/80 hover:bg-zinc-700 border-zinc-600 hover:border-zinc-500"
+                ? "bg-zinc-700/50 text-zinc-500 cursor-not-allowed border-zinc-700"
+                : "bg-zinc-700/80 hover:bg-zinc-700 border-zinc-600 hover:border-zinc-500"
             }`}
           >
             <div className="flex items-center justify-between">
@@ -184,19 +177,25 @@ const Sidebar: React.FC<SidebarProps> = ({
               ) : currentLevel === level.id ? (
                 <motion.div
                   animate={{ x: [0, 3, 0] }}
-                  transition={{ repeat: Infinity, repeatDelay: 2, duration: 0.5 }}
+                  transition={{
+                    repeat: Infinity,
+                    repeatDelay: 2,
+                    duration: 0.5,
+                  }}
                 >
                   <ChevronRight size={16} />
                 </motion.div>
               ) : null}
             </div>
             <p className="text-sm mt-1 opacity-90">{level.title}</p>
-            <p className="text-xs mt-1 text-zinc-400 line-clamp-1">{level.description}</p>
+            <p className="text-xs mt-1 text-zinc-400 line-clamp-1">
+              {level.description}
+            </p>
           </motion.button>
         ))}
       </motion.div>
 
-      <motion.div 
+      <motion.div
         className="mt-8 pt-4 border-t border-zinc-700"
         variants={itemVariants}
       >
@@ -220,7 +219,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         </motion.button>
       </motion.div>
     </motion.div>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar
