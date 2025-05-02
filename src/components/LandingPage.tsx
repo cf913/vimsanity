@@ -67,6 +67,30 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
     }
   }
 
+  // Generate floating squares data
+  const floatingSquares = Array.from({ length: 20 }, (_, i) => {
+    const size = Math.floor(Math.random() * 60) + 20; // Random size between 20-80px
+    const initialX = Math.random() * 100; // Random X position (0-100%)
+    const initialY = Math.random() * 100; // Random Y position (0-100%)
+    const duration = Math.random() * 30 + 50; // Random duration between 50-80s for slow movement
+    const delay = Math.random() * -30; // Random delay for staggered animation start
+    
+    // Alternate between purple and green with some variation
+    const isGreen = i % 2 === 0;
+    const colorIntensity = Math.random() * 0.2 + 0.1; // Random opacity between 0.1-0.3 for subtle effect
+    
+    return {
+      id: i,
+      size,
+      initialX,
+      initialY,
+      duration,
+      delay,
+      isGreen,
+      colorIntensity
+    };
+  });
+
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-zinc-900 to-zinc-800 text-zinc-100 px-4 sm:px-6 lg:px-8 overflow-hidden">
       <div 
@@ -74,7 +98,65 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         style={{ 
           backgroundImage: "radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.05) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(16, 185, 129, 0.05) 0%, transparent 50%)"
         }}
-      />
+      >
+        {/* Floating squares animation */}
+        {floatingSquares.map((square) => (
+          <motion.div
+            key={square.id}
+            className="absolute rounded-md aspect-square"
+            style={{
+              width: square.size,
+              left: `${square.initialX}%`,
+              top: `${square.initialY}%`,
+              backgroundColor: square.isGreen 
+                ? `rgba(16, 185, 129, ${square.colorIntensity})` 
+                : `rgba(168, 85, 247, ${square.colorIntensity})`,
+              filter: `blur(2px) drop-shadow(0 0 8px ${square.isGreen 
+                ? `rgba(16, 185, 129, ${square.colorIntensity + 0.2})` 
+                : `rgba(168, 85, 247, ${square.colorIntensity + 0.2})`})`,
+              zIndex: 0,
+            }}
+            animate={{
+              x: [
+                0,
+                Math.random() * 100 - 50, // Random movement between -50px and 50px
+                Math.random() * 100 - 50,
+                Math.random() * 100 - 50,
+                0
+              ],
+              y: [
+                0,
+                Math.random() * 100 - 50,
+                Math.random() * 100 - 50,
+                Math.random() * 100 - 50,
+                0
+              ],
+              rotate: [0, Math.random() * 40 - 20, 0, Math.random() * 40 - 20, 0],
+              scale: [
+                1,
+                1 + Math.random() * 0.2, // Subtle scale change
+                1,
+                1 + Math.random() * 0.2,
+                1
+              ],
+              opacity: [
+                square.colorIntensity,
+                square.colorIntensity + 0.1,
+                square.colorIntensity,
+                square.colorIntensity + 0.1,
+                square.colorIntensity
+              ]
+            }}
+            transition={{
+              duration: square.duration,
+              ease: "easeInOut",
+              times: [0, 0.25, 0.5, 0.75, 1],
+              repeat: Infinity,
+              delay: square.delay,
+            }}
+          />
+        ))}
+      </div>
       
       <AnimatePresence>
         {isLoaded && (
@@ -201,6 +283,33 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           </p>
         </div>
       </motion.footer>
+
+      {/* Custom animation keyframes */}
+      <style jsx global>{`
+        @keyframes glow-pulse {
+          0% {
+            box-shadow: 0 0 5px rgba(168, 85, 247, 0.3);
+          }
+          50% {
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+          }
+          100% {
+            box-shadow: 0 0 5px rgba(168, 85, 247, 0.3);
+          }
+        }
+
+        @keyframes green-glow-pulse {
+          0% {
+            box-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
+          }
+          50% {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+          }
+          100% {
+            box-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
+          }
+        }
+      `}</style>
     </div>
   )
 }
