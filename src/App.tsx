@@ -23,6 +23,10 @@ function App() {
     setShowLandingPage(false);
   };
 
+  const handleReturnToLanding = () => {
+    setShowLandingPage(true);
+  };
+
   // If showing landing page, render only that
   if (showLandingPage) {
     return (
@@ -47,6 +51,7 @@ function App() {
           isMuted={isMuted}
           setIsMuted={setIsMuted}
           onClose={onCloseSidebar}
+          onReturnToLanding={handleReturnToLanding}
         />
       </div>
 

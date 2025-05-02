@@ -7,6 +7,7 @@ interface SidebarProps {
   isMuted: boolean;
   setIsMuted: (muted: boolean) => void;
   onClose: () => void;
+  onReturnToLanding: () => void;
 }
 
 const levels = [
@@ -45,11 +46,15 @@ const Sidebar: React.FC<SidebarProps> = ({
   isMuted,
   setIsMuted,
   onClose,
+  onReturnToLanding,
 }) => {
   return (
     <div className="w-64 h-full bg-zinc-800 p-4">
       <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-2">
+        <div 
+          className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={onReturnToLanding}
+        >
           <BookOpen className="text-emerald-500" />
           <h1 className="text-xl font-bold font-mono">VimSanity</h1>
         </div>
