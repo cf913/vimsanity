@@ -3,7 +3,12 @@ import {
   useKeyboardHandler,
   KeyActionMap,
 } from "../../hooks/useKeyboardHandler"
-import { processTextForVim } from "../../utils/textUtils"
+import {
+  processTextForVim,
+  moveToNextWordBoundary,
+  moveToPrevWordBoundary,
+  moveToWordEnd,
+} from "../../utils/textUtils"
 
 interface WordMovementLevelProps {
   isMuted: boolean
@@ -48,29 +53,19 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
       }
     },
     w: () => {
-      // Move to next non-space square
-      let next = squarePosition + 1
-      while (next < squares.length && squares[next].isSpace) next++
-      if (next < squares.length) {
-        setSquarePosition(next)
-        checkTarget(next)
-      }
+      const newPos = moveToNextWordBoundary(characters, squarePosition)
+      setSquarePosition(newPos)
+      checkTarget(newPos)
     },
     e: () => {
-      // Move to end of current sequence of non-space squares
-      let end = squarePosition
-      while (end + 1 < squares.length && !squares[end + 1].isSpace) end++
-      setSquarePosition(end)
-      checkTarget(end)
+      const newPos = moveToWordEnd(characters, squarePosition)
+      setSquarePosition(newPos)
+      checkTarget(newPos)
     },
     b: () => {
-      // Move to previous non-space square
-      let prev = squarePosition - 1
-      while (prev >= 0 && squares[prev].isSpace) prev--
-      if (prev >= 0) {
-        setSquarePosition(prev)
-        checkTarget(prev)
-      }
+      const newPos = moveToPrevWordBoundary(characters, squarePosition)
+      setSquarePosition(newPos)
+      checkTarget(newPos)
     },
   }
 
