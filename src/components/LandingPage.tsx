@@ -22,35 +22,35 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         staggerChildren: 0.1, // Faster staggering
         delayChildren: 0.1, // Reduced delay
         duration: 0.3, // Faster overall animation
-      }
-    }
+      },
+    },
   }
 
   const item = {
     hidden: { y: 10, opacity: 0 }, // Reduced distance for snappier feel
-    show: { 
-      y: 0, 
+    show: {
+      y: 0,
       opacity: 1,
       transition: {
         type: "spring",
         stiffness: 200, // Increased stiffness for snappier motion
         damping: 12, // Adjusted damping for quick but controlled motion
-        duration: 0.3 // Faster duration
-      }
-    }
+        duration: 0.3, // Faster duration
+      },
+    },
   }
 
   const buttonVariants = {
     initial: { scale: 1 },
-    hover: { 
+    hover: {
       scale: 1.03, // Reduced scale for snappier feel
       boxShadow: "0px 5px 15px rgba(16, 185, 129, 0.4)",
-      transition: { duration: 0.2 } // Faster transition
+      transition: { duration: 0.2 }, // Faster transition
     },
-    tap: { 
+    tap: {
       scale: 0.97, // Less dramatic scale for quicker return
-      transition: { duration: 0.1 } // Very fast tap response
-    }
+      transition: { duration: 0.1 }, // Very fast tap response
+    },
   }
 
   const featureCardVariants = {
@@ -62,23 +62,23 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         type: "spring",
         stiffness: 400, // Higher stiffness for snappier motion
         damping: 15, // Adjusted damping
-        duration: 0.2 // Faster duration
-      }
-    }
+        duration: 0.2, // Faster duration
+      },
+    },
   }
 
   // Generate floating squares data
   const floatingSquares = Array.from({ length: 20 }, (_, i) => {
-    const size = Math.floor(Math.random() * 60) + 20; // Random size between 20-80px
-    const initialX = Math.random() * 100; // Random X position (0-100%)
-    const initialY = Math.random() * 100; // Random Y position (0-100%)
-    const duration = Math.random() * 30 + 50; // Random duration between 50-80s for slow movement
-    const delay = Math.random() * -30; // Random delay for staggered animation start
-    
+    const size = Math.floor(Math.random() * 60) + 20 // Random size between 20-80px
+    const initialX = Math.random() * 100 // Random X position (0-100%)
+    const initialY = Math.random() * 100 // Random Y position (0-100%)
+    const duration = Math.random() * 30 + 50 // Random duration between 50-80s for slow movement
+    const delay = Math.random() * -30 // Random delay for staggered animation start
+
     // Alternate between purple and green with some variation
-    const isGreen = i % 2 === 0;
-    const colorIntensity = Math.random() * 0.2 + 0.1; // Random opacity between 0.1-0.3 for subtle effect
-    
+    const isGreen = i % 2 === 0
+    const colorIntensity = Math.random() * 0.2 + 0.1 // Random opacity between 0.1-0.3 for subtle effect
+
     return {
       id: i,
       size,
@@ -87,16 +87,17 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       duration,
       delay,
       isGreen,
-      colorIntensity
-    };
-  });
+      colorIntensity,
+    }
+  })
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-zinc-900 to-zinc-800 text-zinc-100 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      <div 
+      <div
         className="absolute inset-0 w-full h-full overflow-hidden z-0"
-        style={{ 
-          backgroundImage: "radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.05) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(16, 185, 129, 0.05) 0%, transparent 50%)"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.05) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(16, 185, 129, 0.05) 0%, transparent 50%)",
         }}
       >
         {/* Floating squares animation */}
@@ -108,12 +109,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               width: square.size,
               left: `${square.initialX}%`,
               top: `${square.initialY}%`,
-              backgroundColor: square.isGreen 
-                ? `rgba(16, 185, 129, ${square.colorIntensity})` 
+              backgroundColor: square.isGreen
+                ? `rgba(16, 185, 129, ${square.colorIntensity})`
                 : `rgba(168, 85, 247, ${square.colorIntensity})`,
-              filter: `blur(2px) drop-shadow(0 0 8px ${square.isGreen 
-                ? `rgba(16, 185, 129, ${square.colorIntensity + 0.2})` 
-                : `rgba(168, 85, 247, ${square.colorIntensity + 0.2})`})`,
+              filter: `blur(2px) drop-shadow(0 0 8px ${
+                square.isGreen
+                  ? `rgba(16, 185, 129, ${square.colorIntensity + 0.2})`
+                  : `rgba(168, 85, 247, ${square.colorIntensity + 0.2})`
+              })`,
               zIndex: 0,
             }}
             animate={{
@@ -122,30 +125,36 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 Math.random() * 100 - 50, // Random movement between -50px and 50px
                 Math.random() * 100 - 50,
                 Math.random() * 100 - 50,
-                0
+                0,
               ],
               y: [
                 0,
                 Math.random() * 100 - 50,
                 Math.random() * 100 - 50,
                 Math.random() * 100 - 50,
-                0
+                0,
               ],
-              rotate: [0, Math.random() * 40 - 20, 0, Math.random() * 40 - 20, 0],
+              rotate: [
+                0,
+                Math.random() * 40 - 20,
+                0,
+                Math.random() * 40 - 20,
+                0,
+              ],
               scale: [
                 1,
                 1 + Math.random() * 0.2, // Subtle scale change
                 1,
                 1 + Math.random() * 0.2,
-                1
+                1,
               ],
               opacity: [
                 square.colorIntensity,
                 square.colorIntensity + 0.1,
                 square.colorIntensity,
                 square.colorIntensity + 0.1,
-                square.colorIntensity
-              ]
+                square.colorIntensity,
+              ],
             }}
             transition={{
               duration: square.duration,
@@ -157,24 +166,26 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           />
         ))}
       </div>
-      
+
       <AnimatePresence>
         {isLoaded && (
-          <motion.div 
+          <motion.div
             className="max-w-3xl w-full text-center space-y-8 relative z-10"
             initial="hidden"
             animate="show"
             variants={container}
           >
             <motion.div variants={item} layout>
-              <motion.h1 
+              <motion.h1
                 className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, type: "spring", stiffness: 200 }}
               >
-                <span className="block bg-clip-text text-transparent bg-gradient-to-r from-zinc-100 to-zinc-300">Welcome to</span>
-                <motion.span 
+                <span className="block bg-clip-text text-transparent bg-gradient-to-r from-zinc-100 to-zinc-300">
+                  Welcome to
+                </span>
+                <motion.span
                   className="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600 mt-2"
                   whileHover={{ scale: 1.01 }}
                   transition={{ type: "spring", stiffness: 400, duration: 0.2 }}
@@ -184,7 +195,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               </motion.h1>
             </motion.div>
 
-            <motion.p 
+            <motion.p
               className="text-xl sm:text-2xl text-zinc-300 mt-4 max-w-2xl mx-auto leading-relaxed"
               variants={item}
             >
@@ -192,27 +203,27 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               editing ninja.
             </motion.p>
 
-            <motion.div 
-              className="mt-8 space-y-6"
-              variants={item}
-            >
-              <motion.div 
+            <motion.div className="mt-8 space-y-6" variants={item}>
+              <motion.div
                 className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left"
                 variants={container}
               >
                 {[
                   {
                     title: "Learn by Doing",
-                    description: "Practice Vim motions in a fun, interactive environment"
+                    description:
+                      "Practice Vim motions in a fun, interactive environment",
                   },
                   {
                     title: "Progressive Challenges",
-                    description: "Start with basics and advance to complex movement patterns"
+                    description:
+                      "Start with basics and advance to complex movement patterns",
                   },
                   {
                     title: "Instant Feedback",
-                    description: "See your progress and improve with each session"
-                  }
+                    description:
+                      "See your progress and improve with each session",
+                  },
                 ].map((feature, index) => (
                   <motion.div
                     key={index}
@@ -221,26 +232,21 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                     whileHover={featureCardVariants.hover}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ 
+                    transition={{
                       delay: index * 0.05, // Very slight staggering
-                      duration: 0.2 
+                      duration: 0.2,
                     }}
                   >
                     <h3 className="text-lg font-medium text-emerald-400 mb-2">
                       {feature.title}
                     </h3>
-                    <p className="text-zinc-400">
-                      {feature.description}
-                    </p>
+                    <p className="text-zinc-400">{feature.description}</p>
                   </motion.div>
                 ))}
               </motion.div>
             </motion.div>
 
-            <motion.div 
-              className="mt-8"
-              variants={item}
-            >
+            <motion.div className="mt-8" variants={item}>
               <motion.button
                 onClick={onGetStarted}
                 className="inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-black bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 shadow-lg"
@@ -254,11 +260,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 <motion.div
                   className="ml-2"
                   animate={{ x: [0, 4, 0] }}
-                  transition={{ 
-                    repeat: Infinity, 
-                    repeatDelay: 1, 
-                    duration: 0.5, 
-                    ease: "easeInOut" 
+                  transition={{
+                    repeat: Infinity,
+                    repeatDelay: 1,
+                    duration: 0.5,
+                    ease: "easeInOut",
                   }}
                 >
                   <ArrowRight size={20} />
@@ -270,7 +276,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       </AnimatePresence>
 
       {/* SEO-friendly footer with additional info */}
-      <motion.footer 
+      <motion.footer
         className="fixed bottom-0 left-0 right-0 py-5 w-full backdrop-blur-sm bg-zinc-900/30"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -285,7 +291,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       </motion.footer>
 
       {/* Custom animation keyframes */}
-      <style jsx global>{`
+      <style>{`
         @keyframes glow-pulse {
           0% {
             box-shadow: 0 0 5px rgba(168, 85, 247, 0.3);
