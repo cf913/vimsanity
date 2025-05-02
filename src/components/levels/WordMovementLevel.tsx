@@ -9,6 +9,8 @@ import {
   moveToPrevWordBoundary,
   moveToWordEnd,
 } from "../../utils/textUtils";
+import ExplosionEffect from "./ExplosionEffect";
+import ConfettiBurst from "./ConfettiBurst";
 
 interface WordMovementLevelProps {
   isMuted: boolean;
@@ -27,6 +29,9 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
   const [squarePosition, setSquarePosition] = useState<number>(0);
   const [squareTarget, setSquareTarget] = useState<number>(5);
   const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [showExplosion, setShowExplosion] = useState(false);
+  const [explosionIdx, setExplosionIdx] = useState<number | null>(null);
 
   // Ref for scrolling
   const containerRef = useRef<HTMLDivElement>(null);
@@ -79,7 +84,11 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
         // Add sound here if needed
       }
       setScore(score + 1);
-      // Set a new random target that's not a space or current position
+      setShowExplosion(true);
+      setExplosionIdx(newPos);
+      setShowConfetti(true);
+      setTimeout(() => setShowExplosion(false), 350);
+      setTimeout(() => setShowConfetti(false), 1500);
       let newTarget;
       do {
         newTarget = Math.floor(Math.random() * squares.length);
@@ -107,29 +116,44 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
           </div>
         </div>
         <div className="relative w-full max-w-3xl bg-zinc-800 p-6 rounded-lg mx-auto overflow-visible">
+          {/* Global Confetti Burst over the game area */}
+          {showConfetti && <ConfettiBurst />}
           <div
             ref={containerRef}
-            className="flex flex-row flex-nowrap scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 whitespace-nowrap py-2 overflow-visible"
+            className="flex flex-row flex-nowrap overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 whitespace-nowrap py-2"
             style={{ scrollBehavior: "smooth" }}
           >
             {squares.map((square, idx) => {
               if (square.isSpace) {
                 return <span key={idx} className="inline-block w-4 h-8"></span>;
               }
+              const isPlayer = idx === squarePosition;
+              const isTarget = idx === squareTarget;
               let base =
-                "inline-flex items-center justify-center mx-0.5 my-0.5 w-8 h-8 transition-all duration-150 ";
-              if (idx === squarePosition)
+                "inline-flex items-center justify-center mx-0.5 my-0.5 w-8 h-8 transition-all duration-150 rounded-md ";
+              if (isPlayer)
                 base +=
                   "bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-500/50 ";
-              else if (idx === squareTarget)
-                base += "bg-purple-500 text-white scale-105 ";
+              else if (isTarget)
+                base +=
+                  "bg-purple-500 text-white scale-105 shadow-lg shadow-purple-500/60 animate-pulse ";
               else base += "bg-zinc-700 text-zinc-300 ";
               return (
                 <span
                   key={idx}
-                  ref={idx === squarePosition ? playerRef : undefined}
-                  className={base + "rounded-md"}
-                ></span>
+                  ref={isPlayer ? playerRef : undefined}
+                  className={base}
+                  style={{ position: "relative" }}
+                >
+                  {isTarget && (
+                    <>
+                      <span className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30 z-0"></span>
+                      {showExplosion && explosionIdx === idx && (
+                        <ExplosionEffect />
+                      )}
+                    </>
+                  )}
+                </span>
               );
             })}
           </div>
