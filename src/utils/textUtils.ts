@@ -38,12 +38,16 @@ export const isWordBoundary = (text: string[], index: number): boolean => {
  * Check if a character at the given index is at a word end
  */
 export const isWordEnd = (text: string[], index: number): boolean => {
-  if (index >= text.length - 1 || index < 0) return false;
+  if (index < 0) return false;
   const current = text[index];
   const next = text[index + 1];
 
+  console.log("current", current);
+  console.log("next", next);
+
   // Word end conditions
   const isNextSpace = /\s/.test(next);
+  const isNextEndOfLine = index >= text.length - 1;
   const isCurrentPunctuation =
     /[.,;:!?()[\]{}'"<>\/\\|+=\-*&^%$#@!~`]/.test(current) && current !== "_";
   const isNextPunctuation =
@@ -54,6 +58,7 @@ export const isWordEnd = (text: string[], index: number): boolean => {
   // 2. A punctuation before a non-punctuation
   // 3. A non-punctuation before a punctuation
   return (
+    isNextEndOfLine ||
     (isNextSpace && !isCurrentPunctuation) ||
     (!isNextPunctuation && isCurrentPunctuation) ||
     (isNextPunctuation && !isCurrentPunctuation)
@@ -79,7 +84,7 @@ export const moveToNextWordBoundary = (
  * Move to the end of current or next word
  */
 export const moveToWordEnd = (text: string[], currentPos: number): number => {
-  for (let i = currentPos + 1; i < text.length - 1; i++) {
+  for (let i = currentPos + 1; i < text.length; i++) {
     if (isWordEnd(text, i)) {
       return i;
     }

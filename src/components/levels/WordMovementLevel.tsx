@@ -1,93 +1,97 @@
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect } from "react";
 import {
   useKeyboardHandler,
   KeyActionMap,
-} from "../../hooks/useKeyboardHandler"
+} from "../../hooks/useKeyboardHandler";
 import {
   processTextForVim,
   moveToNextWordBoundary,
   moveToPrevWordBoundary,
   moveToWordEnd,
-} from "../../utils/textUtils"
+} from "../../utils/textUtils";
 
 interface WordMovementLevelProps {
-  isMuted: boolean
+  isMuted: boolean;
 }
 
 const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
-  const sampleText = "The quick brown fox jumps over the lazy dog"
-  const characters = processTextForVim(sampleText)
+  const sampleText = "The quick brown fox jumps over the lazy dog";
+  const characters = processTextForVim(sampleText);
 
   // We'll use the same number of squares as characters, including spaces for spacing
   const squares = characters.map((char, idx) => ({
     isSpace: char === " ",
     idx,
-  }))
+  }));
 
-  const [squarePosition, setSquarePosition] = useState<number>(0)
-  const [squareTarget, setSquareTarget] = useState<number>(5)
-  const [score, setScore] = useState(0)
+  const [squarePosition, setSquarePosition] = useState<number>(0);
+  const [squareTarget, setSquareTarget] = useState<number>(5);
+  const [score, setScore] = useState(0);
 
   // Ref for scrolling
-  const containerRef = useRef<HTMLDivElement>(null)
-  const playerRef = useRef<HTMLSpanElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (playerRef.current && containerRef.current) {
-      playerRef.current.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" })
+      playerRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
     }
-  }, [squarePosition])
+  }, [squarePosition]);
 
   // Key actions (move left/right, and word boundaries, but now just move between squares)
   const keyActions: KeyActionMap = {
     h: () => {
       if (squarePosition > 0) {
-        setSquarePosition(squarePosition - 1)
-        checkTarget(squarePosition - 1)
+        setSquarePosition(squarePosition - 1);
+        checkTarget(squarePosition - 1);
       }
     },
     l: () => {
       if (squarePosition < squares.length - 1) {
-        setSquarePosition(squarePosition + 1)
-        checkTarget(squarePosition + 1)
+        setSquarePosition(squarePosition + 1);
+        checkTarget(squarePosition + 1);
       }
     },
     w: () => {
-      const newPos = moveToNextWordBoundary(characters, squarePosition)
-      setSquarePosition(newPos)
-      checkTarget(newPos)
+      const newPos = moveToNextWordBoundary(characters, squarePosition);
+      setSquarePosition(newPos);
+      checkTarget(newPos);
     },
     e: () => {
-      const newPos = moveToWordEnd(characters, squarePosition)
-      setSquarePosition(newPos)
-      checkTarget(newPos)
+      const newPos = moveToWordEnd(characters, squarePosition);
+      setSquarePosition(newPos);
+      checkTarget(newPos);
     },
     b: () => {
-      const newPos = moveToPrevWordBoundary(characters, squarePosition)
-      setSquarePosition(newPos)
-      checkTarget(newPos)
+      const newPos = moveToPrevWordBoundary(characters, squarePosition);
+      setSquarePosition(newPos);
+      checkTarget(newPos);
     },
-  }
+  };
 
   const checkTarget = (newPos: number) => {
     if (newPos === squareTarget) {
       if (!isMuted) {
         // Add sound here if needed
       }
-      setScore(score + 1)
+      setScore(score + 1);
       // Set a new random target that's not a space or current position
-      let newTarget
+      let newTarget;
       do {
-        newTarget = Math.floor(Math.random() * squares.length)
-      } while (newTarget === squarePosition || squares[newTarget].isSpace)
-      setSquareTarget(newTarget)
+        newTarget = Math.floor(Math.random() * squares.length);
+      } while (newTarget === squarePosition || squares[newTarget].isSpace);
+      setSquareTarget(newTarget);
     }
-  }
+  };
 
   const { lastKeyPressed } = useKeyboardHandler({
     keyActionMap: keyActions,
     dependencies: [squarePosition, squareTarget, score],
-  })
+  });
 
   return (
     <div className="flex items-center justify-center w-full">
@@ -102,36 +106,31 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
             </div>
           </div>
         </div>
-        <div className="relative w-full max-w-3xl bg-zinc-800 p-6 rounded-lg mx-auto">
+        <div className="relative w-full max-w-3xl bg-zinc-800 p-6 rounded-lg mx-auto overflow-y-visible">
           <div
             ref={containerRef}
-            className="flex flex-row flex-nowrap overflow-x-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 whitespace-nowrap py-2"
-            style={{ scrollBehavior: 'smooth' }}
+            className="flex flex-row flex-nowrap overflow-x-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 whitespace-nowrap py-2 overflow-y-visible"
+            style={{ scrollBehavior: "smooth" }}
           >
             {squares.map((square, idx) => {
               if (square.isSpace) {
-                return (
-                  <span
-                    key={idx}
-                    className="inline-block w-4 h-8"
-                  ></span>
-                )
+                return <span key={idx} className="inline-block w-4 h-8"></span>;
               }
               let base =
-                "inline-flex items-center justify-center mx-0.5 my-0.5 w-8 h-8 transition-all duration-150 "
+                "inline-flex items-center justify-center mx-0.5 my-0.5 w-8 h-8 transition-all duration-150 ";
               if (idx === squarePosition)
                 base +=
-                  "bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-500/50 "
+                  "bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-500/50 ";
               else if (idx === squareTarget)
-                base += "bg-purple-500 text-white scale-105 "
-              else base += "bg-zinc-700 text-zinc-300 "
+                base += "bg-purple-500 text-white scale-105 ";
+              else base += "bg-zinc-700 text-zinc-300 ";
               return (
                 <span
                   key={idx}
                   ref={idx === squarePosition ? playerRef : undefined}
                   className={base + "rounded-md"}
                 ></span>
-              )
+              );
             })}
           </div>
         </div>
@@ -139,11 +138,10 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
           {["w", "b", "e", "h", "l"].map((k) => (
             <kbd
               key={k}
-              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-                lastKeyPressed === k
+              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${lastKeyPressed === k
                   ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110"
                   : ""
-              }`}
+                }`}
             >
               {k}
             </kbd>
@@ -151,7 +149,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default WordMovementLevel
+export default WordMovementLevel;
