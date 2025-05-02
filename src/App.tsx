@@ -3,6 +3,7 @@ import { Menu, X } from "lucide-react";
 import Sidebar from "./components/Sidebar";
 import GameArea from "./components/GameArea";
 import LandingPage from "./components/LandingPage";
+import WIPBanner from './components/WIPBanner';
 import { Analytics } from "@vercel/analytics/react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -75,6 +76,7 @@ function App() {
     return (
       <>
         <LandingPage onGetStarted={handleGetStarted} />
+        <WIPBanner position="corner" />
         <Analytics />
       </>
     );
@@ -138,6 +140,7 @@ function App() {
           duration: 0.3
         }}
       >
+        <WIPBanner position="corner" />
         <motion.button
           onClick={onToggleSidebar}
           className="fixed top-4 left-4 z-50 p-2 bg-zinc-700 rounded-md hover:bg-zinc-600 shadow-md"
