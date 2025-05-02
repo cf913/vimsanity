@@ -92,7 +92,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
   })
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-zinc-900 to-zinc-800 text-zinc-100 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-zinc-900 to-zinc-800 text-zinc-100 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-10 overflow-hidden">
       <div
         className="absolute inset-0 w-full h-full overflow-hidden z-0"
         style={{
@@ -170,7 +170,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       <AnimatePresence>
         {isLoaded && (
           <motion.div
-            className="max-w-3xl w-full text-center space-y-8 relative z-10"
+            className="max-w-3xl w-full text-center space-y-8 relative z-10 pb-20 sm:pb-24 md:pb-28"
             initial="hidden"
             animate="show"
             variants={container}
@@ -277,7 +277,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
       {/* SEO-friendly footer with additional info */}
       <motion.footer
-        className="fixed bottom-0 left-0 right-0 py-5 w-full backdrop-blur-sm bg-zinc-900/30"
+        className="fixed bottom-0 left-0 right-0 py-3 sm:py-5 w-full backdrop-blur-sm bg-zinc-900/30"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
