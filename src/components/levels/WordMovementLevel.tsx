@@ -106,10 +106,10 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
             </div>
           </div>
         </div>
-        <div className="relative w-full max-w-3xl bg-zinc-800 p-6 rounded-lg mx-auto overflow-y-visible">
+        <div className="relative w-full max-w-3xl bg-zinc-800 p-6 rounded-lg mx-auto overflow-visible">
           <div
             ref={containerRef}
-            className="flex flex-row flex-nowrap overflow-x-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 whitespace-nowrap py-2 overflow-y-visible"
+            className="flex flex-row flex-nowrap scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 whitespace-nowrap py-2 overflow-visible"
             style={{ scrollBehavior: "smooth" }}
           >
             {squares.map((square, idx) => {
