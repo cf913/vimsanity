@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import Sidebar from "./components/Sidebar";
 import GameArea from "./components/GameArea";
@@ -6,12 +6,54 @@ import LandingPage from "./components/LandingPage";
 import { Analytics } from "@vercel/analytics/react";
 import { motion, AnimatePresence } from "framer-motion";
 
-function App() {
-  const [showLandingPage, setShowLandingPage] = useState(true);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [currentLevel, setCurrentLevel] = useState(0);
-  const [isMuted, setIsMuted] = useState(false);
+// Keys for localStorage
+const STORAGE_KEYS = {
+  SHOW_LANDING_PAGE: 'vimsanity-show-landing-page',
+  SIDEBAR_OPEN: 'vimsanity-sidebar-open',
+  CURRENT_LEVEL: 'vimsanity-current-level',
+  IS_MUTED: 'vimsanity-is-muted'
+};
 
+function App() {
+  // Initialize state from localStorage or use defaults
+  const [showLandingPage, setShowLandingPage] = useState(() => {
+    const savedValue = localStorage.getItem(STORAGE_KEYS.SHOW_LANDING_PAGE);
+    return savedValue !== null ? savedValue === 'true' : true;
+  });
+  
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    const savedValue = localStorage.getItem(STORAGE_KEYS.SIDEBAR_OPEN);
+    return savedValue !== null ? savedValue === 'true' : true;
+  });
+  
+  const [currentLevel, setCurrentLevel] = useState(() => {
+    const savedValue = localStorage.getItem(STORAGE_KEYS.CURRENT_LEVEL);
+    return savedValue !== null ? parseInt(savedValue, 10) : 0;
+  });
+  
+  const [isMuted, setIsMuted] = useState(() => {
+    const savedValue = localStorage.getItem(STORAGE_KEYS.IS_MUTED);
+    return savedValue !== null ? savedValue === 'true' : false;
+  });
+
+  // Save state changes to localStorage
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.SHOW_LANDING_PAGE, showLandingPage.toString());
+  }, [showLandingPage]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.SIDEBAR_OPEN, isSidebarOpen.toString());
+  }, [isSidebarOpen]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.CURRENT_LEVEL, currentLevel.toString());
+  }, [currentLevel]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.IS_MUTED, isMuted.toString());
+  }, [isMuted]);
+
+  // Custom state setters that update both state and localStorage
   const onCloseSidebar = () => {
     setIsSidebarOpen(false);
   };
