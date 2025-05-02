@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
 import Sidebar from "./components/Sidebar";
 import GameArea from "./components/GameArea";
+import LandingPage from "./components/LandingPage";
 import { Analytics } from "@vercel/analytics/react";
 
 function App() {
+  const [showLandingPage, setShowLandingPage] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [currentLevel, setCurrentLevel] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
@@ -17,6 +19,21 @@ function App() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const handleGetStarted = () => {
+    setShowLandingPage(false);
+  };
+
+  // If showing landing page, render only that
+  if (showLandingPage) {
+    return (
+      <>
+        <LandingPage onGetStarted={handleGetStarted} />
+        <Analytics />
+      </>
+    );
+  }
+
+  // Otherwise render the game interface
   return (
     <div className="min-h-screen bg-zinc-900 text-zinc-100 flex">
       {/* Sidebar */}
