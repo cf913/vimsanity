@@ -26,8 +26,8 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
     idx,
   }))
 
-  const [squarePosition, setSquarePosition] = useState<number>(0)
-  const [squareTarget, setSquareTarget] = useState<number>(5)
+  const [cursor, setcursor] = useState<number>(0)
+  const [target, setSquareTarget] = useState<number>(5)
   const [score, setScore] = useState(0)
   const [showConfetti, setShowConfetti] = useState(false)
   const [showExplosion, setShowExplosion] = useState(false)
@@ -45,47 +45,47 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
         inline: "center",
       })
     }
-  }, [squarePosition])
+  }, [cursor])
 
   // Key actions (move left/right, and word boundaries, but now just move between squares)
   const keyActions: KeyActionMap = {
     h: () => {
-      if (squarePosition > 0) {
-        setSquarePosition(squarePosition - 1)
-        checkTarget(squarePosition - 1)
+      if (cursor > 0) {
+        setcursor(cursor - 1)
+        checkTarget(cursor - 1)
       }
     },
     l: () => {
-      if (squarePosition < squares.length - 1) {
-        setSquarePosition(squarePosition + 1)
-        checkTarget(squarePosition + 1)
+      if (cursor < squares.length - 1) {
+        setcursor(cursor + 1)
+        checkTarget(cursor + 1)
       }
     },
     w: () => {
-      const newPos = moveToNextWordBoundary(characters, squarePosition)
-      setSquarePosition(newPos)
+      const newPos = moveToNextWordBoundary(characters, cursor)
+      setcursor(newPos)
       checkTarget(newPos)
     },
     e: () => {
-      const newPos = moveToWordEnd(characters, squarePosition)
-      setSquarePosition(newPos)
+      const newPos = moveToWordEnd(characters, cursor)
+      setcursor(newPos)
       checkTarget(newPos)
     },
     b: () => {
-      const newPos = moveToPrevWordBoundary(characters, squarePosition)
-      setSquarePosition(newPos)
+      const newPos = moveToPrevWordBoundary(characters, cursor)
+      setcursor(newPos)
       checkTarget(newPos)
     },
   }
 
   const checkTarget = (newPos: number) => {
-    if (newPos === squareTarget) {
+    if (newPos === target) {
       if (!isMuted) {
         // Add sound here if needed
       }
       setScore(score + 1)
       setShowExplosion(true)
-      setExplosionIdx(squareTarget)
+      setExplosionIdx(target)
       // setShowConfetti(true)
 
       // Set a timeout to hide the explosion
@@ -101,19 +101,19 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
       let newTarget
       do {
         newTarget = Math.floor(Math.random() * squares.length)
-      } while (newTarget === squarePosition || squares[newTarget].isSpace)
+      } while (newTarget === cursor || squares[newTarget].isSpace)
       setSquareTarget(newTarget)
     }
   }
 
   const { lastKeyPressed } = useKeyboardHandler({
     keyActionMap: keyActions,
-    dependencies: [squarePosition, squareTarget, score],
+    dependencies: [cursor, target, score],
   })
 
   return (
     <div className="flex items-center justify-center w-full">
-      <div className="w-full max-w-3xl">
+      <div className="w-full">
         <div className="text-center mb-4">
           <p className="text-zinc-400">
             Navigate the abstract grid using vim keys!
@@ -124,22 +124,22 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
             </div>
           </div>
         </div>
-        <div className="relative w-full max-w-3xl bg-zinc-800 p-6 rounded-lg mx-auto overflow-visible">
+        <div className="relative w-full max-w-4xl bg-zinc-800 p-6 rounded-lg mx-auto overflow-visible">
           {/* Global Confetti Burst over the game area */}
           {showConfetti && <ConfettiBurst />}
           <div
             ref={containerRef}
-            className="flex flex-row flex-nowrap overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 whitespace-nowrap py-2"
+            className="flex flex-row overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 py-2"
             style={{ scrollBehavior: "smooth" }}
           >
             {squares.map((square, idx) => {
               if (square.isSpace) {
                 return <span key={idx} className="inline-block w-4 h-8"></span>
               }
-              const isPlayer = idx === squarePosition
-              const isTarget = idx === squareTarget
+              const isPlayer = idx === cursor
+              const isTarget = idx === target
               let base =
-                "inline-flex items-center justify-center mx-0.5 my-0.5 w-8 h-8 transition-all duration-150 rounded-md "
+                "inline-flex items-center justify-center mx-0.5 my-0.5 w-10 h-10 transition-all duration-150 rounded-md "
               if (isPlayer)
                 base +=
                   "bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-500/50 "
