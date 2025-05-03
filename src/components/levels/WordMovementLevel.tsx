@@ -54,6 +54,25 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
     char,
   }))
 
+  // Group characters into words for proper wrapping
+  const words = squares.reduce((acc: Array<Array<typeof squares[0]>>, square) => {
+    if (square.isSpace) {
+      // Add space as its own "word"
+      acc.push([square]);
+      // Start a new word
+      acc.push([]);
+    } else {
+      // If we have no words yet or the last word is a space, start a new word
+      if (acc.length === 0 || acc[acc.length - 1][0]?.isSpace) {
+        acc.push([square]);
+      } else {
+        // Add to the current word
+        acc[acc.length - 1].push(square);
+      }
+    }
+    return acc;
+  }, []).filter(word => word.length > 0); // Remove any empty words
+
   const [cursor, setcursor] = useState<number>(0)
   const [target, setSquareTarget] = useState<number>(5)
   const [score, setScore] = useState(0)
@@ -190,51 +209,55 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
             className="flex flex-row flex-wrap overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 py-2"
             style={{ scrollBehavior: "smooth" }}
           >
-            {squares.map((square, idx) => {
-              if (square.isSpace) {
-                return (
-                  <span key={idx} className="inline-block w-6 h-8 mb-1"></span>
-                )
-              }
-              const isPlayer = idx === cursor
-              const isTarget = idx === target
-              const isRevealed = revealedLetters.has(idx)
-              let base =
-                "inline-flex items-center justify-center mx-0.5 my-0.5 min-w-8 h-8 transition-all duration-150 rounded-md mb-1 "
-              if (isPlayer)
-                base +=
-                  "bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-500/50 "
-              else if (isTarget)
-                base +=
-                  "bg-purple-500 text-white scale-105 shadow-lg shadow-purple-500/60 animate-pulse "
-              else base += "bg-zinc-700 text-zinc-300 "
-              return (
-                <span
-                  key={idx}
-                  ref={isPlayer ? playerRef : undefined}
-                  className={base}
-                  style={{ position: "relative" }}
-                >
-                  {isTarget && (
-                    <span className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30 z-0"></span>
-                  )}
+            {words.map((word, wordIdx) => (
+              <div key={`word-${wordIdx}`} className="flex flex-row whitespace-nowrap mb-1">
+                {word.map((square) => {
+                  if (square.isSpace) {
+                    return (
+                      <span key={square.idx} className="inline-block w-6 h-8"></span>
+                    )
+                  }
+                  const isPlayer = square.idx === cursor
+                  const isTarget = square.idx === target
+                  const isRevealed = revealedLetters.has(square.idx)
+                  let base =
+                    "inline-flex items-center justify-center mx-0.5 my-0.5 min-w-8 h-8 transition-all duration-150 rounded-md "
+                  if (isPlayer)
+                    base +=
+                      "bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-500/50 "
+                  else if (isTarget)
+                    base +=
+                      "bg-purple-500 text-white scale-105 shadow-lg shadow-purple-500/60 animate-pulse "
+                  else base += "bg-zinc-700 text-zinc-300 "
+                  return (
+                    <span
+                      key={square.idx}
+                      ref={isPlayer ? playerRef : undefined}
+                      className={base}
+                      style={{ position: "relative" }}
+                    >
+                      {isTarget && (
+                        <span className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30 z-0"></span>
+                      )}
 
-                  {/* Show the character if it's been revealed */}
-                  {isRevealed && square.char !== " " && (
-                    <span className="z-10 text-lg font-medium font-mono">
-                      {square.char}
+                      {/* Show the character if it's been revealed */}
+                      {isRevealed && square.char !== " " && (
+                        <span className="z-10 text-lg font-medium font-mono">
+                          {square.char}
+                        </span>
+                      )}
+
+                      {/* Explosion effect - moved outside isTarget condition so it can appear even after target changes */}
+                      {showExplosion && explosionIdx === square.idx && (
+                        <div className="absolute inset-0 z-20">
+                          <ExplosionEffect />
+                        </div>
+                      )}
                     </span>
-                  )}
-
-                  {/* Explosion effect - moved outside isTarget condition so it can appear even after target changes */}
-                  {showExplosion && explosionIdx === idx && (
-                    <div className="absolute inset-0 z-20">
-                      <ExplosionEffect />
-                    </div>
-                  )}
-                </span>
-              )
-            })}
+                  )
+                })}
+              </div>
+            ))}
           </div>
         </div>
         <div className="flex gap-4 text-zinc-400 mt-4 justify-center">
