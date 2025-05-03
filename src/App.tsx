@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, BookOpen } from "lucide-react";
 import Sidebar from "./components/Sidebar";
+import DocumentationSidebar from "./components/DocumentationSidebar";
 import GameArea from "./components/GameArea";
 import LandingPage from "./components/LandingPage";
 import WIPBanner from './components/WIPBanner';
@@ -11,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const STORAGE_KEYS = {
   SHOW_LANDING_PAGE: 'vimsanity-show-landing-page',
   SIDEBAR_OPEN: 'vimsanity-sidebar-open',
+  DOC_SIDEBAR_OPEN: 'vimsanity-doc-sidebar-open',
   CURRENT_LEVEL: 'vimsanity-current-level',
   IS_MUTED: 'vimsanity-is-muted'
 };
@@ -25,6 +27,11 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     const savedValue = localStorage.getItem(STORAGE_KEYS.SIDEBAR_OPEN);
     return savedValue !== null ? savedValue === 'true' : true;
+  });
+  
+  const [isDocSidebarOpen, setIsDocSidebarOpen] = useState(() => {
+    const savedValue = localStorage.getItem(STORAGE_KEYS.DOC_SIDEBAR_OPEN);
+    return savedValue !== null ? savedValue === 'true' : false;
   });
   
   const [currentLevel, setCurrentLevel] = useState(() => {
@@ -47,6 +54,10 @@ function App() {
   }, [isSidebarOpen]);
 
   useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.DOC_SIDEBAR_OPEN, isDocSidebarOpen.toString());
+  }, [isDocSidebarOpen]);
+
+  useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.CURRENT_LEVEL, currentLevel.toString());
   }, [currentLevel]);
 
@@ -61,6 +72,14 @@ function App() {
 
   const onToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const onCloseDocSidebar = () => {
+    setIsDocSidebarOpen(false);
+  };
+
+  const onToggleDocSidebar = () => {
+    setIsDocSidebarOpen(!isDocSidebarOpen);
   };
 
   const handleGetStarted = () => {
@@ -85,7 +104,7 @@ function App() {
   // Otherwise render the game interface
   return (
     <div className="min-h-screen bg-zinc-900 text-zinc-100 flex overflow-hidden">
-      {/* Sidebar with AnimatePresence for smooth transitions */}
+      {/* Left Sidebar with AnimatePresence for smooth transitions */}
       <AnimatePresence mode="wait">
         {isSidebarOpen && (
           <motion.div
@@ -112,16 +131,42 @@ function App() {
         )}
       </AnimatePresence>
 
-      {/* Backdrop overlay when sidebar is open on mobile */}
+      {/* Right Documentation Sidebar */}
+      <AnimatePresence mode="wait">
+        {isDocSidebarOpen && (
+          <motion.div
+            className="fixed h-full bg-zinc-800 z-50 w-64 shadow-xl right-0"
+            initial={{ x: 320 }}
+            animate={{ x: 0 }}
+            exit={{ x: 320 }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 300, 
+              damping: 30,
+              duration: 0.3
+            }}
+          >
+            <DocumentationSidebar
+              currentLevel={currentLevel}
+              onClose={onCloseDocSidebar}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Backdrop overlay when sidebars are open on mobile */}
       <AnimatePresence>
-        {isSidebarOpen && (
+        {(isSidebarOpen || isDocSidebarOpen) && (
           <motion.div 
             className="md:hidden fixed inset-0 bg-black/50 z-40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            onClick={onCloseSidebar}
+            onClick={() => {
+              if (isSidebarOpen) onCloseSidebar();
+              if (isDocSidebarOpen) onCloseDocSidebar();
+            }}
           />
         )}
       </AnimatePresence>
@@ -131,7 +176,8 @@ function App() {
         className="flex-1"
         initial={false}
         animate={{ 
-          marginLeft: isSidebarOpen ? "16rem" : "0" 
+          marginLeft: isSidebarOpen ? "16rem" : "0",
+          marginRight: isDocSidebarOpen ? "16rem" : "0"
         }}
         transition={{ 
           type: "spring", 
@@ -141,6 +187,7 @@ function App() {
         }}
       >
         <WIPBanner position="corner" />
+        {/* Left sidebar toggle button */}
         <motion.button
           onClick={onToggleSidebar}
           className="fixed top-4 left-4 z-50 p-2 bg-zinc-700 rounded-md hover:bg-zinc-600 shadow-md"
@@ -159,6 +206,27 @@ function App() {
           }}
         >
           {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+        </motion.button>
+
+        {/* Right documentation sidebar toggle button */}
+        <motion.button
+          onClick={onToggleDocSidebar}
+          className="fixed top-4 right-4 z-50 p-2 bg-zinc-700 rounded-md hover:bg-zinc-600 shadow-md"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          initial={false}
+          animate={{ 
+            x: isDocSidebarOpen ? 100 : 0,
+            opacity: isDocSidebarOpen ? 0 : 1,
+            rotate: isDocSidebarOpen ? 90 : 0
+          }}
+          transition={{ 
+            type: "spring", 
+            stiffness: 400, 
+            damping: 25 
+          }}
+        >
+          {isDocSidebarOpen ? <X size={24} /> : <BookOpen size={24} />}
         </motion.button>
 
         <main className="container mx-auto px-4 py-8 transition-all duration-300">
