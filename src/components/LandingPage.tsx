@@ -94,7 +94,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-zinc-900 to-zinc-800 text-zinc-100 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-10 overflow-hidden">
       <div
-        className="absolute inset-0 w-full h-full overflow-hidden z-0"
+        className="fixed inset-0 w-full h-full overflow-hidden z-0"
         style={{
           backgroundImage:
             "radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.05) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(16, 185, 129, 0.05) 0%, transparent 50%)",
@@ -170,7 +170,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       <AnimatePresence>
         {isLoaded && (
           <motion.div
-            className="max-w-3xl w-full text-center space-y-8 relative z-10 pb-20 sm:pb-24 md:pb-28"
+            className="max-w-3xl w-full text-center space-y-8 relative z-10 pb-20 sm:pb-24 md:pb-28 pt-20"
             initial="hidden"
             animate="show"
             variants={container}
@@ -220,9 +220,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                       "Start with basics and advance to complex movement patterns",
                   },
                   {
-                    title: "Instant Feedback",
+                    title: "Make Coding Fun Again",
                     description:
-                      "See your progress and improve with each session",
+                      "Transform text editing into an addictive game where every keystroke feels like a victory",
                   },
                 ].map((feature, index) => (
                   <motion.div
@@ -246,7 +246,155 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               </motion.div>
             </motion.div>
 
+            {/* Pros and Cons Table Section */}
+            <motion.div className="mt-12" variants={item}>
+              <motion.h2
+                className="text-2xl font-bold text-center mb-6"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600">
+                  Why Master Vim Motions?
+                </span>
+              </motion.h2>
+
+              <motion.div
+                className="bg-zinc-800/80 backdrop-blur-sm rounded-xl border border-zinc-700/50 shadow-lg overflow-hidden"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                whileHover={{
+                  boxShadow: "0px 8px 30px rgba(16, 185, 129, 0.2)",
+                }}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-zinc-700/50">
+                  {/* Vim Motions Column */}
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-emerald-400 mb-4 flex items-center">
+                      <span className="w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center mr-2">
+                        ✓
+                      </span>
+                      Vim Motions
+                    </h3>
+                    <ul className="space-y-3 text-left">
+                      <li className="flex items-start">
+                        <span className="text-emerald-400 mr-2">•</span>
+                        <span className="text-zinc-300">
+                          Control code like a video game character
+                        </span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-emerald-400 mr-2">•</span>
+                        <span className="text-zinc-300">
+                          Execute powerful combo moves with keypresses
+                        </span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-emerald-400 mr-2">•</span>
+                        <span className="text-zinc-300">
+                          Feel like a coding ninja with every keystroke
+                        </span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-emerald-400 mr-2">•</span>
+                        <span className="text-zinc-300">
+                          Unlock new abilities as you level up
+                        </span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-emerald-400 mr-2">•</span>
+                        <span className="text-zinc-300">
+                          Turn mundane editing into an exciting challenge
+                        </span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-emerald-400 mr-2">•</span>
+                        <span className="text-zinc-300">
+                          Editor agnostic (works with most editors)
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Regular Editing Column */}
+                  <div className="p-6 text-left">
+                    <h3 className="text-xl font-semibold text-zinc-400 mb-4 flex items-center">
+                      <span className="w-8 h-8 bg-zinc-500/20 rounded-full flex items-center justify-center mr-2 text-center">
+                        ✗
+                      </span>
+                      Regular Editing
+                    </h3>
+                    <ul className="space-y-3">
+                      <li className="flex items-start">
+                        <span className="text-zinc-500 mr-2">•</span>
+                        <span className="text-zinc-400">
+                          Boring point-and-click movements
+                        </span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-zinc-500 mr-2">•</span>
+                        <span className="text-zinc-400">
+                          Tedious arrow key mashing
+                        </span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-zinc-500 mr-2">•</span>
+                        <span className="text-zinc-400">
+                          Repetitive hand movements causing fatigue
+                        </span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-zinc-500 mr-2">•</span>
+                        <span className="text-zinc-400">
+                          No sense of progression or mastery
+                        </span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-zinc-500 mr-2">•</span>
+                        <span className="text-zinc-400">
+                          Having to switch between mouse and keyboard
+                        </span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-zinc-500 mr-2">•</span>
+                        <span className="text-zinc-400">
+                          Editor specific shortcuts
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-zinc-900/50 p-4 text-center">
+                  <p className="text-emerald-300 font-medium">
+                    VimSanity makes learning these powerful motions fun and
+                    effective
+                  </p>
+                </div>
+              </motion.div>
+            </motion.div>
+
             <motion.div className="mt-8" variants={item}>
+              <motion.div
+                className="mb-4 max-w-lg mx-auto text-center p-3 rounded-lg bg-zinc-800/60 border border-zinc-700/50 backdrop-blur-sm"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2, duration: 0.3 }}
+              >
+                <p className="text-zinc-300 italic text-sm">
+                  <span className="text-emerald-400 font-semibold">
+                    ⚠️ Warning:
+                  </span>{" "}
+                  Starting VimSanity may result in ditching your mouse,
+                  abandoning arrow keys, and 10x-ing your development speed.
+                  <br />
+                  <br />
+                  We can't guarantee it'll make you a better developer, but it
+                  will DEFINITELY make you a faster one.
+                </p>
+              </motion.div>
+
               <motion.button
                 onClick={onGetStarted}
                 className="inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-black bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 shadow-lg"
