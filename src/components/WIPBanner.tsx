@@ -1,64 +1,64 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import React, { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { X } from "lucide-react"
 
 interface WIPBannerProps {
-  position?: 'top' | 'bottom' | 'corner';
+  position?: "top" | "bottom" | "corner"
 }
 
-const WIPBanner: React.FC<WIPBannerProps> = ({ position = 'corner' }) => {
-  const [isVisible, setIsVisible] = useState(true);
-  const [isHovered, setIsHovered] = useState(false);
+const WIPBanner: React.FC<WIPBannerProps> = ({ position = "corner" }) => {
+  const [isVisible, setIsVisible] = useState(true)
+  const [isHovered, setIsHovered] = useState(false)
 
   // Auto-hide the banner after 5 seconds, but keep it in DOM for user to show again
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsVisible(false);
-    }, 5000);
+      setIsVisible(false)
+    }, 5000)
 
-    return () => clearTimeout(timer);
-  }, []);
+    return () => clearTimeout(timer)
+  }, [])
 
   // Position styles based on the position prop
   const getPositionClasses = () => {
     switch (position) {
-      case 'top':
-        return 'top-0 left-1/2 -translate-x-1/2';
-      case 'bottom':
-        return 'bottom-4 left-1/2 -translate-x-1/2';
-      case 'corner':
+      case "top":
+        return "top-0 left-1/2 -translate-x-1/2"
+      case "bottom":
+        return "bottom-4 right-4"
+      case "corner":
       default:
-        return 'top-4 right-4';
+        return "top-4 right-4"
     }
-  };
+  }
 
   // Animation variants
   const bannerVariants = {
-    hidden: { 
+    hidden: {
       opacity: 0,
-      y: position === 'bottom' ? 20 : -20,
+      y: position === "bottom" ? 20 : -20,
       scale: 0.95,
     },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       scale: 1,
       transition: {
-        type: 'spring',
+        type: "spring",
         stiffness: 300,
         damping: 25,
-      }
+      },
     },
-    exit: { 
+    exit: {
       opacity: 0,
       scale: 0.9,
-      transition: { duration: 0.2 }
+      transition: { duration: 0.2 },
     },
     hover: {
       scale: 1.03,
-      boxShadow: '0px 5px 15px rgba(16, 185, 129, 0.4)',
-    }
-  };
+      boxShadow: "0px 5px 15px rgba(16, 185, 129, 0.4)",
+    },
+  }
 
   // Pulse animation for the dot
   const dotVariants = {
@@ -68,9 +68,9 @@ const WIPBanner: React.FC<WIPBannerProps> = ({ position = 'corner' }) => {
       transition: {
         repeat: Infinity,
         duration: 2,
-      }
-    }
-  };
+      },
+    },
+  }
 
   // Minimized state (just shows a small indicator)
   const MinimizedIndicator = () => (
@@ -80,9 +80,9 @@ const WIPBanner: React.FC<WIPBannerProps> = ({ position = 'corner' }) => {
       animate={{ opacity: 1, scale: 1 }}
       whileHover={{ scale: 1.1 }}
       onClick={() => setIsVisible(true)}
-      style={{ 
-        right: '1rem', 
-        top: '1rem',
+      style={{
+        right: "1rem",
+        bottom: "1rem",
       }}
     >
       <div className="bg-emerald-600 text-white p-2 rounded-full shadow-lg flex items-center justify-center">
@@ -94,7 +94,7 @@ const WIPBanner: React.FC<WIPBannerProps> = ({ position = 'corner' }) => {
         <span className="text-xs font-bold">WIP</span>
       </div>
     </motion.div>
-  );
+  )
 
   return (
     <>
@@ -118,12 +118,14 @@ const WIPBanner: React.FC<WIPBannerProps> = ({ position = 'corner' }) => {
                   animate="pulse"
                 />
                 <div className="text-zinc-100 font-medium mr-2">
-                  <span className="text-emerald-400 font-bold">Work in Progress</span>
+                  <span className="text-emerald-400 font-bold">
+                    Work in Progress
+                  </span>
                   {isHovered && (
                     <motion.p
                       className="text-xs text-zinc-300 mt-1"
                       initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
+                      animate={{ opacity: 1, height: "auto" }}
                     >
                       This project is being improved weekly!
                     </motion.p>
@@ -142,10 +144,10 @@ const WIPBanner: React.FC<WIPBannerProps> = ({ position = 'corner' }) => {
           </motion.div>
         )}
       </AnimatePresence>
-      
+
       {!isVisible && <MinimizedIndicator />}
     </>
-  );
-};
+  )
+}
 
-export default WIPBanner;
+export default WIPBanner
