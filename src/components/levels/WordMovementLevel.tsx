@@ -37,11 +37,11 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
     "Text objects are the building blocks of editing mastery",
     "Registers remember what you forgot clipboard never could",
     "Undo tree is a time machine for your editing mistakes",
-    "Vim configuration files grow longer with every epiphany"
+    "Vim configuration files grow longer with every epiphany",
   ]
-  
+
   // Randomly select one sentence when component loads
-  const [selectedTextIndex] = useState(() => 
+  const [selectedTextIndex] = useState(() =>
     Math.floor(Math.random() * sampleTexts.length)
   )
   const sampleText = sampleTexts[selectedTextIndex]
@@ -61,6 +61,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
   const [showExplosion, setShowExplosion] = useState(false)
   const [explosionIdx, setExplosionIdx] = useState<number | null>(null)
   const [revealedLetters, setRevealedLetters] = useState<Set<number>>(new Set())
+  const [levelCompleted, setLevelCompleted] = useState(false)
 
   // Ref for scrolling
   const containerRef = useRef<HTMLDivElement>(null)
@@ -142,6 +143,22 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
     }
   }
 
+  // Check if level is completed (all non-space characters revealed)
+  useEffect(() => {
+    if (revealedLetters.size > 0) {
+      const nonSpaceSquares = squares.filter((square) => !square.isSpace)
+      const allRevealed = nonSpaceSquares.every((square) =>
+        revealedLetters.has(square.idx)
+      )
+
+      if (allRevealed && !levelCompleted) {
+        setLevelCompleted(true)
+        setShowConfetti(true)
+        setTimeout(() => setShowConfetti(false), 3000)
+      }
+    }
+  }, [revealedLetters, squares, levelCompleted])
+
   const { lastKeyPressed } = useKeyboardHandler({
     keyActionMap: keyActions,
     dependencies: [cursor, target, score],
@@ -158,6 +175,11 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
             <div className="bg-zinc-800 px-4 py-2 rounded-lg">
               Score: {score}
             </div>
+            {levelCompleted && (
+              <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse">
+                Level Complete!
+              </div>
+            )}
           </div>
         </div>
         <div className="relative w-full max-w-4xl bg-zinc-800 p-6 rounded-lg mx-auto overflow-visible">
@@ -165,18 +187,20 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
           {showConfetti && <ConfettiBurst />}
           <div
             ref={containerRef}
-            className="flex flex-row overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 py-2"
+            className="flex flex-row flex-wrap overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 py-2"
             style={{ scrollBehavior: "smooth" }}
           >
             {squares.map((square, idx) => {
               if (square.isSpace) {
-                return <span key={idx} className="inline-block w-4 h-8"></span>
+                return (
+                  <span key={idx} className="inline-block w-6 h-8 mb-1"></span>
+                )
               }
               const isPlayer = idx === cursor
               const isTarget = idx === target
               const isRevealed = revealedLetters.has(idx)
               let base =
-                "inline-flex items-center justify-center mx-0.5 my-0.5 w-10 h-10 transition-all duration-150 rounded-md "
+                "inline-flex items-center justify-center mx-0.5 my-0.5 min-w-8 h-8 transition-all duration-150 rounded-md mb-1 "
               if (isPlayer)
                 base +=
                   "bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-500/50 "
