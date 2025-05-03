@@ -17,13 +17,41 @@ interface WordMovementLevelProps {
 }
 
 const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
-  const sampleText = "The quick brown fox jumps over the lazy dog"
+  const sampleTexts = [
+    "Vim users never lose their keys they just remap them",
+    "I would exit Vim but I forgot how to quit the program",
+    "Normal mode is my happy place insert mode gives me anxiety",
+    "The quick brown fox jumps over the lazy Vim user",
+    "Hjkl keys are my compass in the sea of text editing",
+    "Modal editing is the pathway to text manipulation powers",
+    "Vim macros saved me hours dot command saved me days",
+    "Substitute command changed my life and all occurrences",
+    "Visual block mode is the secret weapon of text ninjas",
+    "Escape key is worn out but my productivity is maxed",
+    "Yank and put until your fingers know the dance",
+    "Vim motions flow like water text edits like lightning",
+    "Regular expressions in Vim are both magic and nightmare",
+    "Vimtutor is the dojo where text warriors are forged",
+    "Buffers splits and tabs oh my navigation never looked so good",
+    "Vim plugins are like toppings on an already delicious pizza",
+    "Text objects are the building blocks of editing mastery",
+    "Registers remember what you forgot clipboard never could",
+    "Undo tree is a time machine for your editing mistakes",
+    "Vim configuration files grow longer with every epiphany"
+  ]
+  
+  // Randomly select one sentence when component loads
+  const [selectedTextIndex] = useState(() => 
+    Math.floor(Math.random() * sampleTexts.length)
+  )
+  const sampleText = sampleTexts[selectedTextIndex]
   const characters = processTextForVim(sampleText)
 
   // We'll use the same number of squares as characters, including spaces for spacing
   const squares = characters.map((char, idx) => ({
     isSpace: char === " ",
     idx,
+    char,
   }))
 
   const [cursor, setcursor] = useState<number>(0)
@@ -32,6 +60,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
   const [showConfetti, setShowConfetti] = useState(false)
   const [showExplosion, setShowExplosion] = useState(false)
   const [explosionIdx, setExplosionIdx] = useState<number | null>(null)
+  const [revealedLetters, setRevealedLetters] = useState<Set<number>>(new Set())
 
   // Ref for scrolling
   const containerRef = useRef<HTMLDivElement>(null)
@@ -88,6 +117,13 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
       setExplosionIdx(target)
       // setShowConfetti(true)
 
+      // Add the current target to revealed letters
+      setRevealedLetters((prev) => {
+        const newSet = new Set(prev)
+        newSet.add(target)
+        return newSet
+      })
+
       // Set a timeout to hide the explosion
       setTimeout(() => {
         setShowExplosion(false)
@@ -138,6 +174,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
               }
               const isPlayer = idx === cursor
               const isTarget = idx === target
+              const isRevealed = revealedLetters.has(idx)
               let base =
                 "inline-flex items-center justify-center mx-0.5 my-0.5 w-10 h-10 transition-all duration-150 rounded-md "
               if (isPlayer)
@@ -156,6 +193,13 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
                 >
                   {isTarget && (
                     <span className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30 z-0"></span>
+                  )}
+
+                  {/* Show the character if it's been revealed */}
+                  {isRevealed && square.char !== " " && (
+                    <span className="z-10 text-lg font-medium font-mono">
+                      {square.char}
+                    </span>
                   )}
 
                   {/* Explosion effect - moved outside isTarget condition so it can appear even after target changes */}
