@@ -11,6 +11,7 @@ import {
 } from "../../utils/textUtils"
 import ExplosionEffect from "./ExplosionEffect"
 import ConfettiBurst from "./ConfettiBurst"
+import { RefreshCw, Shuffle, Trophy, Zap } from "lucide-react"
 
 interface WordMovementLevelProps {
   isMuted: boolean
@@ -41,7 +42,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
   ]
 
   // Randomly select one sentence when component loads
-  const [selectedTextIndex] = useState(() =>
+  const [selectedTextIndex, setSelectedTextIndex] = useState(() =>
     Math.floor(Math.random() * sampleTexts.length)
   )
   const sampleText = sampleTexts[selectedTextIndex]
@@ -183,6 +184,28 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
     dependencies: [cursor, target, score],
   })
 
+  const resetLevel = () => {
+    setRevealedLetters(new Set())
+    setScore(0)
+    setLevelCompleted(false)
+    setShowConfetti(false)
+    setcursor(0)
+    // Generate a new target
+    const newTarget = Math.floor(Math.random() * squares.length)
+    setSquareTarget(newTarget)
+  }
+
+  const changeText = () => {
+    // Pick a different text from the list
+    let newIndex
+    do {
+      newIndex = Math.floor(Math.random() * sampleTexts.length)
+    } while (newIndex === selectedTextIndex && sampleTexts.length > 1)
+    
+    setSelectedTextIndex(newIndex)
+    resetLevel()
+  }
+
   return (
     <div className="flex items-center justify-center w-full">
       <div className="w-full">
@@ -191,12 +214,28 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
             Navigate the abstract grid using vim keys!
           </p>
           <div className="mt-4 flex items-center justify-center gap-4">
-            <div className="bg-zinc-800 px-4 py-2 rounded-lg">
-              Score: {score}
+            <div className="bg-zinc-800 px-4 py-2 rounded-lg flex items-center gap-2 shadow-md">
+              <Trophy size={18} className="text-amber-400" />
+              <span>Score: {score}</span>
             </div>
+            <button 
+              onClick={resetLevel}
+              title="Reset Level"
+              className="bg-zinc-700 hover:bg-zinc-600 p-2 rounded-lg text-zinc-200 transition-all duration-200 flex items-center justify-center hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+            >
+              <RefreshCw size={18} className="text-emerald-400" />
+            </button>
+            <button 
+              onClick={changeText}
+              title="New Text"
+              className="bg-zinc-700 hover:bg-zinc-600 p-2 rounded-lg text-zinc-200 transition-all duration-200 flex items-center justify-center hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+            >
+              <Shuffle size={18} className="text-purple-400" />
+            </button>
             {levelCompleted && (
-              <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse">
-                Level Complete!
+              <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
+                <Zap size={18} className="text-yellow-300" />
+                <span>Level Complete!</span>
               </div>
             )}
           </div>
