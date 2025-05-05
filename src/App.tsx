@@ -1,47 +1,47 @@
-import React, { useState, useEffect } from "react"
-import { Menu, X, BookOpen } from "lucide-react"
-import Sidebar from "./components/Sidebar"
-import DocumentationSidebar from "./components/DocumentationSidebar"
-import GameArea from "./components/GameArea"
-import LandingPage from "./components/LandingPage"
-import WIPBanner from "./components/WIPBanner"
-import { Analytics } from "@vercel/analytics/react"
-import { motion, AnimatePresence } from "framer-motion"
+import React, { useState, useEffect } from 'react'
+import { Menu, X, BookOpen } from 'lucide-react'
+import Sidebar from './components/Sidebar'
+import DocumentationSidebar from './components/DocumentationSidebar'
+import GameArea from './components/GameArea'
+import LandingPage from './components/LandingPage'
+import WIPBanner from './components/WIPBanner'
+import { Analytics } from '@vercel/analytics/react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 // Keys for localStorage
 const STORAGE_KEYS = {
-  SHOW_LANDING_PAGE: "vimsanity-show-landing-page",
-  SIDEBAR_OPEN: "vimsanity-sidebar-open",
-  DOC_SIDEBAR_OPEN: "vimsanity-doc-sidebar-open",
-  CURRENT_LEVEL: "vimsanity-current-level",
-  IS_MUTED: "vimsanity-is-muted",
+  SHOW_LANDING_PAGE: 'vimsanity-show-landing-page',
+  SIDEBAR_OPEN: 'vimsanity-sidebar-open',
+  DOC_SIDEBAR_OPEN: 'vimsanity-doc-sidebar-open',
+  CURRENT_LEVEL: 'vimsanity-current-level',
+  IS_MUTED: 'vimsanity-is-muted',
 }
 
 function App() {
   // Initialize state from localStorage or use defaults
   const [showLandingPage, setShowLandingPage] = useState(() => {
     const savedValue = localStorage.getItem(STORAGE_KEYS.SHOW_LANDING_PAGE)
-    return savedValue !== null ? savedValue === "true" : true
+    return savedValue !== null ? savedValue === 'true' : true
   })
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     const savedValue = localStorage.getItem(STORAGE_KEYS.SIDEBAR_OPEN)
-    return savedValue !== null ? savedValue === "true" : true
+    return savedValue !== null ? savedValue === 'true' : true
   })
 
   const [isDocSidebarOpen, setIsDocSidebarOpen] = useState(() => {
     const savedValue = localStorage.getItem(STORAGE_KEYS.DOC_SIDEBAR_OPEN)
-    return savedValue !== null ? savedValue === "true" : false
+    return savedValue !== null ? savedValue === 'true' : false
   })
 
   const [currentLevel, setCurrentLevel] = useState(() => {
     const savedValue = localStorage.getItem(STORAGE_KEYS.CURRENT_LEVEL)
-    return savedValue !== null ? parseInt(savedValue, 10) : 0
+    return savedValue !== null ? parseInt(savedValue, 10) : 1
   })
 
   const [isMuted, setIsMuted] = useState(() => {
     const savedValue = localStorage.getItem(STORAGE_KEYS.IS_MUTED)
-    return savedValue !== null ? savedValue === "true" : false
+    return savedValue !== null ? savedValue === 'true' : false
   })
 
   // Save state changes to localStorage
@@ -119,7 +119,7 @@ function App() {
             animate={{ x: 0 }}
             exit={{ x: -320 }}
             transition={{
-              type: "spring",
+              type: 'spring',
               stiffness: 300,
               damping: 30,
               duration: 0.3,
@@ -146,7 +146,7 @@ function App() {
             animate={{ x: 0 }}
             exit={{ x: 320 }}
             transition={{
-              type: "spring",
+              type: 'spring',
               stiffness: 300,
               damping: 30,
               duration: 0.3,
@@ -182,11 +182,11 @@ function App() {
         className="flex-1"
         initial={false}
         animate={{
-          marginLeft: isSidebarOpen ? "16rem" : "0",
-          marginRight: isDocSidebarOpen ? "16rem" : "0",
+          marginLeft: isSidebarOpen ? '16rem' : '0',
+          marginRight: isDocSidebarOpen ? '16rem' : '0',
         }}
         transition={{
-          type: "spring",
+          type: 'spring',
           stiffness: 300,
           damping: 30,
           duration: 0.3,
@@ -206,7 +206,7 @@ function App() {
             rotate: isSidebarOpen ? -90 : 0,
           }}
           transition={{
-            type: "spring",
+            type: 'spring',
             stiffness: 400,
             damping: 25,
           }}
@@ -227,7 +227,7 @@ function App() {
             rotate: isDocSidebarOpen ? 90 : 0,
           }}
           transition={{
-            type: "spring",
+            type: 'spring',
             stiffness: 400,
             damping: 25,
           }}

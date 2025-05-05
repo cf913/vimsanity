@@ -1,6 +1,6 @@
-import React from "react"
-import { BookOpen, Lock, Volume2, VolumeX, X, ChevronRight } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import React from 'react'
+import { BookOpen, Lock, Volume2, VolumeX, X, ChevronRight } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface SidebarProps {
   currentLevel: number
@@ -14,29 +14,28 @@ interface SidebarProps {
 const levels = [
   {
     id: 0,
-    title: "Playground (All Motions)",
-    description: "Practice all Vim motions in a free environment",
+    title: 'Playground (All Motions)',
+    description: 'Practice all Vim motions in a free environment',
   },
   {
     id: 1,
-    title: "Basic Movement (h, j, k, l)",
-    description: "Learn the fundamental vim motions",
+    title: 'Basic Movement (h, j, k, l)',
+    description: 'Learn the fundamental vim motions',
   },
   {
     id: 2,
-    title: "Word Movement (w, b, e)",
-    description: "Navigate through words efficiently",
+    title: 'Word Movement (w, b, e)',
+    description: 'Navigate through words efficiently',
   },
   {
     id: 3,
-    title: "Line Operations (0, $)",
-    description: "Move to start and end of lines",
-    locked: true,
+    title: 'Line Operations (0, $)',
+    description: 'Move to start and end of lines',
   },
   {
     id: 4,
-    title: "Find Characters (f, t)",
-    description: "Jump to specific characters",
+    title: 'Find Characters (f, t)',
+    description: 'Jump to specific characters',
     locked: true,
   },
 ]
@@ -58,7 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       transition: {
         duration: 0.3,
         staggerChildren: 0.07,
-        when: "beforeChildren",
+        when: 'beforeChildren',
       },
     },
   }
@@ -69,7 +68,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       opacity: 1,
       x: 0,
       transition: {
-        type: "spring",
+        type: 'spring',
         stiffness: 300,
         damping: 24,
       },
@@ -101,7 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     }),
     active: {
       scale: 1.03,
-      boxShadow: "0px 4px 8px rgba(16, 185, 129, 0.25)",
+      boxShadow: '0px 4px 8px rgba(16, 185, 129, 0.25)',
     },
   }
 
@@ -159,16 +158,15 @@ const Sidebar: React.FC<SidebarProps> = ({
             initial="initial"
             whileHover="hover"
             whileTap="tap"
-            animate={currentLevel === level.id ? "active" : "initial"}
+            animate={currentLevel === level.id ? 'active' : 'initial'}
             variants={levelButtonVariants}
             onClick={() => !level.locked && setCurrentLevel(level.id)}
-            className={`w-full text-left p-3 rounded-lg border transition-all ${
-              currentLevel === level.id
-                ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-emerald-400"
+            className={`w-full text-left p-3 rounded-lg border transition-all ${currentLevel === level.id
+                ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-emerald-400'
                 : level.locked
-                ? "bg-zinc-700/50 text-zinc-500 cursor-not-allowed border-zinc-700"
-                : "bg-zinc-700/80 hover:bg-zinc-700 border-zinc-600 hover:border-zinc-500"
-            }`}
+                  ? 'bg-zinc-700/50 text-zinc-500 cursor-not-allowed border-zinc-700'
+                  : 'bg-zinc-700/80 hover:bg-zinc-700 border-zinc-600 hover:border-zinc-500'
+              }`}
           >
             <div className="flex items-center justify-between">
               <span className="font-medium">Level {level.id}</span>

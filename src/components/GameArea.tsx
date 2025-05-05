@@ -1,8 +1,9 @@
-import React from "react"
-import { LevelProps } from "../types/levelTypes"
-import PlaygroundLevel from "./levels/PlaygroundLevel"
-import GridMovementLevel from "./levels/GridMovementLevel"
-import WordMovementLevel from "./levels/WordMovementLevel"
+import React from 'react'
+import { LevelProps } from '../types/levelTypes'
+import PlaygroundLevel from './levels/PlaygroundLevel'
+import GridMovementLevel from './levels/GridMovementLevel'
+import WordMovementLevel from './levels/WordMovementLevel'
+import LineOperations3 from './levels/LineOperations3'
 
 interface GameAreaProps {
   level: number
@@ -19,6 +20,8 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
         return <GridMovementLevel isMuted={isMuted} />
       case 2:
         return <WordMovementLevel isMuted={isMuted} />
+      case 3:
+        return <LineOperations3 isMuted={isMuted} />
       default:
         return <GridMovementLevel isMuted={isMuted} />
     }

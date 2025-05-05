@@ -1,6 +1,6 @@
-import React from "react"
-import { X, ExternalLink } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import React from 'react'
+import { X, ExternalLink } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface DocumentationSidebarProps {
   currentLevel: number
@@ -20,7 +20,7 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
       transition: {
         duration: 0.3,
         staggerChildren: 0.07,
-        when: "beforeChildren",
+        when: 'beforeChildren',
       },
     },
   }
@@ -31,7 +31,7 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
       opacity: 1,
       x: 0,
       transition: {
-        type: "spring",
+        type: 'spring',
         stiffness: 300,
         damping: 24,
       },
@@ -46,15 +46,28 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
           <>
             <h3 className="text-lg font-semibold mb-2">Playground Mode</h3>
             <p className="text-sm mb-3">
-              Practice all Vim motions in a free environment. Try out different key combinations and see how they work.
+              Practice all Vim motions in a free environment. Try out different
+              key combinations and see how they work.
             </p>
             <div className="space-y-2">
               <p className="text-sm font-medium">Available motions:</p>
               <ul className="text-sm space-y-1 list-disc pl-4">
-                <li><kbd className="px-1 bg-zinc-700 rounded">h j k l</kbd> - Basic movement</li>
-                <li><kbd className="px-1 bg-zinc-700 rounded">w b e</kbd> - Word movement</li>
-                <li><kbd className="px-1 bg-zinc-700 rounded">0 $</kbd> - Line operations</li>
-                <li><kbd className="px-1 bg-zinc-700 rounded">f t</kbd> - Find characters</li>
+                <li>
+                  <kbd className="px-1 bg-zinc-700 rounded">h j k l</kbd> -
+                  Basic movement
+                </li>
+                <li>
+                  <kbd className="px-1 bg-zinc-700 rounded">w b e</kbd> - Word
+                  movement
+                </li>
+                <li>
+                  <kbd className="px-1 bg-zinc-700 rounded">0 $</kbd> - Line
+                  operations
+                </li>
+                <li>
+                  <kbd className="px-1 bg-zinc-700 rounded">f t</kbd> - Find
+                  characters
+                </li>
               </ul>
             </div>
           </>
@@ -68,24 +81,47 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             </p>
             <div className="space-y-3">
               <div>
-                <p className="text-sm font-medium"><kbd className="px-2 py-1 bg-zinc-700 rounded">h</kbd> - Move left</p>
-                <p className="text-xs text-zinc-400 ml-1">Like the left arrow key</p>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">h</kbd> - Move
+                  left
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Like the left arrow key
+                </p>
               </div>
               <div>
-                <p className="text-sm font-medium"><kbd className="px-2 py-1 bg-zinc-700 rounded">j</kbd> - Move down</p>
-                <p className="text-xs text-zinc-400 ml-1">Like the down arrow key</p>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">j</kbd> - Move
+                  down
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Like the down arrow key
+                </p>
               </div>
               <div>
-                <p className="text-sm font-medium"><kbd className="px-2 py-1 bg-zinc-700 rounded">k</kbd> - Move up</p>
-                <p className="text-xs text-zinc-400 ml-1">Like the up arrow key</p>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">k</kbd> - Move
+                  up
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Like the up arrow key
+                </p>
               </div>
               <div>
-                <p className="text-sm font-medium"><kbd className="px-2 py-1 bg-zinc-700 rounded">l</kbd> - Move right</p>
-                <p className="text-xs text-zinc-400 ml-1">Like the right arrow key</p>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">l</kbd> - Move
+                  right
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Like the right arrow key
+                </p>
               </div>
             </div>
             <div className="mt-4 text-xs text-zinc-400">
-              <p className="italic">Tip: Think of "j" as having a hook that goes down and "k" as having a stick that points up.</p>
+              <p className="italic">
+                Tip: Think of "j" as having a hook that goes down and "k" as
+                having a stick that points up.
+              </p>
             </div>
           </>
         )
@@ -98,16 +134,31 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             </p>
             <div className="space-y-3">
               <div>
-                <p className="text-sm font-medium"><kbd className="px-2 py-1 bg-zinc-700 rounded">w</kbd> - Move to start of next word</p>
-                <p className="text-xs text-zinc-400 ml-1">Jump forward to the beginning of a word</p>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">w</kbd> - Move
+                  to start of next word
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Jump forward to the beginning of a word
+                </p>
               </div>
               <div>
-                <p className="text-sm font-medium"><kbd className="px-2 py-1 bg-zinc-700 rounded">b</kbd> - Move to start of previous word</p>
-                <p className="text-xs text-zinc-400 ml-1">Jump backward to the beginning of a word</p>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">b</kbd> - Move
+                  to start of previous word
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Jump backward to the beginning of a word
+                </p>
               </div>
               <div>
-                <p className="text-sm font-medium"><kbd className="px-2 py-1 bg-zinc-700 rounded">e</kbd> - Move to end of current word</p>
-                <p className="text-xs text-zinc-400 ml-1">Jump to the end of a word</p>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">e</kbd> - Move
+                  to end of current word
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Jump to the end of a word
+                </p>
               </div>
             </div>
           </>
@@ -121,12 +172,31 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             </p>
             <div className="space-y-3">
               <div>
-                <p className="text-sm font-medium"><kbd className="px-2 py-1 bg-zinc-700 rounded">0</kbd> - Move to start of line</p>
-                <p className="text-xs text-zinc-400 ml-1">Jump to the first character of the line</p>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">0</kbd> - Move
+                  to start of line
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Jump to the first character of the line
+                </p>
               </div>
               <div>
-                <p className="text-sm font-medium"><kbd className="px-2 py-1 bg-zinc-700 rounded">$</kbd> - Move to end of line</p>
-                <p className="text-xs text-zinc-400 ml-1">Jump to the last character of the line</p>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">_</kbd> - Move
+                  to the first non-blank character
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Useful for skipping leading whitespace/indentation
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">$</kbd> - Move
+                  to end of line
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Jump to the last character of the line
+                </p>
               </div>
             </div>
           </>
@@ -140,21 +210,29 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             </p>
             <div className="space-y-3">
               <div>
-                <p className="text-sm font-medium"><kbd className="px-2 py-1 bg-zinc-700 rounded">f{char}</kbd> - Find character forward</p>
-                <p className="text-xs text-zinc-400 ml-1">Move to the next occurrence of {"{char}"}</p>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">f{char}</kbd> -
+                  Find character forward
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Move to the next occurrence of {'{char}'}
+                </p>
               </div>
               <div>
-                <p className="text-sm font-medium"><kbd className="px-2 py-1 bg-zinc-700 rounded">t{char}</kbd> - Till character forward</p>
-                <p className="text-xs text-zinc-400 ml-1">Move to just before the next occurrence of {"{char}"}</p>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">t{char}</kbd> -
+                  Till character forward
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Move to just before the next occurrence of {'{char}'}
+                </p>
               </div>
             </div>
           </>
         )
       default:
         return (
-          <p className="text-sm">
-            Select a level to see its documentation.
-          </p>
+          <p className="text-sm">Select a level to see its documentation.</p>
         )
     }
   }
@@ -170,7 +248,9 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
         className="flex items-center justify-between mb-6"
         variants={itemVariants}
       >
-        <h2 className="text-lg font-semibold text-emerald-400">Documentation</h2>
+        <h2 className="text-lg font-semibold text-emerald-400">
+          Documentation
+        </h2>
         <motion.button
           onClick={onClose}
           className="p-2 hover:bg-zinc-700 rounded-lg transition-colors"
