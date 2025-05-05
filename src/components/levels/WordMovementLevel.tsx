@@ -43,7 +43,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
 
   // Randomly select one sentence when component loads
   const [selectedTextIndex, setSelectedTextIndex] = useState(() =>
-    Math.floor(Math.random() * sampleTexts.length),
+    Math.floor(Math.random() * sampleTexts.length)
   )
   const sampleText = sampleTexts[selectedTextIndex]
   const characters = processTextForVim(sampleText)
@@ -170,10 +170,10 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
     if (revealedLetters.size > 0) {
       const nonSpaceSquares = squares.filter((square) => !square.isSpace)
       const allRevealed = nonSpaceSquares.every((square) =>
-        revealedLetters.has(square.idx),
+        revealedLetters.has(square.idx)
       )
 
-      if (allRevealed && !levelCompleted) {
+      if ((allRevealed && !levelCompleted) || score >= 100) {
         setLevelCompleted(true)
         setShowConfetti(true)
         setTimeout(() => setShowConfetti(false), 3000)
@@ -214,17 +214,24 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
         <div className="text-center mb-4">
           <p className="text-zinc-400">Use w, e, b to navigate horizontally</p>
           <div className="mt-4 flex items-center justify-center gap-4">
-            <div className="bg-zinc-800 px-4 py-2 rounded-lg flex items-center gap-2 shadow-md">
-              <Trophy size={18} className="text-amber-400" />
-              <span>Score: {score}</span>
+            <div className="bg-zinc-800 px-4 py-2 rounded-lg">
+              <span className="text-zinc-400 mr-2">Score:</span>
+              <span className="text-emerald-400 font-bold">{score}</span>
+              <span className="text-zinc-600 ml-1">/100</span>
             </div>
             <button
               onClick={resetLevel}
-              title="Reset Level"
-              className="bg-zinc-700 hover:bg-zinc-600 p-2 rounded-lg text-zinc-200 transition-all duration-200 flex items-center justify-center hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+              className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
+              aria-label="Reset Level"
             >
-              <RefreshCw size={18} className="text-emerald-400" />
+              <RefreshCw size={18} className="text-zinc-400" />
             </button>
+            {levelCompleted && (
+              <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
+                <Zap size={18} className="text-yellow-300" />
+                <span>Level Complete!</span>
+              </div>
+            )}
             <button
               onClick={changeText}
               title="New Text"
@@ -304,15 +311,22 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
               </div>
             ))}
           </div>
+          <div className="text-xs text-zinc-500 mt-4">
+            NOTE: this should be one long line but we are wrapping wordsto make
+            it easier to spot the next target.
+            <br />
+            In reality, you'd have to scroll to see the rest of the line.
+          </div>
         </div>
         <div className="flex gap-4 text-zinc-400 mt-4 justify-center">
           {['w', 'b', 'e', 'h', 'l'].map((k) => (
             <kbd
               key={k}
-              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${lastKeyPressed === k
+              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+                lastKeyPressed === k
                   ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
                   : ''
-                }`}
+              }`}
             >
               {k}
             </kbd>
