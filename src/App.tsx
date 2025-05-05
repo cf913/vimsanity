@@ -48,7 +48,7 @@ function App() {
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEYS.SHOW_LANDING_PAGE,
-      showLandingPage.toString(),
+      showLandingPage.toString()
     )
   }, [showLandingPage])
 
@@ -59,7 +59,7 @@ function App() {
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEYS.DOC_SIDEBAR_OPEN,
-      isDocSidebarOpen.toString(),
+      isDocSidebarOpen.toString()
     )
   }, [isDocSidebarOpen])
 
@@ -141,7 +141,7 @@ function App() {
       <AnimatePresence mode="wait">
         {isDocSidebarOpen && (
           <motion.div
-            className="fixed h-full bg-zinc-800 z-50 w-64 shadow-xl right-0"
+            className="fixed h-full bg-zinc-800 z-50 w-72 shadow-xl right-0"
             initial={{ x: 320 }}
             animate={{ x: 0 }}
             exit={{ x: 320 }}
@@ -183,7 +183,7 @@ function App() {
         initial={false}
         animate={{
           marginLeft: isSidebarOpen ? '16rem' : '0',
-          marginRight: isDocSidebarOpen ? '16rem' : '0',
+          marginRight: isDocSidebarOpen ? '18rem' : '0',
         }}
         transition={{
           type: 'spring',

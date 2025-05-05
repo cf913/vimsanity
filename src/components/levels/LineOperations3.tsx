@@ -231,7 +231,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
   return (
     <div className="flex flex-col items-center justify-center bg-zinc-900 text-white">
       <div className="w-full max-w-4xl">
-        <div className="flex flex-col items-center mb-6">
+        <div className="flex flex-col items-center mb-2">
           {/* <h1 className="text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">
             Line Navigation
           </h1> */}
@@ -263,7 +263,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
             )}
           </div>
         </div>
-        <div className="relative w-full max-w-4xl bg-zinc-800 p-6 rounded-lg mx-auto overflow-y-scroll">
+        <div className="relative w-full max-w-4xl bg-zinc-800 p-6 py-8 rounded-lg mx-auto overflow-y-scroll">
           {/* Global Confetti Burst over the game area */}
           {showConfetti && <ConfettiBurst />}
 

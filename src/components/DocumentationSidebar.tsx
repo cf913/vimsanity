@@ -138,9 +138,7 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
                   <kbd className="px-2 py-1 bg-zinc-700 rounded">w</kbd> - Move
                   to start of next word
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
-                  Jump forward to the beginning of a word
-                </p>
+                <p className="text-xs text-zinc-400 ml-1">W as in "Word"</p>
               </div>
               <div>
                 <p className="text-sm font-medium">
@@ -148,7 +146,7 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
                   to start of previous word
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Jump backward to the beginning of a word
+                  B as in "Back" or "Beginning"
                 </p>
               </div>
               <div>
@@ -156,9 +154,7 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
                   <kbd className="px-2 py-1 bg-zinc-700 rounded">e</kbd> - Move
                   to end of current word
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
-                  Jump to the end of a word
-                </p>
+                <p className="text-xs text-zinc-400 ml-1">E as in "End"</p>
               </div>
             </div>
           </>
@@ -239,7 +235,7 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
 
   return (
     <motion.div
-      className="w-64 h-full bg-zinc-800 p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-600 scrollbar-track-zinc-800"
+      className="w-72 h-full bg-zinc-800 p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-600 scrollbar-track-zinc-800"
       initial="hidden"
       animate="visible"
       variants={sidebarVariants}

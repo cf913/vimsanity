@@ -312,7 +312,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
             ))}
           </div>
           <div className="text-xs text-zinc-500 mt-4">
-            NOTE: this should be one long line but we are wrapping wordsto make
+            NOTE: this should be one long line but we are wrapping words to make
             it easier to spot the next target.
             <br />
             In reality, you'd have to scroll to see the rest of the line.
