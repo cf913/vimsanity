@@ -257,43 +257,52 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
   // Key actions for movement
   const keyActions: KeyActionMap = {
     f: () => {
-      if (awaitingCharacter) return false
+      if (awaitingCharacter) return handleCharacterInput('f')
       setLastKeyPressed('f')
       setPendingCommand('f')
       setAwaitingCharacter(true)
       return true
     },
     F: () => {
-      if (awaitingCharacter) return false
+      if (awaitingCharacter) return handleCharacterInput('F')
       setLastKeyPressed('F')
       setPendingCommand('F')
       setAwaitingCharacter(true)
       return true
     },
     t: () => {
-      if (awaitingCharacter) return false
+      if (awaitingCharacter) return handleCharacterInput('t')
       setLastKeyPressed('t')
       setPendingCommand('t')
       setAwaitingCharacter(true)
       return true
     },
     T: () => {
-      if (awaitingCharacter) return false
+      if (awaitingCharacter) return handleCharacterInput('T')
       setLastKeyPressed('T')
       setPendingCommand('T')
       setAwaitingCharacter(true)
       return true
     },
+    Escape: () => {
+      if (awaitingCharacter) {
+        setLastKeyPressed('Escape')
+        setAwaitingCharacter(false)
+        setPendingCommand(null)
+        return true
+      }
+      return false
+    },
     ';': () => {
-      if (awaitingCharacter) return false
+      if (awaitingCharacter) return handleCharacterInput(';')
       return repeatLastSearch()
     },
     ',': () => {
-      if (awaitingCharacter) return false
+      if (awaitingCharacter) return handleCharacterInput(',')
       return repeatLastSearchReverse()
     },
     j: () => {
-      if (awaitingCharacter) return false
+      if (awaitingCharacter) return handleCharacterInput('j')
 
       setLastKeyPressed('j')
       if (currentLineIndex < linesOfSquares.length - 1) {
@@ -312,7 +321,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
       return true
     },
     k: () => {
-      if (awaitingCharacter) return false
+      if (awaitingCharacter) return handleCharacterInput('k')
 
       setLastKeyPressed('k')
       if (currentLineIndex > 0) {
@@ -575,8 +584,8 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
             ))}
           </div>
           <div className="text-xs text-zinc-500 mt-4 max-w-xl">
-            <span className="text-amber-400 font-semibold">PRO TIP:</span> After
-            using any character search command (f, F, t, T), press{' '}
+            <span className="text-emerald-400 font-semibold">PRO TIP:</span>{' '}
+            After using any character search command (f, F, t, T), press{' '}
             <kbd className="px-1 py-0.5 bg-zinc-700 rounded text-zinc-300">
               ;
             </kbd>{' '}
