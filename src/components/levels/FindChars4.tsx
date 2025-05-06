@@ -77,7 +77,9 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
 
   // States for f and t commands
   const [awaitingCharacter, setAwaitingCharacter] = useState<boolean>(false)
-  const [pendingCommand, setPendingCommand] = useState<'f' | 't' | null>(null)
+  const [pendingCommand, setPendingCommand] = useState<
+    'f' | 'F' | 't' | 'T' | null
+  >(null)
   const [targetChar, setTargetChar] = useState<string | null>(null)
 
   // Refs for scrolling
@@ -139,6 +141,20 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
     return false // Character not found
   }
 
+  // Function to handle 'F' command (reverse search)
+  const handleFReverseCommand = (char: string) => {
+    // Find the previous occurrence of the character on the current line
+    const currentLine = linesOfSquares[currentLineIndex]
+    for (let i = cursor - 1; i >= 0; i--) {
+      if (currentLine[i].char.toLowerCase() === char.toLowerCase()) {
+        setCursor(i)
+        checkTarget(i, currentLineIndex)
+        return true
+      }
+    }
+    return false // Character not found
+  }
+
   // Function to handle 't' command
   const handleTCommand = (char: string) => {
     // Move to just before the next occurrence of the character
@@ -147,6 +163,20 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
       if (currentLine[i].char.toLowerCase() === char.toLowerCase()) {
         setCursor(i - 1)
         checkTarget(i - 1, currentLineIndex)
+        return true
+      }
+    }
+    return false // Character not found
+  }
+
+  // Function to handle 'T' command (reverse search)
+  const handleTReverseCommand = (char: string) => {
+    // Move to just after the previous occurrence of the character
+    const currentLine = linesOfSquares[currentLineIndex]
+    for (let i = cursor - 1; i >= 0; i--) {
+      if (currentLine[i].char.toLowerCase() === char.toLowerCase()) {
+        setCursor(i + 1)
+        checkTarget(i + 1, currentLineIndex)
         return true
       }
     }
@@ -163,8 +193,12 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
     let success = false
     if (pendingCommand === 'f') {
       success = handleFCommand(char)
+    } else if (pendingCommand === 'F') {
+      success = handleFReverseCommand(char)
     } else if (pendingCommand === 't') {
       success = handleTCommand(char)
+    } else if (pendingCommand === 'T') {
+      success = handleTReverseCommand(char)
     }
 
     setPendingCommand(null)
@@ -180,10 +214,24 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
       setAwaitingCharacter(true)
       return true
     },
+    F: () => {
+      if (awaitingCharacter) return false
+      setLastKeyPressed('F')
+      setPendingCommand('F')
+      setAwaitingCharacter(true)
+      return true
+    },
     t: () => {
       if (awaitingCharacter) return false
       setLastKeyPressed('t')
       setPendingCommand('t')
+      setAwaitingCharacter(true)
+      return true
+    },
+    T: () => {
+      if (awaitingCharacter) return false
+      setLastKeyPressed('T')
+      setPendingCommand('T')
       setAwaitingCharacter(true)
       return true
     },
@@ -313,12 +361,11 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
       <div className="w-full max-w-4xl">
         <div className="flex flex-col items-center mb-2">
           <p className="text-zinc-400 text-center max-w-lg mb-4">
-            Use <kbd className="px-2 py-1 bg-zinc-800 rounded">f</kbd> +
-            character to find and move to the next occurrence of that character
-            in the same line. Use{' '}
-            <kbd className="px-2 py-1 bg-zinc-800 rounded">t</kbd> + character
-            to move to just before the next occurrence of that character in the
-            same line.
+            Use <kbd className="px-2 py-1 bg-zinc-800 rounded">f</kbd>,{' '}
+            <kbd className="px-2 py-1 bg-zinc-800 rounded">F</kbd>,{' '}
+            <kbd className="px-2 py-1 bg-zinc-800 rounded">t</kbd> and{' '}
+            <kbd className="px-2 py-1 bg-zinc-800 rounded">T</kbd> to quickly
+            jump to a character occurence in the current line.
           </p>
 
           <div className="flex items-center gap-4 mb-2">
@@ -350,7 +397,14 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
               <div className="bg-amber-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
                 <span>
                   Type a character to{' '}
-                  {pendingCommand === 'f' ? 'find' : 'move before'}...
+                  {pendingCommand === 'f'
+                    ? 'find'
+                    : pendingCommand === 'F'
+                      ? 'find (reverse)'
+                      : pendingCommand === 't'
+                        ? 'move before'
+                        : 'move after'}
+                  ...
                 </span>
               </div>
             )}
@@ -461,7 +515,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
           </div>
         </div>
         <div className="flex gap-4 text-zinc-400 mt-4 justify-center">
-          {['f', 't', 'j', 'k'].map((k) => (
+          {['f', 'F', 't', 'T', 'j', 'k'].map((k) => (
             <kbd
               key={k}
               className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${lastKeyPressed === k

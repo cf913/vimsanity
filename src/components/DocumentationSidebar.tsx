@@ -228,11 +228,30 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">F + char</kbd>{' '}
+                  - Find character backward
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Move to the previous occurrence of {'{char}'} on the current line
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
                   <kbd className="px-2 py-1 bg-zinc-700 rounded">t + char</kbd>{' '}
                   - Till character forward
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Move to just before the next occurrence of {'{char}'} on the
+                  current line
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">T + char</kbd>{' '}
+                  - Till character backward
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Move to just after the previous occurrence of {'{char}'} on the
                   current line
                 </p>
               </div>
@@ -253,9 +272,9 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             </div>
             <div className="mt-4 text-xs text-zinc-400">
               <p className="italic">
-                Tip: After pressing 'f' or 't', you need to type the character
-                you want to find. The cursor will move to (or just before) the
-                next occurrence of that character.
+                Tip: After pressing 'f', 'F', 't', or 'T', you need to type the character
+                you want to find. The cursor will move to (or just before/after) the
+                next or previous occurrence of that character depending on the command used.
               </p>
             </div>
           </>
