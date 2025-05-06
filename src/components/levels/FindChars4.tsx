@@ -81,6 +81,10 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
     'f' | 'F' | 't' | 'T' | null
   >(null)
   const [targetChar, setTargetChar] = useState<string | null>(null)
+  const [lastSearchChar, setLastSearchChar] = useState<string | null>(null)
+  const [lastSearchCommand, setLastSearchCommand] = useState<
+    'f' | 'F' | 't' | 'T' | null
+  >(null)
 
   // Refs for scrolling
   const containerRef = useRef<HTMLDivElement>(null)
@@ -190,6 +194,10 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
     setLastKeyPressed(pendingCommand + char)
     setAwaitingCharacter(false)
 
+    // Save the last search character and command for ; and , keys
+    setLastSearchChar(char)
+    setLastSearchCommand(pendingCommand)
+
     let success = false
     if (pendingCommand === 'f') {
       success = handleFCommand(char)
@@ -202,6 +210,47 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
     }
 
     setPendingCommand(null)
+    return success
+  }
+
+  // Repeat last search in same direction (;)
+  const repeatLastSearch = () => {
+    if (!lastSearchChar || !lastSearchCommand) return false
+
+    setLastKeyPressed(';')
+
+    let success = false
+    if (lastSearchCommand === 'f') {
+      success = handleFCommand(lastSearchChar)
+    } else if (lastSearchCommand === 'F') {
+      success = handleFReverseCommand(lastSearchChar)
+    } else if (lastSearchCommand === 't') {
+      success = handleTCommand(lastSearchChar)
+    } else if (lastSearchCommand === 'T') {
+      success = handleTReverseCommand(lastSearchChar)
+    }
+
+    return success
+  }
+
+  // Repeat last search in opposite direction (,)
+  const repeatLastSearchReverse = () => {
+    if (!lastSearchChar || !lastSearchCommand) return false
+
+    setLastKeyPressed(',')
+
+    let success = false
+    // Use the opposite command
+    if (lastSearchCommand === 'f') {
+      success = handleFReverseCommand(lastSearchChar)
+    } else if (lastSearchCommand === 'F') {
+      success = handleFCommand(lastSearchChar)
+    } else if (lastSearchCommand === 't') {
+      success = handleTReverseCommand(lastSearchChar)
+    } else if (lastSearchCommand === 'T') {
+      success = handleTCommand(lastSearchChar)
+    }
+
     return success
   }
 
@@ -234,6 +283,14 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
       setPendingCommand('T')
       setAwaitingCharacter(true)
       return true
+    },
+    ';': () => {
+      if (awaitingCharacter) return false
+      return repeatLastSearch()
+    },
+    ',': () => {
+      if (awaitingCharacter) return false
+      return repeatLastSearchReverse()
     },
     j: () => {
       if (awaitingCharacter) return false
@@ -353,6 +410,8 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
     setRevealedLetters(new Set())
     setAwaitingCharacter(false)
     setPendingCommand(null)
+    setLastSearchChar(null)
+    setLastSearchCommand(null)
     setNewTarget()
   }
 
@@ -515,7 +574,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
           </div>
         </div>
         <div className="flex gap-4 text-zinc-400 mt-4 justify-center">
-          {['f', 'F', 't', 'T', 'j', 'k'].map((k) => (
+          {['f', 'F', 't', 'T', ';', ',', 'j', 'k'].map((k) => (
             <kbd
               key={k}
               className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${lastKeyPressed === k
