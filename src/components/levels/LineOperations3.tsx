@@ -41,7 +41,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
       isSpace: char === ' ',
       idx,
       char,
-    })),
+    }))
   )
 
   // Group characters into words for each line
@@ -65,7 +65,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
           }
           return acc
         }, [])
-        .filter((word) => word.length > 0), // Remove any empty words
+        .filter((word) => word.length > 0) // Remove any empty words
   )
 
   // Track current line and position within that line
@@ -101,13 +101,15 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
     // Choose a random line
     const randomLineIndex = Math.floor(Math.random() * linesOfSquares.length)
     // Choose a random position in that line
-    const prevWasAtStart = target === 0
 
-    const prevWasAtEnd = target === linesOfSquares[targetLineIndex].length - 1
+    // target was start of line or at first non-whitespace character
+    const prevWasAtStart =
+      target ===
+      linesOfSquares[targetLineIndex].findIndex((square) => !square.isSpace)
 
     const randomPos = prevWasAtStart
-      ? linesOfSquares[targetLineIndex].length - 1
-      : 0
+      ? linesOfSquares[randomLineIndex].length - 1
+      : linesOfSquares[randomLineIndex].findIndex((square) => !square.isSpace)
 
     setTarget(randomPos)
     setTargetLineIndex(randomLineIndex)
@@ -126,9 +128,12 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
       checkTarget(0, currentLineIndex)
     },
     _: () => {
-      // move cursor to start of line
-      setCursor(0)
-      checkTarget(0, currentLineIndex)
+      // move cursor to the first non-whitespace character
+      const firstNonWhitespace = linesOfSquares[currentLineIndex].findIndex(
+        (square) => !square.isSpace
+      )
+      setCursor(firstNonWhitespace)
+      checkTarget(firstNonWhitespace, currentLineIndex)
     },
     $: () => {
       // move cursor to end of current line
@@ -143,7 +148,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
         // Ensure cursor doesn't go beyond the end of the next line
         const nextLineCursor = Math.min(
           cursor,
-          linesOfSquares[nextLineIndex].length - 1,
+          linesOfSquares[nextLineIndex].length - 1
         )
 
         setCurrentLineIndex(nextLineIndex)
@@ -159,7 +164,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
         // Ensure cursor doesn't go beyond the end of the previous line
         const prevLineCursor = Math.min(
           cursor,
-          linesOfSquares[prevLineIndex].length - 1,
+          linesOfSquares[prevLineIndex].length - 1
         )
 
         setCurrentLineIndex(prevLineIndex)
@@ -295,7 +300,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
                         square.idx === target && lineIdx === targetLineIndex
 
                       const isRevealed = revealedLetters.has(
-                        `${lineIdx}-${square.idx}`,
+                        `${lineIdx}-${square.idx}`
                       )
 
                       let base =

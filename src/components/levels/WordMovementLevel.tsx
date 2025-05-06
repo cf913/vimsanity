@@ -261,15 +261,17 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
                 className="flex flex-row whitespace-nowrap mb-1"
               >
                 {word.map((square) => {
+                  const isPlayer = square.idx === cursor
                   if (square.isSpace) {
                     return (
                       <span
                         key={square.idx}
-                        className="inline-block w-6 h-8"
+                        className={`inline-block w-8 h-8 mx-0.5 my-0.5 transition-all duration-150 rounded-md ${
+                          isPlayer ? 'bg-emerald-500/25' : ''
+                        }`}
                       ></span>
                     )
                   }
-                  const isPlayer = square.idx === cursor
                   const isTarget = square.idx === target
                   const isRevealed = revealedLetters.has(square.idx)
                   let base =
