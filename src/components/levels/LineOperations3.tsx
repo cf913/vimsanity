@@ -22,11 +22,14 @@ interface LevelProps {
 const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
   // Array of 5 different lines of text
   const sampleTexts = [
-    'Norem ipsum dolor sY',
-    'Ied do eiusmod tempD',
-    'Ct dolore magna aliO',
-    'Eeniam quis nostrudN',
-    'Laboris nisi ut aliE',
+    'Norem ipsum dolor sC',
+    'Ied do eiusmod tempO',
+    '  Colo re magna aliN',
+    '   Eia quis nostrudG',
+    '  Oor = niaasdf jjiR',
+    ' Nbo asanisi utaaliA',
+    'Eabori anis aut aliT',
+    '!abo asd isiaut a iS',
   ]
 
   // Process each line of text separately
@@ -38,7 +41,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
       isSpace: char === ' ',
       idx,
       char,
-    }))
+    })),
   )
 
   // Group characters into words for each line
@@ -62,7 +65,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
           }
           return acc
         }, [])
-        .filter((word) => word.length > 0) // Remove any empty words
+        .filter((word) => word.length > 0), // Remove any empty words
   )
 
   // Track current line and position within that line
@@ -140,7 +143,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
         // Ensure cursor doesn't go beyond the end of the next line
         const nextLineCursor = Math.min(
           cursor,
-          linesOfSquares[nextLineIndex].length - 1
+          linesOfSquares[nextLineIndex].length - 1,
         )
 
         setCurrentLineIndex(nextLineIndex)
@@ -156,7 +159,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
         // Ensure cursor doesn't go beyond the end of the previous line
         const prevLineCursor = Math.min(
           cursor,
-          linesOfSquares[prevLineIndex].length - 1
+          linesOfSquares[prevLineIndex].length - 1,
         )
 
         setCurrentLineIndex(prevLineIndex)
@@ -285,21 +288,14 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
                     className="flex flex-row whitespace-nowrap mb-1"
                   >
                     {word.map((square) => {
-                      if (square.isSpace) {
-                        return (
-                          <span
-                            key={`space-${lineIdx}-${square.idx}`}
-                            className="inline-block w-8 h-8"
-                          ></span>
-                        )
-                      }
-
                       const isPlayer =
                         square.idx === cursor && lineIdx === currentLineIndex
+
                       const isTarget =
                         square.idx === target && lineIdx === targetLineIndex
+
                       const isRevealed = revealedLetters.has(
-                        `${lineIdx}-${square.idx}`
+                        `${lineIdx}-${square.idx}`,
                       )
 
                       let base =
@@ -312,6 +308,22 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
                         base +=
                           'bg-purple-500 text-white scale-105 shadow-lg shadow-purple-500/60 animate-pulse '
                       else base += 'bg-zinc-700 text-zinc-300 '
+
+                      if (square.isSpace) {
+                        let baseSpace =
+                          'inline-block mx-0.5 my-0.5 w-8 h-8 transition-all duration-150 rounded-md '
+                        if (isPlayer) {
+                          baseSpace +=
+                            'bg-emerald-500/25 text-white scale-110 shadow-lg shadow-emerald-500/10 '
+                        }
+                        return (
+                          <span
+                            key={`space-${lineIdx}-${square.idx}`}
+                            ref={isPlayer ? playerRef : undefined}
+                            className={baseSpace}
+                          ></span>
+                        )
+                      }
 
                       return (
                         <span
