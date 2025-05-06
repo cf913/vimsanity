@@ -34,7 +34,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
       isSpace: char === ' ',
       idx,
       char,
-    }))
+    })),
   )
 
   // Group characters into words for each line
@@ -58,7 +58,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
           }
           return acc
         }, [])
-        .filter((word) => word.length > 0) // Remove any empty words
+        .filter((word) => word.length > 0), // Remove any empty words
   )
 
   // Track current line and position within that line
@@ -174,14 +174,18 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
   // Key actions for movement
   const keyActions: KeyActionMap = {
     f: () => {
+      if (awaitingCharacter) return false
       setLastKeyPressed('f')
       setPendingCommand('f')
       setAwaitingCharacter(true)
+      return true
     },
     t: () => {
+      if (awaitingCharacter) return false
       setLastKeyPressed('t')
       setPendingCommand('t')
       setAwaitingCharacter(true)
+      return true
     },
     j: () => {
       if (awaitingCharacter) return false
@@ -193,7 +197,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
         // Ensure cursor doesn't go beyond the end of the next line
         const nextLineCursor = Math.min(
           cursor,
-          linesOfSquares[nextLineIndex].length - 1
+          linesOfSquares[nextLineIndex].length - 1,
         )
 
         setCurrentLineIndex(nextLineIndex)
@@ -212,7 +216,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
         // Ensure cursor doesn't go beyond the end of the previous line
         const prevLineCursor = Math.min(
           cursor,
-          linesOfSquares[prevLineIndex].length - 1
+          linesOfSquares[prevLineIndex].length - 1,
         )
 
         setCurrentLineIndex(prevLineIndex)
@@ -227,7 +231,11 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
   const allChars =
     'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}\\|;:\'",.<>/?'
   for (const char of allChars) {
-    keyActions[char] = () => handleCharacterInput(char)
+    if (keyActions[char]) continue
+    keyActions[char] = () => {
+      if (!awaitingCharacter) return false
+      return handleCharacterInput(char)
+    }
   }
 
   // Register keyboard handler
@@ -357,11 +365,10 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
             {linesOfWords.map((words, lineIdx) => (
               <div
                 key={`line-${lineIdx}`}
-                className={`flex flex-row overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 ${
-                  lineIdx === currentLineIndex
+                className={`flex flex-row overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 ${lineIdx === currentLineIndex
                     ? 'bg-zinc-700/30 rounded-md'
                     : ''
-                }`}
+                  }`}
                 ref={lineIdx === currentLineIndex ? containerRef : undefined}
               >
                 {words.map((word, wordIdx) => (
@@ -377,7 +384,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
                         square.idx === target && lineIdx === targetLineIndex
 
                       const isRevealed = revealedLetters.has(
-                        `${lineIdx}-${square.idx}`
+                        `${lineIdx}-${square.idx}`,
                       )
 
                       // Highlight characters that match the target character on the current line
@@ -385,7 +392,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
                         lineIdx === currentLineIndex &&
                         targetChar &&
                         square.char.toLowerCase() ===
-                          targetChar.toLowerCase() &&
+                        targetChar.toLowerCase() &&
                         square.idx > cursor
 
                       let base =
@@ -457,11 +464,10 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
           {['f', 't', 'j', 'k'].map((k) => (
             <kbd
               key={k}
-              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-                lastKeyPressed === k
+              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${lastKeyPressed === k
                   ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
                   : ''
-              }`}
+                }`}
             >
               {k}
             </kbd>
