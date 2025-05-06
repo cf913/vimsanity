@@ -34,7 +34,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
       isSpace: char === ' ',
       idx,
       char,
-    })),
+    }))
   )
 
   // Group characters into words for each line
@@ -58,7 +58,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
           }
           return acc
         }, [])
-        .filter((word) => word.length > 0), // Remove any empty words
+        .filter((word) => word.length > 0) // Remove any empty words
   )
 
   // Track current line and position within that line
@@ -302,7 +302,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
         // Ensure cursor doesn't go beyond the end of the next line
         const nextLineCursor = Math.min(
           cursor,
-          linesOfSquares[nextLineIndex].length - 1,
+          linesOfSquares[nextLineIndex].length - 1
         )
 
         setCurrentLineIndex(nextLineIndex)
@@ -321,7 +321,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
         // Ensure cursor doesn't go beyond the end of the previous line
         const prevLineCursor = Math.min(
           cursor,
-          linesOfSquares[prevLineIndex].length - 1,
+          linesOfSquares[prevLineIndex].length - 1
         )
 
         setCurrentLineIndex(prevLineIndex)
@@ -459,10 +459,10 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
                   {pendingCommand === 'f'
                     ? 'find'
                     : pendingCommand === 'F'
-                      ? 'find (reverse)'
-                      : pendingCommand === 't'
-                        ? 'move before'
-                        : 'move after'}
+                    ? 'find (reverse)'
+                    : pendingCommand === 't'
+                    ? 'move before'
+                    : 'move after'}
                   ...
                 </span>
               </div>
@@ -478,10 +478,11 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
             {linesOfWords.map((words, lineIdx) => (
               <div
                 key={`line-${lineIdx}`}
-                className={`flex flex-row overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 ${lineIdx === currentLineIndex
+                className={`flex flex-row overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 ${
+                  lineIdx === currentLineIndex
                     ? 'bg-zinc-700/30 rounded-md'
                     : ''
-                  }`}
+                }`}
                 ref={lineIdx === currentLineIndex ? containerRef : undefined}
               >
                 {words.map((word, wordIdx) => (
@@ -497,16 +498,17 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
                         square.idx === target && lineIdx === targetLineIndex
 
                       const isRevealed = revealedLetters.has(
-                        `${lineIdx}-${square.idx}`,
+                        `${lineIdx}-${square.idx}`
                       )
 
                       // Highlight characters that match the target character on the current line
                       const isMatchingChar =
                         lineIdx === currentLineIndex &&
                         targetChar &&
-                        square.char.toLowerCase() ===
-                        targetChar.toLowerCase() &&
-                        square.idx > cursor
+                        square.char.toLowerCase() === targetChar.toLowerCase()
+                      {
+                        /* square.idx > cursor */
+                      }
 
                       let base =
                         'inline-flex items-center justify-center mx-0.5 my-0.5 min-w-8 h-8 transition-all duration-150 rounded-md '
@@ -572,15 +574,30 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
               </div>
             ))}
           </div>
+          <div className="text-xs text-zinc-500 mt-4 max-w-xl">
+            <span className="text-amber-400 font-semibold">PRO TIP:</span> After
+            using any character search command (f, F, t, T), press{' '}
+            <kbd className="px-1 py-0.5 bg-zinc-700 rounded text-zinc-300">
+              ;
+            </kbd>{' '}
+            to repeat the search in the same direction or{' '}
+            <kbd className="px-1 py-0.5 bg-zinc-700 rounded text-zinc-300">
+              ,
+            </kbd>{' '}
+            to repeat in the opposite direction. This lets you quickly navigate
+            through multiple occurrences of the same character. It even works
+            after moving to a different line!
+          </div>
         </div>
         <div className="flex gap-4 text-zinc-400 mt-4 justify-center">
           {['f', 'F', 't', 'T', ';', ',', 'j', 'k'].map((k) => (
             <kbd
               key={k}
-              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${lastKeyPressed === k
+              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+                lastKeyPressed === k
                   ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
                   : ''
-                }`}
+              }`}
             >
               {k}
             </kbd>
