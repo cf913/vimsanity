@@ -75,6 +75,11 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
   const [levelCompleted, setLevelCompleted] = useState(false)
   const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
 
+  // States for f and t commands
+  const [awaitingCharacter, setAwaitingCharacter] = useState<boolean>(false)
+  const [pendingCommand, setPendingCommand] = useState<'f' | 't' | null>(null)
+  const [targetChar, setTargetChar] = useState<string | null>(null)
+
   // Refs for scrolling
   const containerRef = useRef<HTMLDivElement>(null)
   const playerRef = useRef<HTMLSpanElement>(null)
@@ -93,17 +98,24 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
   const setNewTarget = () => {
     // Choose a random line
     const randomLineIndex = Math.floor(Math.random() * linesOfSquares.length)
-    // Choose a random position in that line
 
-    // target was start of line or at first non-whitespace character
-    const prevWasAtStart =
-      target ===
-      linesOfSquares[targetLineIndex].findIndex((square) => !square.isSpace)
+    // Find a non-space character to use as the target
+    const nonSpaceIndices = linesOfSquares[randomLineIndex]
+      .map((square, idx) => (!square.isSpace ? idx : -1))
+      .filter((idx) => idx !== -1)
 
-    const randomPos = prevWasAtStart
-      ? linesOfSquares[randomLineIndex].length - 1
-      : linesOfSquares[randomLineIndex].findIndex((square) => !square.isSpace)
+    if (nonSpaceIndices.length === 0) {
+      // If no non-space characters, try another line
+      setNewTarget()
+      return
+    }
 
+    // Choose a random non-space character
+    const randomPos =
+      nonSpaceIndices[Math.floor(Math.random() * nonSpaceIndices.length)]
+
+    // Set the target character for display
+    setTargetChar(linesOfSquares[randomLineIndex][randomPos].char)
     setTarget(randomPos)
     setTargetLineIndex(randomLineIndex)
   }
@@ -113,27 +125,67 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
     setNewTarget()
   }, [])
 
+  // Function to handle 'f' command
+  const handleFCommand = (char: string) => {
+    // Find the next occurrence of the character on the current line
+    const currentLine = linesOfSquares[currentLineIndex]
+    for (let i = cursor + 1; i < currentLine.length; i++) {
+      if (currentLine[i].char.toLowerCase() === char.toLowerCase()) {
+        setCursor(i)
+        checkTarget(i, currentLineIndex)
+        return true
+      }
+    }
+    return false // Character not found
+  }
+
+  // Function to handle 't' command
+  const handleTCommand = (char: string) => {
+    // Move to just before the next occurrence of the character
+    const currentLine = linesOfSquares[currentLineIndex]
+    for (let i = cursor + 1; i < currentLine.length; i++) {
+      if (currentLine[i].char.toLowerCase() === char.toLowerCase()) {
+        setCursor(i - 1)
+        checkTarget(i - 1, currentLineIndex)
+        return true
+      }
+    }
+    return false // Character not found
+  }
+
+  // Handle character input after f or t command
+  const handleCharacterInput = (char: string) => {
+    if (!awaitingCharacter) return false
+
+    setLastKeyPressed(pendingCommand + char)
+    setAwaitingCharacter(false)
+
+    let success = false
+    if (pendingCommand === 'f') {
+      success = handleFCommand(char)
+    } else if (pendingCommand === 't') {
+      success = handleTCommand(char)
+    }
+
+    setPendingCommand(null)
+    return success
+  }
+
   // Key actions for movement
   const keyActions: KeyActionMap = {
-    0: () => {
-      // move cursor to start of line
-      setCursor(0)
-      checkTarget(0, currentLineIndex)
+    f: () => {
+      setLastKeyPressed('f')
+      setPendingCommand('f')
+      setAwaitingCharacter(true)
     },
-    _: () => {
-      // move cursor to the first non-whitespace character
-      const firstNonWhitespace = linesOfSquares[currentLineIndex].findIndex(
-        (square) => !square.isSpace
-      )
-      setCursor(firstNonWhitespace)
-      checkTarget(firstNonWhitespace, currentLineIndex)
-    },
-    $: () => {
-      // move cursor to end of current line
-      setCursor(linesOfSquares[currentLineIndex].length - 1)
-      checkTarget(linesOfSquares[currentLineIndex].length - 1, currentLineIndex)
+    t: () => {
+      setLastKeyPressed('t')
+      setPendingCommand('t')
+      setAwaitingCharacter(true)
     },
     j: () => {
+      if (awaitingCharacter) return false
+
       setLastKeyPressed('j')
       if (currentLineIndex < linesOfSquares.length - 1) {
         // Move to next line
@@ -148,8 +200,11 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
         setCursor(nextLineCursor)
         checkTarget(nextLineCursor, nextLineIndex)
       }
+      return true
     },
     k: () => {
+      if (awaitingCharacter) return false
+
       setLastKeyPressed('k')
       if (currentLineIndex > 0) {
         // Move to previous line
@@ -164,21 +219,35 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
         setCursor(prevLineCursor)
         checkTarget(prevLineCursor, prevLineIndex)
       }
+      return true
     },
+  }
+
+  // Add handlers for all possible character inputs
+  const allChars =
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}\\|;:\'",.<>/?'
+  for (const char of allChars) {
+    keyActions[char] = () => handleCharacterInput(char)
   }
 
   // Register keyboard handler
   const { lastKeyPressed: keyboardLastKey } = useKeyboardHandler({
     keyActionMap: keyActions,
-    dependencies: [cursor, currentLineIndex, linesOfSquares],
+    dependencies: [
+      cursor,
+      currentLineIndex,
+      linesOfSquares,
+      awaitingCharacter,
+      pendingCommand,
+    ],
   })
 
   // Update lastKeyPressed state when keyboard events happen
   useEffect(() => {
-    if (keyboardLastKey) {
+    if (keyboardLastKey && !awaitingCharacter) {
       setLastKeyPressed(keyboardLastKey)
     }
-  }, [keyboardLastKey])
+  }, [keyboardLastKey, awaitingCharacter])
 
   // Check if the player has reached the target
   const checkTarget = (newPos: number, lineIndex: number) => {
@@ -207,7 +276,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
         // Set a new target
         setNewTarget()
 
-        // Check if level is completed (10 targets hit)
+        // Check if level is completed (100 targets hit)
         if (score + 1 >= 100) {
           setLevelCompleted(true)
           setShowConfetti(true)
@@ -226,6 +295,8 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
     setScore(0)
     setLevelCompleted(false)
     setRevealedLetters(new Set())
+    setAwaitingCharacter(false)
+    setPendingCommand(null)
     setNewTarget()
   }
 
@@ -233,14 +304,13 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
     <div className="flex flex-col items-center justify-center bg-zinc-900 text-white">
       <div className="w-full max-w-4xl">
         <div className="flex flex-col items-center mb-2">
-          {/* <h1 className="text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">
-            Line Navigation
-          </h1> */}
           <p className="text-zinc-400 text-center max-w-lg mb-4">
-            Use <kbd className="px-2 py-1 bg-zinc-800 rounded">0</kbd>,{' '}
-            <kbd className="px-2 py-1 bg-zinc-800 rounded">_</kbd> and{' '}
-            <kbd className="px-2 py-1 bg-zinc-800 rounded">$</kbd> to quickly
-            jump to ends of a line.
+            Use <kbd className="px-2 py-1 bg-zinc-800 rounded">f</kbd> +
+            character to find and move to the next occurrence of that character
+            in the same line. Use{' '}
+            <kbd className="px-2 py-1 bg-zinc-800 rounded">t</kbd> + character
+            to move to just before the next occurrence of that character in the
+            same line.
           </p>
 
           <div className="flex items-center gap-4 mb-2">
@@ -260,6 +330,20 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
               <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
                 <Zap size={18} className="text-yellow-300" />
                 <span>Level Complete!</span>
+              </div>
+            )}
+            {targetChar && (
+              <div className="bg-purple-600 px-4 py-2 rounded-lg text-white flex items-center gap-2 shadow-md">
+                <span>Target: </span>
+                <span className="font-mono font-bold">{targetChar}</span>
+              </div>
+            )}
+            {awaitingCharacter && (
+              <div className="bg-amber-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
+                <span>
+                  Type a character to{' '}
+                  {pendingCommand === 'f' ? 'find' : 'move before'}...
+                </span>
               </div>
             )}
           </div>
@@ -296,6 +380,14 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
                         `${lineIdx}-${square.idx}`
                       )
 
+                      // Highlight characters that match the target character on the current line
+                      const isMatchingChar =
+                        lineIdx === currentLineIndex &&
+                        targetChar &&
+                        square.char.toLowerCase() ===
+                          targetChar.toLowerCase() &&
+                        square.idx > cursor
+
                       let base =
                         'inline-flex items-center justify-center mx-0.5 my-0.5 min-w-8 h-8 transition-all duration-150 rounded-md '
 
@@ -305,6 +397,8 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
                       else if (isTarget)
                         base +=
                           'bg-purple-500 text-white scale-105 shadow-lg shadow-purple-500/60 animate-pulse '
+                      else if (isMatchingChar)
+                        base += 'bg-amber-500/30 text-amber-200 '
                       else base += 'bg-zinc-700 text-zinc-300 '
 
                       if (square.isSpace) {
@@ -334,12 +428,13 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
                             <span className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30 z-0"></span>
                           )}
 
-                          {/* Show the character if it's been revealed */}
-                          {isRevealed && square.char !== ' ' && (
-                            <span className="z-10 text-lg font-medium font-mono">
-                              {square.char}
-                            </span>
-                          )}
+                          {/* Show the character if it's been revealed or is a matching character */}
+                          {(isRevealed || isMatchingChar) &&
+                            square.char !== ' ' && (
+                              <span className="z-10 text-lg font-medium font-mono">
+                                {square.char}
+                              </span>
+                            )}
 
                           {/* Explosion effect */}
                           {showExplosion &&
@@ -359,7 +454,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
           </div>
         </div>
         <div className="flex gap-4 text-zinc-400 mt-4 justify-center">
-          {['0', '_', '$', 'j', 'k'].map((k) => (
+          {['f', 't', 'j', 'k'].map((k) => (
             <kbd
               key={k}
               className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
@@ -371,6 +466,21 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
               {k}
             </kbd>
           ))}
+          {pendingCommand && (
+            <div className="flex items-center">
+              <span className="mx-2">+</span>
+              <kbd className="px-3 py-1 bg-amber-600 text-white rounded-lg animate-pulse">
+                ?
+              </kbd>
+            </div>
+          )}
+          {lastKeyPressed.length > 1 && (
+            <div className="flex items-center">
+              <span className="text-emerald-400 font-mono px-3 py-1 bg-zinc-800 rounded-lg">
+                {lastKeyPressed}
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

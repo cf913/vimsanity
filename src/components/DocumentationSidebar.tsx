@@ -130,20 +130,23 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
           <>
             <h3 className="text-lg font-semibold mb-2">Word Movement</h3>
             <p className="text-sm mb-3">
-              Navigate through text by words rather than individual characters:
+              Navigate through text word by word more efficiently:
             </p>
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
                   <kbd className="px-2 py-1 bg-zinc-700 rounded">w</kbd> - Move
-                  to start of next word
+                  to next word start
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Jump to the beginning of the next word
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">W as in "Word"</p>
               </div>
               <div>
                 <p className="text-sm font-medium">
                   <kbd className="px-2 py-1 bg-zinc-700 rounded">b</kbd> - Move
-                  to start of previous word
+                  to previous word start
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   B as in "Back" or "Beginning"
@@ -152,10 +155,19 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               <div>
                 <p className="text-sm font-medium">
                   <kbd className="px-2 py-1 bg-zinc-700 rounded">e</kbd> - Move
-                  to end of current word
+                  to word end
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Jump to the end of the current word
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">E as in "End"</p>
               </div>
+            </div>
+            <div className="mt-4 text-xs text-zinc-400">
+              <p className="italic">
+                Tip: These motions work across lines and consider punctuation as
+                separate words.
+              </p>
             </div>
           </>
         )
@@ -207,22 +219,44 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">f{char}</kbd> -
-                  Find character forward
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">f + char</kbd>{' '}
+                  - Find character forward
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Move to the next occurrence of {'{char}'}
+                  Move to the next occurrence of {'{char}'} on the current line
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">t{char}</kbd> -
-                  Till character forward
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">t + char</kbd>{' '}
+                  - Till character forward
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Move to just before the next occurrence of {'{char}'}
+                  Move to just before the next occurrence of {'{char}'} on the
+                  current line
                 </p>
               </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">j</kbd> - Move
+                  down
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">Move down one line</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">k</kbd> - Move
+                  up
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">Move up one line</p>
+              </div>
+            </div>
+            <div className="mt-4 text-xs text-zinc-400">
+              <p className="italic">
+                Tip: After pressing 'f' or 't', you need to type the character
+                you want to find. The cursor will move to (or just before) the
+                next occurrence of that character.
+              </p>
             </div>
           </>
         )
