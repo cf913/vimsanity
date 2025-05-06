@@ -1,5 +1,13 @@
 import React from 'react'
-import { BookOpen, Lock, Volume2, VolumeX, X, ChevronRight } from 'lucide-react'
+import {
+  BookOpen,
+  Lock,
+  Volume2,
+  VolumeX,
+  X,
+  ChevronRight,
+  Construction,
+} from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface SidebarProps {
@@ -36,6 +44,7 @@ const levels = [
     id: 4,
     title: 'Find Characters (f, t)',
     description: 'Jump to specific characters',
+    wip: true,
   },
 ]
 
@@ -170,8 +179,11 @@ const Sidebar: React.FC<SidebarProps> = ({
           >
             <div className="flex items-center justify-between">
               <span className="font-medium">Level {level.id}</span>
-              {level.locked ? (
-                <Lock size={16} />
+              {level.wip ? (
+                <span className="text-amber-600 flex items-center gap-1 font-bold">
+                  <Construction size={16} className="text-amber-600" />
+                  WIP
+                </span>
               ) : currentLevel === level.id ? (
                 <motion.div
                   animate={{ x: [0, 3, 0] }}

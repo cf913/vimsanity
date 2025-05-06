@@ -6,7 +6,7 @@ import {
 import { processTextForVim } from '../../utils/textUtils'
 import ExplosionEffect from './ExplosionEffect'
 import ConfettiBurst from './ConfettiBurst'
-import { RefreshCw, Zap } from 'lucide-react'
+import { RefreshCw, Zap, AlertTriangle, X } from 'lucide-react'
 
 interface LevelProps {
   isMuted: boolean
@@ -74,6 +74,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
   const [revealedLetters, setRevealedLetters] = useState<Set<string>>(new Set()) // Using "lineIdx-charIdx" format
   const [levelCompleted, setLevelCompleted] = useState(false)
   const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
+  const [showBanner, setShowBanner] = useState(true)
 
   // States for f and t commands
   const [awaitingCharacter, setAwaitingCharacter] = useState<boolean>(false)
@@ -628,6 +629,38 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
           )}
         </div>
       </div>
+      {/* Rolling banner at the bottom */}
+      <style>
+        {`
+          @keyframes marquee {
+            0% { transform: translateX(50%); }
+            100% { transform: translateX(-50%); }
+          }
+        `}
+      </style>
+      {showBanner && (
+        <div
+          onClick={() => setShowBanner(false)}
+          className="hover:cursor-pointer fixed bottom-0 left-0 w-full bg-amber-600 overflow-hidden py-2 z-2"
+        >
+          <div
+            className="whitespace-nowrap text-white font-bold flex items-center justify-between"
+            style={{
+              animation: 'marquee 50s linear infinite',
+              display: 'inline-block',
+            }}
+          >
+            <span className="flex items-center">
+              <AlertTriangle size={18} className="text-white mr-2" />
+              LEVEL UNDER ACTIVE DEVELOPMENT, PROCEED WITH CAUTION
+              &nbsp;&nbsp;&nbsp; LEVEL UNDER DEVELOPMENT, PROCEED WITH CAUTION
+              &nbsp;&nbsp;&nbsp; LEVEL UNDER DEVELOPMENT, PROCEED WITH CAUTION
+              &nbsp;&nbsp;&nbsp; LEVEL UNDER DEVELOPMENT, PROCEED WITH CAUTION
+              &nbsp;&nbsp;&nbsp; LEVEL UNDER DEVELOPMENT, PROCEED WITH CAUTION
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

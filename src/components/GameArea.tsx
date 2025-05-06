@@ -33,7 +33,7 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
   return (
     <div className="flex flex-col items-center gap-8">
       <div className="text-center">
-        <h2 className="text-3xl font-bold mb-2">Level {level}</h2>
+        <h2 className="text-3xl font-bold mEb-2">Level {level}</h2>
       </div>
 
       {renderLevel()}
