@@ -4,9 +4,11 @@ import Sidebar from './components/Sidebar'
 import DocumentationSidebar from './components/DocumentationSidebar'
 import GameArea from './components/GameArea'
 import LandingPage from './components/LandingPage'
+import MobileWarning from './components/MobileWarning'
 import WIPBanner from './components/WIPBanner'
 import { Analytics } from '@vercel/analytics/react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { isMobile } from './utils/isMobile'
 
 // Keys for localStorage
 const STORAGE_KEYS = {
@@ -15,6 +17,7 @@ const STORAGE_KEYS = {
   DOC_SIDEBAR_OPEN: 'vimsanity-doc-sidebar-open',
   CURRENT_LEVEL: 'vimsanity-current-level',
   IS_MUTED: 'vimsanity-is-muted',
+  SHOW_MOBILE_WARNING: 'vimsanity-show-mobile-warning',
 }
 
 function App() {
@@ -22,6 +25,11 @@ function App() {
   const [showLandingPage, setShowLandingPage] = useState(() => {
     const savedValue = localStorage.getItem(STORAGE_KEYS.SHOW_LANDING_PAGE)
     return savedValue !== null ? savedValue === 'true' : true
+  })
+  
+  const [showMobileWarning, setShowMobileWarning] = useState(() => {
+    const savedValue = localStorage.getItem(STORAGE_KEYS.SHOW_MOBILE_WARNING)
+    return savedValue !== null ? savedValue === 'true' : false
   })
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
@@ -70,6 +78,10 @@ function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.IS_MUTED, isMuted.toString())
   }, [isMuted])
+  
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.SHOW_MOBILE_WARNING, showMobileWarning.toString())
+  }, [showMobileWarning])
 
   // Custom state setters that update both state and localStorage
   const onCloseSidebar = () => {
@@ -89,11 +101,19 @@ function App() {
   }
 
   const handleGetStarted = () => {
-    setShowLandingPage(false)
+    // Check if user is on mobile device
+    if (isMobile()) {
+      setShowLandingPage(false)
+      setShowMobileWarning(true)
+    } else {
+      setShowLandingPage(false)
+      setShowMobileWarning(false)
+    }
   }
 
   const handleReturnToLanding = () => {
     setShowLandingPage(true)
+    setShowMobileWarning(false)
   }
 
   // If showing landing page, render only that
@@ -102,6 +122,16 @@ function App() {
       <>
         <LandingPage onGetStarted={handleGetStarted} />
         <WIPBanner position="corner" />
+        <Analytics />
+      </>
+    )
+  }
+  
+  // If showing mobile warning, render that
+  if (showMobileWarning) {
+    return (
+      <>
+        <MobileWarning onReturnToLanding={handleReturnToLanding} />
         <Analytics />
       </>
     )
