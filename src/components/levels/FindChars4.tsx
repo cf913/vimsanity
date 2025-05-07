@@ -15,14 +15,14 @@ interface LevelProps {
 const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
   // Array of 5 different lines of text
   const sampleTexts = [
-    'Norem ipsum dolor sC',
-    'Ied do eiusmod tempO',
-    '  Colo re magna aliN',
-    '   Eia quis nostrudG',
-    '  Oor = niaasdf jjiR',
-    ' Nbo asanisi utaaliA',
-    'Eabori anis aut aliT',
-    '!abo asd isiaut a iS',
+    'Vim file navigations',
+    'Open splits with :sp',
+    '  Copy text with yan',
+    '   Go to line number',
+    '    Edit text easily',
+    ' Awk is vim-friendly',
+    'Try using less mouse',
+    'Substitution rocks!!',
   ]
 
   // Process each line of text separately
