@@ -3,9 +3,7 @@ import {
   useKeyboardHandler,
   KeyActionMap,
 } from '../../hooks/useKeyboardHandler'
-import {
-  processTextForVim,
-} from '../../utils/textUtils'
+import { processTextForVim } from '../../utils/textUtils'
 import ExplosionEffect from './ExplosionEffect'
 import ConfettiBurst from './ConfettiBurst'
 import { RefreshCw, Zap } from 'lucide-react'
@@ -25,7 +23,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     'Search is not just for finding text.',
     'It can be the fastest way to move.',
     'Search commands are powerful tools.',
-    'Try searching for "search" in this text.',
+    'Try searching for "search" here.',
     'Or find the word "tools" to practice.',
   ]
 
@@ -38,7 +36,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
       isSpace: char === ' ',
       idx,
       char,
-    }))
+    })),
   )
 
   // Group characters into words for each line
@@ -62,7 +60,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
           }
           return acc
         }, [])
-        .filter((word) => word.length > 0) // Remove any empty words
+        .filter((word) => word.length > 0), // Remove any empty words
   )
 
   // Track current line and position within that line
@@ -78,12 +76,16 @@ const SearchLevel5: React.FC<LevelProps> = () => {
   const [revealedLetters, setRevealedLetters] = useState<Set<string>>(new Set()) // Using "lineIdx-charIdx" format
   const [levelCompleted, setLevelCompleted] = useState(false)
   const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
-  
+
   // Search functionality states
   const [isSearching, setIsSearching] = useState(false)
-  const [searchDirection, setSearchDirection] = useState<'forward' | 'backward'>('forward')
+  const [searchDirection, setSearchDirection] = useState<
+    'forward' | 'backward'
+  >('forward')
   const [searchTerm, setSearchTerm] = useState('')
-  const [searchMatches, setSearchMatches] = useState<Array<{lineIdx: number, startIdx: number, endIdx: number}>>([])
+  const [searchMatches, setSearchMatches] = useState<
+    Array<{ lineIdx: number; startIdx: number; endIdx: number }>
+  >([])
   const [currentMatchIndex, setCurrentMatchIndex] = useState<number>(-1)
 
   // Refs for scrolling
@@ -104,35 +106,45 @@ const SearchLevel5: React.FC<LevelProps> = () => {
   // Set a new target randomly
   const setNewTarget = () => {
     // First, find all potential targets that have special patterns (like "search" or "tools")
-    const targetPatterns = ['search', 'vim', 'tools', 'next', 'move'];
-    const potentialTargets: Array<{lineIdx: number, charIdx: number, pattern: string}> = [];
-    
+    const targetPatterns = ['search', 'vim', 'tools', 'next', 'move']
+    const potentialTargets: Array<{
+      lineIdx: number
+      charIdx: number
+      pattern: string
+    }> = []
+
     linesOfSquares.forEach((line, lineIdx) => {
-      const lineText = line.map(square => square.char).join('').toLowerCase();
-      targetPatterns.forEach(pattern => {
-        let startIdx = lineText.indexOf(pattern);
+      const lineText = line
+        .map((square) => square.char)
+        .join('')
+        .toLowerCase()
+      targetPatterns.forEach((pattern) => {
+        let startIdx = lineText.indexOf(pattern)
         while (startIdx !== -1) {
           potentialTargets.push({
             lineIdx,
             charIdx: startIdx + Math.floor(pattern.length / 2), // Target middle of word
-            pattern
-          });
-          startIdx = lineText.indexOf(pattern, startIdx + 1);
+            pattern,
+          })
+          startIdx = lineText.indexOf(pattern, startIdx + 1)
         }
-      });
-    });
+      })
+    })
 
     if (potentialTargets.length === 0) {
       // Fallback to random position if no patterns found
-      const randomLineIndex = Math.floor(Math.random() * linesOfSquares.length);
-      const randomPos = Math.floor(Math.random() * linesOfSquares[randomLineIndex].length);
-      setTarget(randomPos);
-      setTargetLineIndex(randomLineIndex);
+      const randomLineIndex = Math.floor(Math.random() * linesOfSquares.length)
+      const randomPos = Math.floor(
+        Math.random() * linesOfSquares[randomLineIndex].length,
+      )
+      setTarget(randomPos)
+      setTargetLineIndex(randomLineIndex)
     } else {
       // Choose a random target from the potential targets
-      const randomTarget = potentialTargets[Math.floor(Math.random() * potentialTargets.length)];
-      setTarget(randomTarget.charIdx);
-      setTargetLineIndex(randomTarget.lineIdx);
+      const randomTarget =
+        potentialTargets[Math.floor(Math.random() * potentialTargets.length)]
+      setTarget(randomTarget.charIdx)
+      setTargetLineIndex(randomTarget.lineIdx)
     }
   }
 
@@ -145,297 +157,430 @@ const SearchLevel5: React.FC<LevelProps> = () => {
   // Perform search across all lines
   const performSearch = (term: string) => {
     if (!term) {
-      setSearchMatches([]);
-      setCurrentMatchIndex(-1);
-      return;
+      setSearchMatches([])
+      setCurrentMatchIndex(-1)
+      return
     }
-    
-    const matches: Array<{lineIdx: number, startIdx: number, endIdx: number}> = [];
-    const lowercaseTerm = term.toLowerCase();
-    
+
+    const matches: Array<{
+      lineIdx: number
+      startIdx: number
+      endIdx: number
+    }> = []
+    const lowercaseTerm = term.toLowerCase()
+
     linesOfSquares.forEach((line, lineIdx) => {
-      const lineText = line.map(square => square.char).join('').toLowerCase();
-      let startIdx = lineText.indexOf(lowercaseTerm);
-      
+      const lineText = line
+        .map((square) => square.char)
+        .join('')
+        .toLowerCase()
+      let startIdx = lineText.indexOf(lowercaseTerm)
+
       while (startIdx !== -1) {
         matches.push({
           lineIdx,
           startIdx,
-          endIdx: startIdx + lowercaseTerm.length - 1
-        });
-        startIdx = lineText.indexOf(lowercaseTerm, startIdx + 1);
+          endIdx: startIdx + lowercaseTerm.length - 1,
+        })
+        startIdx = lineText.indexOf(lowercaseTerm, startIdx + 1)
       }
-    });
-    
-    setSearchMatches(matches);
-    
+    })
+
+    setSearchMatches(matches)
+
     // Set current match index based on search direction and current cursor position
     if (matches.length > 0) {
       if (searchDirection === 'forward') {
         // Find the next match after current position
-        const nextMatch = matches.findIndex(match => 
-          match.lineIdx > currentLineIndex || 
-          (match.lineIdx === currentLineIndex && match.startIdx > cursor)
-        );
-        setCurrentMatchIndex(nextMatch !== -1 ? nextMatch : 0);
+        const nextMatch = matches.findIndex(
+          (match) =>
+            match.lineIdx > currentLineIndex ||
+            (match.lineIdx === currentLineIndex && match.startIdx > cursor),
+        )
+        setCurrentMatchIndex(nextMatch !== -1 ? nextMatch : 0)
       } else {
         // Find the previous match before current position
-        const prevMatchIndex = matches.findIndex(match => 
-          match.lineIdx < currentLineIndex || 
-          (match.lineIdx === currentLineIndex && match.startIdx < cursor)
-        );
-        setCurrentMatchIndex(prevMatchIndex !== -1 ? prevMatchIndex : matches.length - 1);
+        const prevMatchIndex = matches.findIndex(
+          (match) =>
+            match.lineIdx < currentLineIndex ||
+            (match.lineIdx === currentLineIndex && match.startIdx < cursor),
+        )
+        setCurrentMatchIndex(
+          prevMatchIndex !== -1 ? prevMatchIndex : matches.length - 1,
+        )
       }
     } else {
-      setCurrentMatchIndex(-1);
+      setCurrentMatchIndex(-1)
     }
   }
 
   // Navigate to the next search match
   const navigateToNextMatch = () => {
-    if (searchMatches.length === 0) return;
-    
-    let newMatchIndex;
+    if (searchMatches.length === 0) return
+
+    let newMatchIndex
     if (searchDirection === 'forward') {
-      newMatchIndex = (currentMatchIndex + 1) % searchMatches.length;
+      newMatchIndex = (currentMatchIndex + 1) % searchMatches.length
     } else {
-      newMatchIndex = (currentMatchIndex - 1 + searchMatches.length) % searchMatches.length;
+      newMatchIndex =
+        (currentMatchIndex - 1 + searchMatches.length) % searchMatches.length
     }
-    
-    setCurrentMatchIndex(newMatchIndex);
-    const match = searchMatches[newMatchIndex];
-    setCurrentLineIndex(match.lineIdx);
-    setCursor(match.startIdx);
-    checkTarget(match.startIdx, match.lineIdx);
+
+    setCurrentMatchIndex(newMatchIndex)
+    const match = searchMatches[newMatchIndex]
+    setCurrentLineIndex(match.lineIdx)
+    setCursor(match.startIdx)
+    checkTarget(match.startIdx, match.lineIdx)
   }
 
   // Navigate to the previous search match
   const navigateToPrevMatch = () => {
-    if (searchMatches.length === 0) return;
-    
-    let newMatchIndex;
+    if (searchMatches.length === 0) return
+
+    let newMatchIndex
     if (searchDirection === 'forward') {
-      newMatchIndex = (currentMatchIndex - 1 + searchMatches.length) % searchMatches.length;
+      newMatchIndex =
+        (currentMatchIndex - 1 + searchMatches.length) % searchMatches.length
     } else {
-      newMatchIndex = (currentMatchIndex + 1) % searchMatches.length;
+      newMatchIndex = (currentMatchIndex + 1) % searchMatches.length
     }
-    
-    setCurrentMatchIndex(newMatchIndex);
-    const match = searchMatches[newMatchIndex];
-    setCurrentLineIndex(match.lineIdx);
-    setCursor(match.startIdx);
-    checkTarget(match.startIdx, match.lineIdx);
+
+    setCurrentMatchIndex(newMatchIndex)
+    const match = searchMatches[newMatchIndex]
+    setCurrentLineIndex(match.lineIdx)
+    setCursor(match.startIdx)
+    checkTarget(match.startIdx, match.lineIdx)
   }
 
   // Clear search state
   const clearSearch = () => {
-    setIsSearching(false);
-    setSearchTerm('');
-    setSearchMatches([]);
-    setCurrentMatchIndex(-1);
+    setIsSearching(false)
+    setSearchTerm('')
+    // Keep search matches and currentMatchIndex to allow further navigation
+
+    // Remove searching class from body
+    document.body.classList.remove('searching')
+
+    // Return focus to container
+    if (containerRef.current) {
+      setTimeout(() => {
+        containerRef.current?.focus()
+      }, 10)
+    }
   }
 
   // Start searching
   const startSearch = (direction: 'forward' | 'backward') => {
-    setIsSearching(true);
-    setSearchDirection(direction);
-    setSearchTerm('');
-    // Focus the input element for search
+    setIsSearching(true)
+    setSearchDirection(direction)
+    setSearchTerm('')
+    setSearchMatches([])
+    setCurrentMatchIndex(-1)
+
+    // Immediately add a class to the body to help with styling/handling
+    document.body.classList.add('searching')
+
+    // We need to wait for the input to be rendered before focusing
     setTimeout(() => {
       if (searchInputRef.current) {
-        searchInputRef.current.focus();
+        try {
+          // Try multiple focus methods
+          searchInputRef.current.focus()
+          searchInputRef.current.click()
+
+          // Create a temporary input event to trigger browser focus behavior
+          const event = new Event('input', { bubbles: true })
+          searchInputRef.current.dispatchEvent(event)
+
+          // Place cursor at end of text
+          const length = searchInputRef.current.value.length
+          searchInputRef.current.setSelectionRange(length, length)
+        } catch (e) {
+          console.error('Failed to focus search input:', e)
+        }
       }
-    }, 10);
+    }, 100)
   }
 
   // Handle search input change
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+    e.stopPropagation() // Prevent event bubbling
+    const value = e.target.value
+    setSearchTerm(value)
+    // Don't search on every keystroke to avoid performance issues
+    if (value.length > 2) {
+      performSearch(value)
+    } else if (value.length === 0) {
+      setSearchMatches([])
+      setCurrentMatchIndex(-1)
+    }
   }
 
   // Handle search input submission
   const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
+    e.stopPropagation()
+
     if (searchTerm) {
-      performSearch(searchTerm);
-      setIsSearching(false);
-      
+      // Ensure we have the most up-to-date search results
+      performSearch(searchTerm)
+
       // If matches found, go to the first one
       if (searchMatches.length > 0 && currentMatchIndex !== -1) {
-        const match = searchMatches[currentMatchIndex];
-        setCurrentLineIndex(match.lineIdx);
-        setCursor(match.startIdx);
-        checkTarget(match.startIdx, match.lineIdx);
+        const match = searchMatches[currentMatchIndex]
+        setCurrentLineIndex(match.lineIdx)
+        setCursor(match.startIdx)
+        checkTarget(match.startIdx, match.lineIdx)
       }
-    } else {
-      clearSearch();
     }
+
+    // End search mode
+    clearSearch()
   }
 
   // Key actions map
   const keyActions: KeyActionMap = {
-    '/': () => {
-      startSearch('forward');
-      setLastKeyPressed('/');
-    },
-    '?': () => {
-      startSearch('backward');
-      setLastKeyPressed('?');
-    },
-    'n': () => {
+    // Search operations are now handled by the global event handler
+    // to prevent conflicts with input field
+    n: () => {
       if (searchMatches.length > 0) {
-        navigateToNextMatch();
-        setLastKeyPressed('n');
+        navigateToNextMatch()
+        setLastKeyPressed('n')
       }
     },
-    'N': () => {
+    N: () => {
       if (searchMatches.length > 0) {
-        navigateToPrevMatch();
-        setLastKeyPressed('N');
+        navigateToPrevMatch()
+        setLastKeyPressed('N')
       }
     },
-    'Escape': () => {
+    Escape: () => {
       if (isSearching) {
-        clearSearch();
+        clearSearch()
       }
     },
-    'h': () => {
-      setLastKeyPressed('h');
-      if (cursor > 0) {
-        const newPos = cursor - 1;
-        setCursor(newPos);
-        checkTarget(newPos, currentLineIndex);
+    h: () => {
+      if (!isSearching) {
+        setLastKeyPressed('h')
+        if (cursor > 0) {
+          const newPos = cursor - 1
+          setCursor(newPos)
+          checkTarget(newPos, currentLineIndex)
+        }
       }
     },
-    'l': () => {
-      setLastKeyPressed('l');
-      if (cursor < linesOfSquares[currentLineIndex].length - 1) {
-        const newPos = cursor + 1;
-        setCursor(newPos);
-        checkTarget(newPos, currentLineIndex);
+    l: () => {
+      if (!isSearching) {
+        setLastKeyPressed('l')
+        if (cursor < linesOfSquares[currentLineIndex].length - 1) {
+          const newPos = cursor + 1
+          setCursor(newPos)
+          checkTarget(newPos, currentLineIndex)
+        }
       }
     },
-    'j': () => {
-      setLastKeyPressed('j');
-      if (currentLineIndex < linesOfSquares.length - 1) {
-        const nextLineIndex = currentLineIndex + 1;
-        const nextLineCursor = Math.min(
-          cursor,
-          linesOfSquares[nextLineIndex].length - 1
-        );
-        setCurrentLineIndex(nextLineIndex);
-        setCursor(nextLineCursor);
-        checkTarget(nextLineCursor, nextLineIndex);
+    j: () => {
+      if (!isSearching) {
+        setLastKeyPressed('j')
+        if (currentLineIndex < linesOfSquares.length - 1) {
+          const nextLineIndex = currentLineIndex + 1
+          const nextLineCursor = Math.min(
+            cursor,
+            linesOfSquares[nextLineIndex].length - 1,
+          )
+          setCurrentLineIndex(nextLineIndex)
+          setCursor(nextLineCursor)
+          checkTarget(nextLineCursor, nextLineIndex)
+        }
       }
     },
-    'k': () => {
-      setLastKeyPressed('k');
-      if (currentLineIndex > 0) {
-        const prevLineIndex = currentLineIndex - 1;
-        const prevLineCursor = Math.min(
-          cursor,
-          linesOfSquares[prevLineIndex].length - 1
-        );
-        setCurrentLineIndex(prevLineIndex);
-        setCursor(prevLineCursor);
-        checkTarget(prevLineCursor, prevLineIndex);
+    k: () => {
+      if (!isSearching) {
+        setLastKeyPressed('k')
+        if (currentLineIndex > 0) {
+          const prevLineIndex = currentLineIndex - 1
+          const prevLineCursor = Math.min(
+            cursor,
+            linesOfSquares[prevLineIndex].length - 1,
+          )
+          setCurrentLineIndex(prevLineIndex)
+          setCursor(prevLineCursor)
+          checkTarget(prevLineCursor, prevLineIndex)
+        }
       }
     },
   }
 
+  // Setup global event handler for the search input
+  useEffect(() => {
+    // Create a global handler for keyboard events
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Don't interfere with input typing
+      if (
+        document.activeElement instanceof HTMLInputElement ||
+        document.activeElement instanceof HTMLTextAreaElement
+      ) {
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          clearSearch()
+        }
+        return
+      }
+
+      // Handle search keys when not in search mode
+      if (!isSearching) {
+        if (e.key === '/' || e.key === '?') {
+          e.preventDefault()
+          startSearch(e.key === '/' ? 'forward' : 'backward')
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleGlobalKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown)
+    }
+  }, [isSearching])
+
   // Register keyboard handler
   const { lastKeyPressed: keyboardLastKey } = useKeyboardHandler({
     keyActionMap: keyActions,
-    dependencies: [cursor, currentLineIndex, linesOfSquares, searchMatches, currentMatchIndex, isSearching],
+    dependencies: [
+      cursor,
+      currentLineIndex,
+      linesOfSquares,
+      searchMatches,
+      currentMatchIndex,
+    ],
+    disabled: isSearching,
+    onAnyKey: () => {
+      // Always check if we're searching and refocus the input if needed
+      if (
+        isSearching &&
+        searchInputRef.current &&
+        document.activeElement !== searchInputRef.current
+      ) {
+        searchInputRef.current.focus()
+      }
+    },
   })
 
   // Update lastKeyPressed state when keyboard events happen
   useEffect(() => {
-    if (keyboardLastKey && !isSearching) {
-      setLastKeyPressed(keyboardLastKey);
+    if (keyboardLastKey) {
+      setLastKeyPressed(keyboardLastKey)
     }
-  }, [keyboardLastKey, isSearching])
+  }, [keyboardLastKey])
+
+  // Add a global click handler to help manage search state
+  useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent) => {
+      // If we're searching and click outside the search form, end search
+      if (isSearching) {
+        const target = e.target as HTMLElement
+        const searchForm = document.querySelector('form')
+        if (searchForm && !searchForm.contains(target)) {
+          clearSearch()
+        }
+      }
+    }
+
+    window.addEventListener('click', handleGlobalClick)
+    return () => {
+      window.removeEventListener('click', handleGlobalClick)
+    }
+  }, [isSearching])
 
   // Check if the player has reached the target
   const checkTarget = (newPos: number, lineIndex: number) => {
     if (newPos === target && lineIndex === targetLineIndex) {
       // Play explosion effect
-      setExplosionIdx(newPos);
-      setExplosionLineIdx(lineIndex);
-      setShowExplosion(true);
+      setExplosionIdx(newPos)
+      setExplosionLineIdx(lineIndex)
+      setShowExplosion(true)
 
       // Reveal the letter
       setRevealedLetters((prev) => {
-        const newSet = new Set(prev);
-        newSet.add(`${lineIndex}-${newPos}`);
-        return newSet;
-      });
+        const newSet = new Set(prev)
+        newSet.add(`${lineIndex}-${newPos}`)
+        return newSet
+      })
 
       // Increment score
-      setScore((prevScore) => prevScore + 1);
+      setScore((prevScore) => prevScore + 1)
 
       // Set a timeout to hide the explosion and set a new target
       setTimeout(() => {
-        setShowExplosion(false);
-        setExplosionIdx(null);
-        setExplosionLineIdx(null);
+        setShowExplosion(false)
+        setExplosionIdx(null)
+        setExplosionLineIdx(null)
 
         // Set a new target
-        setNewTarget();
+        setNewTarget()
 
         // Check if level is completed (10 targets hit)
         if (score + 1 >= 10) {
-          setLevelCompleted(true);
-          setShowConfetti(true);
+          setLevelCompleted(true)
+          setShowConfetti(true)
           setTimeout(() => {
-            setShowConfetti(false);
-          }, 3000);
+            setShowConfetti(false)
+          }, 3000)
         }
-      }, 200);
+      }, 200)
     }
   }
 
   // Reset the level
   const resetLevel = () => {
-    setCursor(0);
-    setCurrentLineIndex(0);
-    setScore(0);
-    setLevelCompleted(false);
-    setRevealedLetters(new Set());
-    clearSearch();
-    setNewTarget();
+    setCursor(0)
+    setCurrentLineIndex(0)
+    setScore(0)
+    setLevelCompleted(false)
+    setRevealedLetters(new Set())
+    clearSearch()
+    setNewTarget()
   }
 
   // Determine if a character is part of a search match
   const isInSearchMatch = (lineIdx: number, charIdx: number) => {
-    if (searchMatches.length === 0) return false;
-    
-    return searchMatches.some(match => 
-      match.lineIdx === lineIdx && 
-      charIdx >= match.startIdx && 
-      charIdx <= match.endIdx
-    );
+    if (searchMatches.length === 0) return false
+
+    return searchMatches.some(
+      (match) =>
+        match.lineIdx === lineIdx &&
+        charIdx >= match.startIdx &&
+        charIdx <= match.endIdx,
+    )
   }
 
   // Determine if a character is part of the current search match
   const isInCurrentMatch = (lineIdx: number, charIdx: number) => {
-    if (searchMatches.length === 0 || currentMatchIndex === -1) return false;
-    
-    const currentMatch = searchMatches[currentMatchIndex];
-    return currentMatch.lineIdx === lineIdx && 
-           charIdx >= currentMatch.startIdx && 
-           charIdx <= currentMatch.endIdx;
+    if (searchMatches.length === 0 || currentMatchIndex === -1) return false
+
+    const currentMatch = searchMatches[currentMatchIndex]
+    return (
+      currentMatch.lineIdx === lineIdx &&
+      charIdx >= currentMatch.startIdx &&
+      charIdx <= currentMatch.endIdx
+    )
   }
 
   return (
-    <div className="flex flex-col items-center justify-center bg-zinc-900 text-white">
-      <div className="w-full max-w-4xl">
+    <div
+      className={`flex flex-col items-center justify-center bg-zinc-900 text-white ${isSearching ? 'searching' : ''}`}
+      tabIndex={-1}
+    >
+      <div className="w-full max-w-6xl px-4">
         <div className="flex flex-col items-center mb-2">
           <p className="text-zinc-400 text-center max-w-lg mb-4">
-            Use <kbd className="px-2 py-1 bg-zinc-800 rounded">/</kbd> to search forward, 
-            <kbd className="px-2 py-1 bg-zinc-800 rounded">?</kbd> to search backward,
-            <kbd className="px-2 py-1 bg-zinc-800 rounded">n</kbd> for next match, and
-            <kbd className="px-2 py-1 bg-zinc-800 rounded">N</kbd> for previous match.
+            Use <kbd className="px-2 py-1 bg-zinc-800 rounded">/</kbd> to search
+            forward,
+            <kbd className="px-2 py-1 bg-zinc-800 rounded">?</kbd> to search
+            backward,
+            <kbd className="px-2 py-1 bg-zinc-800 rounded">n</kbd> for next
+            match, and
+            <kbd className="px-2 py-1 bg-zinc-800 rounded">N</kbd> for previous
+            match.
           </p>
 
           <div className="flex items-center gap-4 mb-2">
@@ -459,12 +604,21 @@ const SearchLevel5: React.FC<LevelProps> = () => {
             )}
           </div>
         </div>
-        <div className="relative w-full max-w-4xl bg-zinc-800 p-6 py-8 rounded-lg mx-auto overflow-y-scroll">
+        <div
+          className="relative w-full max-w-6xl bg-zinc-800 p-6 py-8 rounded-lg mx-auto overflow-y-scroll"
+          ref={containerRef}
+          tabIndex={0}
+          onClick={() => isSearching && clearSearch()}
+        >
           {/* Search Input */}
           {isSearching && (
             <div className="absolute top-2 left-6 right-6 z-10">
-              <form onSubmit={handleSearchSubmit} className="flex items-center">
-                <span className="text-emerald-400 mr-2">
+              <form
+                onSubmit={handleSearchSubmit}
+                className="flex items-center"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <span className="text-emerald-400 mr-2 font-mono text-lg">
                   {searchDirection === 'forward' ? '/' : '?'}
                 </span>
                 <input
@@ -472,8 +626,28 @@ const SearchLevel5: React.FC<LevelProps> = () => {
                   type="text"
                   value={searchTerm}
                   onChange={handleSearchInputChange}
-                  className="bg-zinc-700 text-white px-2 py-1 rounded flex-grow focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  onClick={(e) => e.stopPropagation()}
+                  onFocus={(e) => {
+                    e.currentTarget.select()
+                    e.stopPropagation()
+                  }}
+                  onKeyDown={(e) => {
+                    // Prevent propagation to avoid triggering other keyboard handlers
+                    e.stopPropagation()
+                    if (e.key === 'Escape') {
+                      e.preventDefault()
+                      clearSearch()
+                    } else if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handleSearchSubmit(e)
+                    }
+                  }}
+                  className="bg-zinc-700 text-white px-2 py-1 rounded flex-grow focus:outline-none focus:ring-2 focus:ring-emerald-400 font-mono"
                   autoFocus
+                  autoComplete="off"
+                  spellCheck="false"
+                  placeholder="Type to search..."
+                  onBlur={(e) => e.stopPropagation()}
                 />
               </form>
             </div>
@@ -509,11 +683,17 @@ const SearchLevel5: React.FC<LevelProps> = () => {
                       // Track revealed letters for game state
                       revealedLetters.has(`${lineIdx}-${square.idx}`)
 
-                      const isSearchHighlight = isInSearchMatch(lineIdx, square.idx)
-                      const isCurrentMatchHighlight = isInCurrentMatch(lineIdx, square.idx)
+                      const isSearchHighlight = isInSearchMatch(
+                        lineIdx,
+                        square.idx,
+                      )
+                      const isCurrentMatchHighlight = isInCurrentMatch(
+                        lineIdx,
+                        square.idx,
+                      )
 
                       let base =
-                        'inline-flex items-center justify-center mx-0.5 my-0.5 min-w-8 h-8 transition-all duration-150 rounded-md '
+                        'inline-flex items-center justify-center mx-0.5 my-0.5 min-w-6 h-8 transition-all duration-150 rounded-md '
 
                       if (isPlayer)
                         base +=
@@ -525,14 +705,12 @@ const SearchLevel5: React.FC<LevelProps> = () => {
                         base +=
                           'bg-amber-500 text-white scale-105 shadow-lg shadow-amber-500/50 '
                       else if (isSearchHighlight)
-                        base +=
-                          'bg-amber-700 text-white '
-                      else
-                        base += 'bg-zinc-700 text-zinc-300 '
+                        base += 'bg-amber-500/30 text-amber-200 '
+                      else base += 'bg-zinc-700 text-zinc-300 '
 
                       if (square.isSpace) {
                         let baseSpace =
-                          'inline-block mx-0.5 my-0.5 w-8 h-8 transition-all duration-150 rounded-md '
+                          'inline-block mx-0.5 my-0.5 w-6 h-8 transition-all duration-150 rounded-md '
                         if (isPlayer) {
                           baseSpace +=
                             'bg-emerald-500/25 text-white scale-110 shadow-lg shadow-emerald-500/10 '

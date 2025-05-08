@@ -47,13 +47,13 @@ const levels = [
     id: 4,
     title: 'Find Characters (f, t)',
     description: 'Jump to specific characters',
-    wip: true,
     locked: false,
   },
   {
     id: 5,
     title: 'Search Operations (/, ?, n, N)',
     description: 'Search text and navigate matches',
+    wip: true,
     locked: false,
   },
 ]
@@ -183,8 +183,8 @@ const Sidebar: React.FC<SidebarProps> = ({
               currentLevel === level.id
                 ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-emerald-400'
                 : level.locked
-                ? 'bg-zinc-700/50 text-zinc-500 cursor-not-allowed border-zinc-700'
-                : 'bg-zinc-700/80 hover:bg-zinc-700 border-zinc-600 hover:border-zinc-500'
+                  ? 'bg-zinc-700/50 text-zinc-500 cursor-not-allowed border-zinc-700'
+                  : 'bg-zinc-700/80 hover:bg-zinc-700 border-zinc-600 hover:border-zinc-500'
             }`}
           >
             <div className="flex items-center justify-between">

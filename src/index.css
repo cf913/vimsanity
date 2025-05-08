@@ -17,3 +17,25 @@
     border-color: var(--color-gray-200, currentcolor);
   }
 }
+
+/* Custom styles for search functionality */
+.searching input:focus {
+  outline: 2px solid #10b981 !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+}
+
+/* Ensure the search input is always accessible and visible */
+body.searching * {
+  pointer-events: auto;
+}
+
+body.searching input {
+  caret-color: #10b981;
+  color: white;
+}
+
+/* Make sure the input has proper z-index */
+form input {
+  z-index: 100;
+  position: relative;
+}

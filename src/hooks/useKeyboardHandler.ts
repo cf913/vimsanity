@@ -10,18 +10,32 @@ export interface KeyActionMap {
 
 interface UseKeyboardHandlerProps {
   keyActionMap: KeyActionMap;
-  dependencies?: any[];
+  dependencies?: unknown[];
   onAnyKey?: (key: string) => void;
+  disabled?: boolean;
 }
 
 export const useKeyboardHandler = ({
   keyActionMap,
   dependencies = [],
-  onAnyKey
+  onAnyKey,
+  disabled = false
 }: UseKeyboardHandlerProps) => {
   const [lastKeyPressed, setLastKeyPressed] = useState<string | null>(null);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    // Skip if target is an input, textarea, or contentEditable element
+    if (
+      e.target instanceof HTMLInputElement ||
+      e.target instanceof HTMLTextAreaElement ||
+      (e.target instanceof HTMLElement && e.target.isContentEditable)
+    ) {
+      return;
+    }
+    
+    // Skip event handling if disabled
+    if (disabled) return;
+    
     e.preventDefault();
     
     // Set the last key pressed for animation
@@ -42,12 +56,15 @@ export const useKeyboardHandler = ({
     if (handler) {
       handler(e.key);
     }
-  }, [keyActionMap, onAnyKey, ...dependencies]);
+  }, [keyActionMap, onAnyKey, disabled]);
 
   useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
+    // Re-create effect when dependencies change
+    const keyHandler = (e: KeyboardEvent) => handleKeyDown(e);
+    window.addEventListener("keydown", keyHandler);
+    return () => window.removeEventListener("keydown", keyHandler);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleKeyDown, ...dependencies]);
 
   return { lastKeyPressed };
 };
