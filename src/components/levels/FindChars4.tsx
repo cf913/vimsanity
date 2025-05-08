@@ -479,110 +479,112 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
             )}
           </div>
         </div>
-        <div className="relative w-full max-w-4xl bg-zinc-800 p-6 py-8 rounded-lg mx-auto overflow-y-scroll">
+        <div className="relative flex  flex-col w-full max-w-4xl bg-zinc-800 p-6 py-8 rounded-lg mx-auto">
           {/* Global Confetti Burst over the game area */}
           {showConfetti && <ConfettiBurst />}
 
           {/* Container for all lines */}
-          <div className="flex flex-col">
-            {linesOfWords.map((words, lineIdx) => (
-              <div
-                key={`line-${lineIdx}`}
-                className={`flex flex-row overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 ${
-                  lineIdx === currentLineIndex
-                    ? 'bg-zinc-700/30 rounded-md'
-                    : ''
-                }`}
-                ref={lineIdx === currentLineIndex ? containerRef : undefined}
-              >
-                {words.map((word, wordIdx) => (
-                  <div
-                    key={`word-${lineIdx}-${wordIdx}`}
-                    className="flex flex-row whitespace-nowrap mb-1"
-                  >
-                    {word.map((square) => {
-                      const isPlayer =
-                        square.idx === cursor && lineIdx === currentLineIndex
+          <div className="flex-1">
+            <div className="flex flex-col max-w-[calc(100vw-5rem)] overflow-x-scroll py-4 overflow-y-visible">
+              {linesOfWords.map((words, lineIdx) => (
+                <div
+                  key={`line-${lineIdx}`}
+                  className={`flex flex-row overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 ${
+                    lineIdx === currentLineIndex
+                      ? 'bg-zinc-700/30 rounded-md'
+                      : ''
+                  }`}
+                  ref={lineIdx === currentLineIndex ? containerRef : undefined}
+                >
+                  {words.map((word, wordIdx) => (
+                    <div
+                      key={`word-${lineIdx}-${wordIdx}`}
+                      className="flex flex-row whitespace-nowrap mb-1"
+                    >
+                      {word.map((square) => {
+                        const isPlayer =
+                          square.idx === cursor && lineIdx === currentLineIndex
 
-                      const isTarget =
-                        square.idx === target && lineIdx === targetLineIndex
+                        const isTarget =
+                          square.idx === target && lineIdx === targetLineIndex
 
-                      const isRevealed = revealedLetters.has(
-                        `${lineIdx}-${square.idx}`,
-                      )
+                        const isRevealed = revealedLetters.has(
+                          `${lineIdx}-${square.idx}`,
+                        )
 
-                      // Highlight characters that match the target character on the current line
-                      const isMatchingChar =
-                        lineIdx === currentLineIndex &&
-                        targetChar &&
-                        square.char.toLowerCase() === targetChar.toLowerCase()
-                      {
-                        /* square.idx > cursor */
-                      }
-
-                      let base =
-                        'inline-flex items-center justify-center mx-0.5 my-0.5 min-w-8 h-8 transition-all duration-150 rounded-md '
-
-                      if (isPlayer)
-                        base +=
-                          'bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-500/50 '
-                      else if (isTarget)
-                        base +=
-                          'bg-purple-500 text-white scale-105 shadow-lg shadow-purple-500/60 animate-pulse '
-                      else if (isMatchingChar)
-                        base += 'bg-amber-500/30 text-amber-200 '
-                      else base += 'bg-zinc-700 text-zinc-300 '
-
-                      if (square.isSpace) {
-                        let baseSpace =
-                          'inline-block mx-0.5 my-0.5 w-8 h-8 transition-all duration-150 rounded-md '
-                        if (isPlayer) {
-                          baseSpace +=
-                            'bg-emerald-500/25 text-white scale-110 shadow-lg shadow-emerald-500/10 '
+                        // Highlight characters that match the target character on the current line
+                        const isMatchingChar =
+                          lineIdx === currentLineIndex &&
+                          targetChar &&
+                          square.char.toLowerCase() === targetChar.toLowerCase()
+                        {
+                          /* square.idx > cursor */
                         }
+
+                        let base =
+                          'inline-flex items-center justify-center mx-0.5 my-0.5 min-w-8 h-8 transition-all duration-150 rounded-md '
+
+                        if (isPlayer)
+                          base +=
+                            'bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-500/50 '
+                        else if (isTarget)
+                          base +=
+                            'bg-purple-500 text-white scale-105 shadow-lg shadow-purple-500/60 animate-pulse '
+                        else if (isMatchingChar)
+                          base += 'bg-amber-500/30 text-amber-200 '
+                        else base += 'bg-zinc-700 text-zinc-300 '
+
+                        if (square.isSpace) {
+                          let baseSpace =
+                            'inline-block mx-0.5 my-0.5 w-8 h-8 transition-all duration-150 rounded-md '
+                          if (isPlayer) {
+                            baseSpace +=
+                              'bg-emerald-500/25 text-white scale-110 shadow-lg shadow-emerald-500/10 '
+                          }
+                          return (
+                            <span
+                              key={`space-${lineIdx}-${square.idx}`}
+                              ref={isPlayer ? playerRef : undefined}
+                              className={baseSpace}
+                            ></span>
+                          )
+                        }
+
                         return (
                           <span
-                            key={`space-${lineIdx}-${square.idx}`}
+                            key={`char-${lineIdx}-${square.idx}`}
                             ref={isPlayer ? playerRef : undefined}
-                            className={baseSpace}
-                          ></span>
+                            className={base}
+                            style={{ position: 'relative' }}
+                          >
+                            {isTarget && (
+                              <span className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30 z-0"></span>
+                            )}
+
+                            {/* Show the character if it's been revealed or is a matching character */}
+                            {(isRevealed || isMatchingChar) &&
+                              square.char !== ' ' && (
+                                <span className="z-10 text-lg font-medium font-mono">
+                                  {square.char}
+                                </span>
+                              )}
+
+                            {/* Explosion effect */}
+                            {showExplosion &&
+                              explosionIdx === square.idx &&
+                              explosionLineIdx === lineIdx && (
+                                <div className="absolute inset-0 z-20">
+                                  <ExplosionEffect />
+                                </div>
+                              )}
+                          </span>
                         )
-                      }
-
-                      return (
-                        <span
-                          key={`char-${lineIdx}-${square.idx}`}
-                          ref={isPlayer ? playerRef : undefined}
-                          className={base}
-                          style={{ position: 'relative' }}
-                        >
-                          {isTarget && (
-                            <span className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30 z-0"></span>
-                          )}
-
-                          {/* Show the character if it's been revealed or is a matching character */}
-                          {(isRevealed || isMatchingChar) &&
-                            square.char !== ' ' && (
-                              <span className="z-10 text-lg font-medium font-mono">
-                                {square.char}
-                              </span>
-                            )}
-
-                          {/* Explosion effect */}
-                          {showExplosion &&
-                            explosionIdx === square.idx &&
-                            explosionLineIdx === lineIdx && (
-                              <div className="absolute inset-0 z-20">
-                                <ExplosionEffect />
-                              </div>
-                            )}
-                        </span>
-                      )
-                    })}
-                  </div>
-                ))}
-              </div>
-            ))}
+                      })}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
           <div className="text-xs text-zinc-500 mt-4 max-w-xl">
             <span className="font-semibold">NOTE:</span> While this level is
