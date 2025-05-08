@@ -1,14 +1,13 @@
 import React from 'react'
 import {
   BookOpen,
-  Lock,
   Volume2,
   VolumeX,
   X,
   ChevronRight,
   Construction,
 } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 interface SidebarProps {
   currentLevel: number
@@ -24,27 +23,38 @@ const levels = [
     id: 0,
     title: 'Playground (All Motions)',
     description: 'Practice all Vim motions in a free environment',
+    locked: false,
   },
   {
     id: 1,
     title: 'Basic Movement (h, j, k, l)',
     description: 'Learn the fundamental vim motions',
+    locked: false,
   },
   {
     id: 2,
     title: 'Word Movement (w, b, e)',
     description: 'Navigate through words efficiently',
+    locked: false,
   },
   {
     id: 3,
     title: 'Line Operations (0, $)',
     description: 'Move to start and end of lines',
+    locked: false,
   },
   {
     id: 4,
     title: 'Find Characters (f, t)',
     description: 'Jump to specific characters',
     wip: true,
+    locked: false,
+  },
+  {
+    id: 5,
+    title: 'Search Operations (/, ?, n, N)',
+    description: 'Search text and navigate matches',
+    locked: false,
   },
 ]
 
@@ -159,7 +169,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div className="h-1 w-16 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full" />
         </motion.div>
 
-        {levels.map((level, index) => (
+        {levels.map((level) => (
           <motion.button
             key={level.id}
             custom={!!level.locked}

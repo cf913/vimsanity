@@ -1,6 +1,6 @@
 import React from 'react'
 import { X, ExternalLink } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 interface DocumentationSidebarProps {
   currentLevel: number
@@ -275,6 +275,67 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
                 Tip: After pressing 'f', 'F', 't', or 'T', you need to type the character
                 you want to find. The cursor will move to (or just before/after) the
                 next or previous occurrence of that character depending on the command used.
+              </p>
+            </div>
+          </>
+        )
+      case 5:
+        return (
+          <>
+            <h3 className="text-lg font-semibold mb-2">Search Operations</h3>
+            <p className="text-sm mb-3">
+              Search for text patterns and navigate between matches:
+            </p>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">/</kbd> - Search forward
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Search for a pattern going forward from your current position
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Type your search pattern and press Enter to confirm
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">?</kbd> - Search backward
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Search for a pattern going backward from your current position
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Type your search pattern and press Enter to confirm
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">n</kbd> - Next match
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Jump to the next occurrence of your search pattern
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Continues in the direction of your original search
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">N</kbd> - Previous match
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Jump to the previous occurrence of your search pattern
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Moves opposite to the direction of your original search
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 text-xs text-zinc-400">
+              <p className="italic">
+                Tip: Search is one of Vim's most powerful navigation tools. You can 
+                use it to quickly jump to specific words, variables, or patterns in your text.
               </p>
             </div>
           </>
