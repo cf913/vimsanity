@@ -3,17 +3,10 @@ import {
   useKeyboardHandler,
   KeyActionMap,
 } from '../../hooks/useKeyboardHandler'
-import {
-  processTextForVim,
-  moveToNextWordBoundary,
-  moveToPrevWordBoundary,
-  moveToWordEnd,
-  findLineStart,
-  findLineEnd,
-} from '../../utils/textUtils'
+import { processTextForVim } from '../../utils/textUtils'
 import ExplosionEffect from './ExplosionEffect'
 import ConfettiBurst from './ConfettiBurst'
-import { RefreshCw, Shuffle, Trophy, Zap } from 'lucide-react'
+import { RefreshCw, Zap } from 'lucide-react'
 
 interface LevelProps {
   isMuted: boolean
@@ -41,7 +34,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
       isSpace: char === ' ',
       idx,
       char,
-    }))
+    })),
   )
 
   // Group characters into words for each line
@@ -65,7 +58,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
           }
           return acc
         }, [])
-        .filter((word) => word.length > 0) // Remove any empty words
+        .filter((word) => word.length > 0), // Remove any empty words
   )
 
   // Track current line and position within that line
@@ -130,7 +123,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
     _: () => {
       // move cursor to the first non-whitespace character
       const firstNonWhitespace = linesOfSquares[currentLineIndex].findIndex(
-        (square) => !square.isSpace
+        (square) => !square.isSpace,
       )
       setCursor(firstNonWhitespace)
       checkTarget(firstNonWhitespace, currentLineIndex)
@@ -148,7 +141,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
         // Ensure cursor doesn't go beyond the end of the next line
         const nextLineCursor = Math.min(
           cursor,
-          linesOfSquares[nextLineIndex].length - 1
+          linesOfSquares[nextLineIndex].length - 1,
         )
 
         setCurrentLineIndex(nextLineIndex)
@@ -164,7 +157,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
         // Ensure cursor doesn't go beyond the end of the previous line
         const prevLineCursor = Math.min(
           cursor,
-          linesOfSquares[prevLineIndex].length - 1
+          linesOfSquares[prevLineIndex].length - 1,
         )
 
         setCurrentLineIndex(prevLineIndex)
@@ -300,7 +293,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
                         square.idx === target && lineIdx === targetLineIndex
 
                       const isRevealed = revealedLetters.has(
-                        `${lineIdx}-${square.idx}`
+                        `${lineIdx}-${square.idx}`,
                       )
 
                       let base =

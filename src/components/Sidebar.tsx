@@ -21,8 +21,9 @@ interface SidebarProps {
 const levels = [
   {
     id: 0,
-    title: 'Playground (All Motions)',
+    title: 'Dev playground, ignore this',
     description: 'Practice all Vim motions in a free environment',
+    wip: true,
     locked: false,
   },
   {
@@ -219,7 +220,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         className="mt-8 pt-4 border-t border-zinc-700"
         variants={itemVariants}
       >
-        <motion.button
+        {/* <motion.button
           onClick={() => setIsMuted(!isMuted)}
           className="flex items-center gap-2 px-3 py-2 w-full rounded-lg hover:bg-zinc-700/70 transition-colors"
           whileHover={buttonVariants.hover}
@@ -236,7 +237,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               <span className="text-sm text-zinc-300">Mute Sounds</span>
             </>
           )}
-        </motion.button>
+        </motion.button> */}
       </motion.div>
     </motion.div>
   )

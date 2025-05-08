@@ -594,9 +594,8 @@ const SearchLevel5: React.FC<LevelProps> = () => {
             <kbd className="px-2 py-1 bg-zinc-800 rounded">?</kbd> to search
             backward,
             <kbd className="px-2 py-1 bg-zinc-800 rounded">n</kbd> for next
-            match, and
-            <kbd className="px-2 py-1 bg-zinc-800 rounded">N</kbd> for previous
-            match.
+            match, and <kbd className="px-2 py-1 bg-zinc-800 rounded">N</kbd>{' '}
+            for previous match.
           </p>
 
           <div className="flex items-center gap-4 mb-2">
@@ -628,7 +627,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
         >
           {/* Search Input */}
           {isSearching && (
-            <div className="absolute top-2 left-6 right-6 z-10">
+            <div className="absolute bottom-2 left-6 right-6 z-10">
               <form
                 onSubmit={handleSearchSubmit}
                 className="flex items-center"
@@ -659,23 +658,26 @@ const SearchLevel5: React.FC<LevelProps> = () => {
                     } else if (e.key === 'ArrowUp') {
                       e.preventDefault()
                       if (searchHistory.length > 0) {
-                        const newIndex = historyIndex < searchHistory.length - 1 ? historyIndex + 1 : historyIndex;
-                        setHistoryIndex(newIndex);
-                        const historyItem = searchHistory[newIndex];
-                        setSearchTerm(historyItem);
-                        performSearch(historyItem);
+                        const newIndex =
+                          historyIndex < searchHistory.length - 1
+                            ? historyIndex + 1
+                            : historyIndex
+                        setHistoryIndex(newIndex)
+                        const historyItem = searchHistory[newIndex]
+                        setSearchTerm(historyItem)
+                        performSearch(historyItem)
                       }
                     } else if (e.key === 'ArrowDown') {
                       e.preventDefault()
                       if (historyIndex > 0) {
-                        const newIndex = historyIndex - 1;
-                        setHistoryIndex(newIndex);
-                        const historyItem = searchHistory[newIndex];
-                        setSearchTerm(historyItem);
-                        performSearch(historyItem);
+                        const newIndex = historyIndex - 1
+                        setHistoryIndex(newIndex)
+                        const historyItem = searchHistory[newIndex]
+                        setSearchTerm(historyItem)
+                        performSearch(historyItem)
                       } else if (historyIndex === 0) {
-                        setHistoryIndex(-1);
-                        setSearchTerm('');
+                        setHistoryIndex(-1)
+                        setSearchTerm('')
                       }
                     }
                   }}
@@ -792,6 +794,14 @@ const SearchLevel5: React.FC<LevelProps> = () => {
                 ))}
               </div>
             ))}
+            <div className="text-xs text-zinc-500 mt-4 max-w-xl">
+              <span className="font-semibold">NOTE:</span> While this level is
+              case insensitive for learning purposes, Vim's{' '}
+              <kbd className="px-1 py-1 bg-zinc-700 rounded text-white font-mono">
+                /
+              </kbd>{' '}
+              search is usually case sensitive by default.
+            </div>
           </div>
         </div>
         <div className="flex gap-4 text-zinc-400 mt-4 justify-center">

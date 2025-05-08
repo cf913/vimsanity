@@ -585,6 +585,11 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
             ))}
           </div>
           <div className="text-xs text-zinc-500 mt-4 max-w-xl">
+            <span className="font-semibold">NOTE:</span> While this level is
+            case insensitive for learning purposes, Vim's line search is indeed
+            case sensitive.
+          </div>
+          <div className="text-xs text-zinc-500 mt-4 max-w-xl">
             <span className="text-emerald-400 font-semibold">PRO TIP:</span>{' '}
             After using any character search command (f, F, t, T), press{' '}
             <kbd className="px-1 py-0.5 bg-zinc-700 rounded text-zinc-300">
