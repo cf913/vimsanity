@@ -638,7 +638,6 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
           }
         `}
       </style>
-      <WarningSplash />
     </div>
   )
 }
