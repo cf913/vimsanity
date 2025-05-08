@@ -88,6 +88,8 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     Array<{ lineIdx: number; startIdx: number; endIdx: number }>
   >([])
   const [currentMatchIndex, setCurrentMatchIndex] = useState<number>(-1)
+  const [searchHistory, setSearchHistory] = useState<string[]>([])
+  const [historyIndex, setHistoryIndex] = useState<number>(-1)
 
   // Refs for scrolling
   const containerRef = useRef<HTMLDivElement>(null)
@@ -257,6 +259,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
   const clearSearch = () => {
     setIsSearching(false)
     setSearchTerm('')
+    setHistoryIndex(-1)
     // Keep search matches and currentMatchIndex to allow further navigation
 
     // Remove searching class from body
@@ -333,6 +336,16 @@ const SearchLevel5: React.FC<LevelProps> = () => {
         setCursor(match.startIdx)
         checkTarget(match.startIdx, match.lineIdx)
       }
+
+      // Add to search history if not already the most recent entry
+      setSearchHistory((prev) => {
+        // Don't add duplicates in a row
+        if (prev.length === 0 || prev[0] !== searchTerm) {
+          return [searchTerm, ...prev]
+        }
+        return prev
+      })
+      setHistoryIndex(-1)
     }
 
     // End search mode
@@ -539,6 +552,8 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     setLevelCompleted(false)
     setRevealedLetters(new Set())
     clearSearch()
+    setSearchHistory([])
+    setHistoryIndex(-1)
     setNewTarget()
   }
 
@@ -641,6 +656,27 @@ const SearchLevel5: React.FC<LevelProps> = () => {
                     } else if (e.key === 'Enter') {
                       e.preventDefault()
                       handleSearchSubmit(e)
+                    } else if (e.key === 'ArrowUp') {
+                      e.preventDefault()
+                      if (searchHistory.length > 0) {
+                        const newIndex = historyIndex < searchHistory.length - 1 ? historyIndex + 1 : historyIndex;
+                        setHistoryIndex(newIndex);
+                        const historyItem = searchHistory[newIndex];
+                        setSearchTerm(historyItem);
+                        performSearch(historyItem);
+                      }
+                    } else if (e.key === 'ArrowDown') {
+                      e.preventDefault()
+                      if (historyIndex > 0) {
+                        const newIndex = historyIndex - 1;
+                        setHistoryIndex(newIndex);
+                        const historyItem = searchHistory[newIndex];
+                        setSearchTerm(historyItem);
+                        performSearch(historyItem);
+                      } else if (historyIndex === 0) {
+                        setHistoryIndex(-1);
+                        setSearchTerm('');
+                      }
                     }
                   }}
                   className="bg-zinc-700 text-white px-2 py-1 rounded flex-grow focus:outline-none focus:ring-2 focus:ring-emerald-400 font-mono"
