@@ -7,6 +7,7 @@ import { processTextForVim } from '../../utils/textUtils'
 import ExplosionEffect from './ExplosionEffect'
 import ConfettiBurst from './ConfettiBurst'
 import { RefreshCw, Zap } from 'lucide-react'
+import WarningSplash from '../common/WarningSplash'
 
 interface LevelProps {
   isMuted: boolean
@@ -772,6 +773,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
           ))}
         </div>
       </div>
+      <WarningSplash />
     </div>
   )
 }

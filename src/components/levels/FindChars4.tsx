@@ -7,6 +7,7 @@ import { processTextForVim } from '../../utils/textUtils'
 import ExplosionEffect from './ExplosionEffect'
 import ConfettiBurst from './ConfettiBurst'
 import { RefreshCw, Zap, AlertTriangle, X } from 'lucide-react'
+import WarningSplash from '../common/WarningSplash'
 
 interface LevelProps {
   isMuted: boolean
@@ -34,7 +35,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
       isSpace: char === ' ',
       idx,
       char,
-    }))
+    })),
   )
 
   // Group characters into words for each line
@@ -58,7 +59,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
           }
           return acc
         }, [])
-        .filter((word) => word.length > 0) // Remove any empty words
+        .filter((word) => word.length > 0), // Remove any empty words
   )
 
   // Track current line and position within that line
@@ -74,7 +75,6 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
   const [revealedLetters, setRevealedLetters] = useState<Set<string>>(new Set()) // Using "lineIdx-charIdx" format
   const [levelCompleted, setLevelCompleted] = useState(false)
   const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
-  const [showBanner, setShowBanner] = useState(true)
 
   // States for f and t commands
   const [awaitingCharacter, setAwaitingCharacter] = useState<boolean>(false)
@@ -312,7 +312,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
         // Ensure cursor doesn't go beyond the end of the next line
         const nextLineCursor = Math.min(
           cursor,
-          linesOfSquares[nextLineIndex].length - 1
+          linesOfSquares[nextLineIndex].length - 1,
         )
 
         setCurrentLineIndex(nextLineIndex)
@@ -331,7 +331,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
         // Ensure cursor doesn't go beyond the end of the previous line
         const prevLineCursor = Math.min(
           cursor,
-          linesOfSquares[prevLineIndex].length - 1
+          linesOfSquares[prevLineIndex].length - 1,
         )
 
         setCurrentLineIndex(prevLineIndex)
@@ -469,10 +469,10 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
                   {pendingCommand === 'f'
                     ? 'find'
                     : pendingCommand === 'F'
-                    ? 'find (reverse)'
-                    : pendingCommand === 't'
-                    ? 'move before'
-                    : 'move after'}
+                      ? 'find (reverse)'
+                      : pendingCommand === 't'
+                        ? 'move before'
+                        : 'move after'}
                   ...
                 </span>
               </div>
@@ -508,7 +508,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
                         square.idx === target && lineIdx === targetLineIndex
 
                       const isRevealed = revealedLetters.has(
-                        `${lineIdx}-${square.idx}`
+                        `${lineIdx}-${square.idx}`,
                       )
 
                       // Highlight characters that match the target character on the current line
@@ -638,29 +638,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
           }
         `}
       </style>
-      {showBanner && (
-        <div
-          onClick={() => setShowBanner(false)}
-          className="hover:cursor-pointer fixed bottom-0 left-0 w-full bg-amber-600 overflow-hidden py-2 z-2"
-        >
-          <div
-            className="whitespace-nowrap text-white font-bold flex items-center justify-between"
-            style={{
-              animation: 'marquee 50s linear infinite',
-              display: 'inline-block',
-            }}
-          >
-            <span className="flex items-center">
-              <AlertTriangle size={18} className="text-white mr-2" />
-              LEVEL UNDER ACTIVE DEVELOPMENT, PROCEED WITH CAUTION
-              &nbsp;&nbsp;&nbsp; LEVEL UNDER DEVELOPMENT, PROCEED WITH CAUTION
-              &nbsp;&nbsp;&nbsp; LEVEL UNDER DEVELOPMENT, PROCEED WITH CAUTION
-              &nbsp;&nbsp;&nbsp; LEVEL UNDER DEVELOPMENT, PROCEED WITH CAUTION
-              &nbsp;&nbsp;&nbsp; LEVEL UNDER DEVELOPMENT, PROCEED WITH CAUTION
-            </span>
-          </div>
-        </div>
-      )}
+      <WarningSplash />
     </div>
   )
 }
