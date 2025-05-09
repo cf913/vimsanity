@@ -34,7 +34,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
       isSpace: char === ' ',
       idx,
       char,
-    })),
+    }))
   )
 
   // Group characters into words for each line
@@ -58,7 +58,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
           }
           return acc
         }, [])
-        .filter((word) => word.length > 0), // Remove any empty words
+        .filter((word) => word.length > 0) // Remove any empty words
   )
 
   // Track current line and position within that line
@@ -89,23 +89,97 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
     }
   }, [cursor, currentLineIndex])
 
-  // Set a new target randomly
+  // Set a new target randomly - only select unrevealed squares
   const setNewTarget = () => {
-    // Choose a random line
-    const randomLineIndex = Math.floor(Math.random() * linesOfSquares.length)
-    // Choose a random position in that line
-
-    // target was start of line or at first non-whitespace character
+    // Determine if we should target start or end of line based on previous target
     const prevWasAtStart =
       target ===
       linesOfSquares[targetLineIndex].findIndex((square) => !square.isSpace)
 
-    const randomPos = prevWasAtStart
-      ? linesOfSquares[randomLineIndex].length - 1
-      : linesOfSquares[randomLineIndex].findIndex((square) => !square.isSpace)
+    // Collect all available unrevealed positions that match our constraint
+    const availablePositions: { lineIndex: number; position: number }[] = []
 
-    setTarget(randomPos)
-    setTargetLineIndex(randomLineIndex)
+    linesOfSquares.forEach((line, lineIdx) => {
+      // Get the position based on our alternating pattern
+      const startPos = line.findIndex((square) => !square.isSpace)
+      const endPos = line.length - 1
+
+      // Choose position based on alternating pattern
+      const posToCheck = prevWasAtStart ? endPos : startPos
+
+      // Check if this position is unrevealed
+      if (
+        !revealedLetters.has(`${lineIdx}-${posToCheck}`) &&
+        !line[posToCheck].isSpace
+      ) {
+        availablePositions.push({ lineIndex: lineIdx, position: posToCheck })
+      }
+    })
+
+    // If we have available positions, choose one randomly
+    if (availablePositions.length > 0) {
+      const randomIndex = Math.floor(Math.random() * availablePositions.length)
+      const { lineIndex, position } = availablePositions[randomIndex]
+
+      setTarget(position)
+      setTargetLineIndex(lineIndex)
+    } else {
+      // If no unrevealed positions match our constraint, try the opposite constraint
+      const secondaryPositions: { lineIndex: number; position: number }[] = []
+
+      linesOfSquares.forEach((line, lineIdx) => {
+        // Get the opposite position from our alternating pattern
+        const startPos = line.findIndex((square) => !square.isSpace)
+        const endPos = line.length - 1
+
+        // Choose the opposite position
+        const posToCheck = prevWasAtStart ? startPos : endPos
+
+        // Check if this position is unrevealed
+        if (
+          !revealedLetters.has(`${lineIdx}-${posToCheck}`) &&
+          !line[posToCheck].isSpace
+        ) {
+          secondaryPositions.push({ lineIndex: lineIdx, position: posToCheck })
+        }
+      })
+
+      if (secondaryPositions.length > 0) {
+        const randomIndex = Math.floor(
+          Math.random() * secondaryPositions.length
+        )
+        const { lineIndex, position } = secondaryPositions[randomIndex]
+
+        setTarget(position)
+        setTargetLineIndex(lineIndex)
+      } else {
+        // If still no unrevealed positions, check for any unrevealed position
+        const anyPositions: { lineIndex: number; position: number }[] = []
+
+        linesOfSquares.forEach((line, lineIdx) => {
+          line.forEach((square, squareIdx) => {
+            if (
+              !square.isSpace &&
+              !revealedLetters.has(`${lineIdx}-${squareIdx}`)
+            ) {
+              anyPositions.push({ lineIndex: lineIdx, position: squareIdx })
+            }
+          })
+        })
+
+        if (anyPositions.length > 0) {
+          const randomIndex = Math.floor(Math.random() * anyPositions.length)
+          const { lineIndex, position } = anyPositions[randomIndex]
+
+          setTarget(position)
+          setTargetLineIndex(lineIndex)
+        } else {
+          // All squares have been revealed - level complete!
+          setLevelCompleted(true)
+          setShowConfetti(true)
+        }
+      }
+    }
   }
 
   // Initialize the game with a random target
@@ -123,7 +197,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
     _: () => {
       // move cursor to the first non-whitespace character
       const firstNonWhitespace = linesOfSquares[currentLineIndex].findIndex(
-        (square) => !square.isSpace,
+        (square) => !square.isSpace
       )
       setCursor(firstNonWhitespace)
       checkTarget(firstNonWhitespace, currentLineIndex)
@@ -141,7 +215,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
         // Ensure cursor doesn't go beyond the end of the next line
         const nextLineCursor = Math.min(
           cursor,
-          linesOfSquares[nextLineIndex].length - 1,
+          linesOfSquares[nextLineIndex].length - 1
         )
 
         setCurrentLineIndex(nextLineIndex)
@@ -157,7 +231,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
         // Ensure cursor doesn't go beyond the end of the previous line
         const prevLineCursor = Math.min(
           cursor,
-          linesOfSquares[prevLineIndex].length - 1,
+          linesOfSquares[prevLineIndex].length - 1
         )
 
         setCurrentLineIndex(prevLineIndex)
@@ -192,6 +266,10 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
       setRevealedLetters((prev) => {
         const newSet = new Set(prev)
         newSet.add(`${lineIndex}-${newPos}`)
+        if (newSet.size === 16) {
+          setLevelCompleted(true)
+          setShowConfetti(true)
+        }
         return newSet
       })
 
@@ -207,14 +285,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
         // Set a new target
         setNewTarget()
 
-        // Check if level is completed (10 targets hit)
-        if (score + 1 >= 100) {
-          setLevelCompleted(true)
-          setShowConfetti(true)
-          setTimeout(() => {
-            setShowConfetti(false)
-          }, 3000)
-        }
+        // Level completion is now handled in setNewTarget when no unrevealed squares remain
       }, 200)
     }
   }
@@ -247,7 +318,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
             <div className="bg-zinc-800 px-4 py-2 rounded-lg">
               <span className="text-zinc-400 mr-2">Score:</span>
               <span className="text-emerald-400 font-bold">{score}</span>
-              <span className="text-zinc-600 ml-1">/100</span>
+              <span className="text-zinc-600 ml-1">/16</span>
             </div>
             <button
               onClick={resetLevel}
@@ -293,7 +364,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
                         square.idx === target && lineIdx === targetLineIndex
 
                       const isRevealed = revealedLetters.has(
-                        `${lineIdx}-${square.idx}`,
+                        `${lineIdx}-${square.idx}`
                       )
 
                       let base =

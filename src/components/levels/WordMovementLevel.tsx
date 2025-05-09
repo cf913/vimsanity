@@ -160,7 +160,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
       let availableSquares = squares
         .filter(
           (square, idx) =>
-            !square.isSpace && idx !== cursor && !newRevealed.has(idx)
+            !square.isSpace && idx !== cursor && !revealedLetters.has(idx)
         )
         .map((square) => square.idx)
 
