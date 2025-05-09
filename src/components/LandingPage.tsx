@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react"
-import { ArrowRight } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import React, { useEffect, useState } from 'react'
+import { ArrowRight } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface LandingPageProps {
   onGetStarted: () => void
@@ -32,7 +32,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       y: 0,
       opacity: 1,
       transition: {
-        type: "spring",
+        type: 'spring',
         stiffness: 200, // Increased stiffness for snappier motion
         damping: 12, // Adjusted damping for quick but controlled motion
         duration: 0.3, // Faster duration
@@ -44,7 +44,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
     initial: { scale: 1 },
     hover: {
       scale: 1.03, // Reduced scale for snappier feel
-      boxShadow: "0px 5px 15px rgba(16, 185, 129, 0.4)",
+      boxShadow: '0px 5px 15px rgba(16, 185, 129, 0.4)',
       transition: { duration: 0.2 }, // Faster transition
     },
     tap: {
@@ -56,10 +56,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
   const featureCardVariants = {
     hover: {
       y: -5, // Reduced movement for snappier feel
-      boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.3)",
-      backgroundColor: "rgb(39, 39, 42)",
+      boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
+      backgroundColor: 'rgb(39, 39, 42)',
       transition: {
-        type: "spring",
+        type: 'spring',
         stiffness: 400, // Higher stiffness for snappier motion
         damping: 15, // Adjusted damping
         duration: 0.2, // Faster duration
@@ -97,7 +97,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         className="fixed inset-0 w-full h-full overflow-hidden z-0"
         style={{
           backgroundImage:
-            "radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.05) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(16, 185, 129, 0.05) 0%, transparent 50%)",
+            'radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.05) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(16, 185, 129, 0.05) 0%, transparent 50%)',
         }}
       >
         {/* Floating squares animation */}
@@ -158,7 +158,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             }}
             transition={{
               duration: square.duration,
-              ease: "easeInOut",
+              ease: 'easeInOut',
               times: [0, 0.25, 0.5, 0.75, 1],
               repeat: Infinity,
               delay: square.delay,
@@ -180,15 +180,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, type: "spring", stiffness: 200 }}
+                transition={{ duration: 0.3, type: 'spring', stiffness: 200 }}
               >
-                <span className="block bg-clip-text text-transparent bg-gradient-to-r from-zinc-100 to-zinc-300">
-                  Welcome to
-                </span>
                 <motion.span
-                  className="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600 mt-2"
+                  className="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600"
                   whileHover={{ scale: 1.01 }}
-                  transition={{ type: "spring", stiffness: 400, duration: 0.2 }}
+                  transition={{ type: 'spring', stiffness: 400, duration: 0.2 }}
                 >
                   VimSanity
                 </motion.span>
@@ -199,8 +196,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               className="text-xl sm:text-2xl text-zinc-300 mt-4 max-w-2xl mx-auto leading-relaxed"
               variants={item}
             >
-              Master Vim motions through interactive gameplay and become a text
-              editing ninja.
+              Learn Vim motions the fun way
             </motion.p>
 
             <motion.div className="mt-8 space-y-6" variants={item}>
@@ -210,19 +206,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               >
                 {[
                   {
-                    title: "Learn by Doing",
-                    description:
-                      "Practice Vim motions in a fun, interactive environment",
+                    title: 'No Mouse Needed',
+                    description: 'Move around text using just your keyboard',
                   },
                   {
-                    title: "Progressive Challenges",
-                    description:
-                      "Start with basics and advance to complex movement patterns",
+                    title: 'Simple to Start',
+                    description: 'Begin with basic movements anyone can learn',
                   },
                   {
-                    title: "Make Coding Fun Again",
-                    description:
-                      "Transform text editing into an addictive game where every keystroke feels like a victory",
+                    title: 'Learn by Playing',
+                    description: 'Practice in a game that makes learning fun',
                   },
                 ].map((feature, index) => (
                   <motion.div
@@ -233,7 +226,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{
-                      delay: index * 0.05, // Very slight staggering
+                      delay: index * 0.05,
                       duration: 0.2,
                     }}
                   >
@@ -246,135 +239,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               </motion.div>
             </motion.div>
 
-            {/* Pros and Cons Table Section */}
-            <motion.div className="mt-12" variants={item}>
-              <motion.h2
-                className="text-2xl font-bold text-center mb-6"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600">
-                  Why Master Vim Motions?
-                </span>
-              </motion.h2>
-
-              <motion.div
-                className="bg-zinc-800/80 backdrop-blur-sm rounded-xl border border-zinc-700/50 shadow-lg overflow-hidden"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                whileHover={{
-                  boxShadow: "0px 8px 30px rgba(16, 185, 129, 0.2)",
-                }}
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-zinc-700/50">
-                  {/* Vim Motions Column */}
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold text-emerald-400 mb-4 flex items-center">
-                      <span className="w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center mr-2">
-                        ✓
-                      </span>
-                      Vim Motions
-                    </h3>
-                    <ul className="space-y-3 text-left">
-                      <li className="flex items-start">
-                        <span className="text-emerald-400 mr-2">•</span>
-                        <span className="text-zinc-300">
-                          Control code like a video game character
-                        </span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-emerald-400 mr-2">•</span>
-                        <span className="text-zinc-300">
-                          Execute powerful combo moves with keypresses
-                        </span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-emerald-400 mr-2">•</span>
-                        <span className="text-zinc-300">
-                          Feel like a coding ninja with every keystroke
-                        </span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-emerald-400 mr-2">•</span>
-                        <span className="text-zinc-300">
-                          Unlock new abilities as you level up
-                        </span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-emerald-400 mr-2">•</span>
-                        <span className="text-zinc-300">
-                          Turn mundane editing into an exciting challenge
-                        </span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-emerald-400 mr-2">•</span>
-                        <span className="text-zinc-300">
-                          Editor agnostic (works with most editors)
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  {/* Regular Editing Column */}
-                  <div className="p-6 text-left">
-                    <h3 className="text-xl font-semibold text-zinc-400 mb-4 flex items-center">
-                      <span className="w-8 h-8 bg-zinc-500/20 rounded-full flex items-center justify-center mr-2 text-center">
-                        ✗
-                      </span>
-                      Regular Editing
-                    </h3>
-                    <ul className="space-y-3">
-                      <li className="flex items-start">
-                        <span className="text-zinc-500 mr-2">•</span>
-                        <span className="text-zinc-400">
-                          Boring point-and-click movements
-                        </span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-zinc-500 mr-2">•</span>
-                        <span className="text-zinc-400">
-                          Tedious arrow key mashing
-                        </span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-zinc-500 mr-2">•</span>
-                        <span className="text-zinc-400">
-                          Repetitive hand movements causing fatigue
-                        </span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-zinc-500 mr-2">•</span>
-                        <span className="text-zinc-400">
-                          No sense of progression or mastery
-                        </span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-zinc-500 mr-2">•</span>
-                        <span className="text-zinc-400">
-                          Having to switch between mouse and keyboard
-                        </span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-zinc-500 mr-2">•</span>
-                        <span className="text-zinc-400">
-                          Editor specific shortcuts
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="bg-zinc-900/50 p-4 text-center">
-                  <p className="text-emerald-300 font-medium">
-                    VimSanity makes learning these powerful motions fun and
-                    effective
-                  </p>
-                </div>
-              </motion.div>
-            </motion.div>
-
             <motion.div className="mt-8" variants={item}>
               <motion.div
                 className="mb-4 max-w-lg mx-auto text-center p-3 rounded-lg bg-zinc-800/60 border border-zinc-700/50 backdrop-blur-sm"
@@ -382,16 +246,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2, duration: 0.3 }}
               >
-                <p className="text-zinc-300 italic text-sm">
-                  <span className="text-emerald-400 font-semibold">
-                    ⚠️ Warning:
-                  </span>{" "}
-                  Starting VimSanity may result in ditching your mouse,
-                  abandoning arrow keys, and 10x-ing your development speed.
-                  <br />
-                  <br />
-                  We can't guarantee it'll make you a better developer, but it
-                  will DEFINITELY make you a faster one.
+                <p className="text-zinc-300 text-sm">
+                  Type less. Move faster. Have fun.
                 </p>
               </motion.div>
 
@@ -412,7 +268,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                     repeat: Infinity,
                     repeatDelay: 1,
                     duration: 0.5,
-                    ease: "easeInOut",
+                    ease: 'easeInOut',
                   }}
                 >
                   <ArrowRight size={20} />
@@ -431,10 +287,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         transition={{ duration: 0.3 }}
       >
         <div className="text-center text-zinc-500 text-sm">
-          <p>VimSanity - The interactive way to master Vim motions</p>
-          <p className="mt-1">
-            Improve your productivity with keyboard-driven text editing
-          </p>
+          <p>VimSanity - Learn keyboard shortcuts through play</p>
         </div>
       </motion.footer>
 
