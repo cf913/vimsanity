@@ -140,12 +140,11 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
       setExplosionIdx(target)
       // setShowConfetti(true)
 
+      const oldRevealed = revealedLetters
+      const newRevealed = new Set(oldRevealed)
+      newRevealed.add(target)
       // Add the current target to revealed letters
-      setRevealedLetters((prev) => {
-        const newSet = new Set(prev)
-        newSet.add(target)
-        return newSet
-      })
+      setRevealedLetters(newRevealed)
 
       // Set a timeout to hide the explosion
       setTimeout(() => {
@@ -156,12 +155,25 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
       // skipping confetti for now
       // setTimeout(() => setShowConfetti(false), 1500);
 
-      // Generate new target
+      // Generate new target - must be a square that hasn't been revealed yet
       let newTarget
-      do {
-        newTarget = Math.floor(Math.random() * squares.length)
-      } while (newTarget === cursor || squares[newTarget].isSpace)
-      setSquareTarget(newTarget)
+      let availableSquares = squares
+        .filter(
+          (square, idx) =>
+            !square.isSpace && idx !== cursor && !newRevealed.has(idx)
+        )
+        .map((square) => square.idx)
+
+      // Check if there are any available squares left
+      if (availableSquares.length > 0) {
+        // Pick a random square from available ones
+        const randomIndex = Math.floor(Math.random() * availableSquares.length)
+        newTarget = availableSquares[randomIndex]
+        setSquareTarget(newTarget)
+      } else {
+        // All squares have been revealed - level complete!
+        setLevelCompleted(true)
+      }
     }
   }
 
@@ -192,8 +204,11 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
     setLevelCompleted(false)
     setShowConfetti(false)
     setcursor(0)
-    // Generate a new target
-    const newTarget = Math.floor(Math.random() * squares.length)
+    // Generate a new target - ensure it's not a space
+    let newTarget
+    do {
+      newTarget = Math.floor(Math.random() * squares.length)
+    } while (squares[newTarget].isSpace)
     setSquareTarget(newTarget)
   }
 
@@ -217,7 +232,10 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
             <div className="bg-zinc-800 px-4 py-2 rounded-lg">
               <span className="text-zinc-400 mr-2">Score:</span>
               <span className="text-emerald-400 font-bold">{score}</span>
-              <span className="text-zinc-600 ml-1">/100</span>
+              {/* max score based on length of text minus spaces */}
+              <span className="text-zinc-600 ml-1">
+                /{squares.filter((square) => !square.isSpace).length}
+              </span>
             </div>
             <button
               onClick={resetLevel}
@@ -226,12 +244,6 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
             >
               <RefreshCw size={18} className="text-zinc-400" />
             </button>
-            {levelCompleted && (
-              <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
-                <Zap size={18} className="text-yellow-300" />
-                <span>Level Complete!</span>
-              </div>
-            )}
             <button
               onClick={changeText}
               title="New Text"
