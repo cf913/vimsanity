@@ -1,10 +1,19 @@
 # VimSanity
 
-Website: [vimsanity.com](https://www.vimsanity.com)
+Check it out: [vimsanity.com](https://www.vimsanity.com)
 
-## Master Vim Navigation Through Interactive Gameplay
+## Why VimSanity
 
-VimSanity is an interactive web application designed to help you learn and practice Vim's powerful navigation and search commands in a fun, game-like environment.
+We wanted to make learning vim motions as simple as possible, for that stubborn friend of yours who you've been trying to convert since forever now.
+
+Here is the idea:
+
+- Straight to the point.
+- Discover motions on your own.
+- Satisfying and easy to understand.
+- As true to vim motions as possible.
+
+Unlike other tools designed to learn Vim, VimSanity abstracts Vim motions away from code editors. This approach makes the learning process more beginner-friendly, especially for those who think that learning Vim is intimidating, or dare I say, insane...
 
 ## What is VimSanity?
 
@@ -16,24 +25,15 @@ VimSanity transforms Vim's sometimes intimidating learning curve into an engagin
 - Track your progress with a scoring system
 - Complete challenges to reinforce your skills
 
-## Search Level Features
-
-Our advanced search level mimics Vim's powerful search capabilities:
-
-- Press `/` to search forward through text
-- Press `?` to search backward
-- Use `n` to find the next match
-- Use `N` to find the previous match
-- Navigate through your search history using the up and down arrow keys
-- Watch your cursor automatically jump to matches
-
 ## How to Get Started
 
+1. Check out the [website](https://vimsanity.com).
+
 1. Clone this repository
-2. Run `npm install` to install dependencies
-3. Run `npm start` to launch the application
-4. Begin with the basic levels and progress to more advanced techniques
-5. Practice regularly to build muscle memory for Vim commands
+1. Run `npm install` to install dependencies
+1. Run `npm start` to launch the application
+1. Begin with the basic levels and progress to more advanced techniques
+1. Practice regularly to build muscle memory for Vim commands
 
 ## Why Learn Vim?
 
