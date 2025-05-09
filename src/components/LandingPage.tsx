@@ -206,16 +206,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               >
                 {[
                   {
-                    title: 'No Mouse Needed',
-                    description: 'Move around text using just your keyboard',
+                    title: 'But why?',
+                    description: 'You want to edit faster. We will make you.',
                   },
                   {
                     title: 'Simple to Start',
-                    description: 'Begin with basic movements anyone can learn',
+                    description: 'Begin with the most basic movements',
                   },
                   {
-                    title: 'Learn by Playing',
-                    description: 'Practice in a game that makes learning fun',
+                    title: 'Learn by Repetition',
+                    description: '8 minutes a day keeps the mouse away',
                   },
                 ].map((feature, index) => (
                   <motion.div
