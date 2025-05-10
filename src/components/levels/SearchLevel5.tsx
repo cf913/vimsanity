@@ -6,6 +6,7 @@ import {
 import { processTextForVim } from '../../utils/textUtils'
 import ExplosionEffect from './ExplosionEffect'
 import ConfettiBurst from './ConfettiBurst'
+import LevelTimer from '../common/LevelTimer'
 import { RefreshCw, Zap } from 'lucide-react'
 import WarningSplash from '../common/WarningSplash'
 
@@ -90,6 +91,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
   const [currentMatchIndex, setCurrentMatchIndex] = useState<number>(-1)
   const [searchHistory, setSearchHistory] = useState<string[]>([])
   const [historyIndex, setHistoryIndex] = useState<number>(-1)
+  const [timerActive, setTimerActive] = useState<boolean>(false)
 
   // Refs for scrolling
   const containerRef = useRef<HTMLDivElement>(null)
@@ -157,8 +159,16 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Start timer on first interaction
+  const activateTimer = () => {
+    if (!timerActive) {
+      setTimerActive(true)
+    }
+  }
+
   // Perform search across all lines
   const performSearch = (term: string) => {
+    activateTimer()
     if (!term) {
       setSearchMatches([])
       setCurrentMatchIndex(-1)
@@ -219,6 +229,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
 
   // Navigate to the next search match
   const navigateToNextMatch = () => {
+    activateTimer()
     if (searchMatches.length === 0) return
 
     let newMatchIndex
@@ -238,6 +249,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
 
   // Navigate to the previous search match
   const navigateToPrevMatch = () => {
+    activateTimer()
     if (searchMatches.length === 0) return
 
     let newMatchIndex
@@ -275,6 +287,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
 
   // Start searching
   const startSearch = (direction: 'forward' | 'backward') => {
+    activateTimer()
     setIsSearching(true)
     setSearchDirection(direction)
     setSearchTerm('')
@@ -308,6 +321,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
 
   // Handle search input change
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    activateTimer()
     e.stopPropagation() // Prevent event bubbling
     const value = e.target.value
     setSearchTerm(value)
@@ -322,6 +336,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
 
   // Handle search input submission
   const handleSearchSubmit = (e: React.FormEvent) => {
+    activateTimer()
     e.preventDefault()
     e.stopPropagation()
 
@@ -357,12 +372,14 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     // Search operations are now handled by the global event handler
     // to prevent conflicts with input field
     n: () => {
+      activateTimer()
       if (searchMatches.length > 0) {
         navigateToNextMatch()
         setLastKeyPressed('n')
       }
     },
     N: () => {
+      activateTimer()
       if (searchMatches.length > 0) {
         navigateToPrevMatch()
         setLastKeyPressed('N')
@@ -374,6 +391,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
       }
     },
     h: () => {
+      activateTimer()
       if (!isSearching) {
         setLastKeyPressed('h')
         if (cursor > 0) {
@@ -384,6 +402,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
       }
     },
     l: () => {
+      activateTimer()
       if (!isSearching) {
         setLastKeyPressed('l')
         if (cursor < linesOfSquares[currentLineIndex].length - 1) {
@@ -394,6 +413,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
       }
     },
     j: () => {
+      activateTimer()
       if (!isSearching) {
         setLastKeyPressed('j')
         if (currentLineIndex < linesOfSquares.length - 1) {
@@ -409,6 +429,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
       }
     },
     k: () => {
+      activateTimer()
       if (!isSearching) {
         setLastKeyPressed('k')
         if (currentLineIndex > 0) {
@@ -819,6 +840,9 @@ const SearchLevel5: React.FC<LevelProps> = () => {
           ))}
         </div>
       </div>
+
+      {/* Level Timer */}
+      <LevelTimer levelId="5-search-level" isActive={timerActive} />
       {/* <WarningSplash /> */}
     </div>
   )

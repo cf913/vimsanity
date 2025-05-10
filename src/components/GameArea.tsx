@@ -39,6 +39,9 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
       </div>
 
       {renderLevel()}
+      {/* <div> */}
+      {/*   <LevelTimer levelId={level} isActive={true} /> */}
+      {/* </div> */}
     </div>
   )
 }

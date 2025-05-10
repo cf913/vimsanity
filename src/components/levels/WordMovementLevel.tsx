@@ -11,6 +11,7 @@ import {
 } from '../../utils/textUtils'
 import ExplosionEffect from './ExplosionEffect'
 import ConfettiBurst from './ConfettiBurst'
+import LevelTimer from '../common/LevelTimer'
 import { RefreshCw, Shuffle, Trophy, Zap } from 'lucide-react'
 
 interface WordMovementLevelProps {
@@ -43,7 +44,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
 
   // Randomly select one sentence when component loads
   const [selectedTextIndex, setSelectedTextIndex] = useState(() =>
-    Math.floor(Math.random() * sampleTexts.length)
+    Math.floor(Math.random() * sampleTexts.length),
   )
   const sampleText = sampleTexts[selectedTextIndex]
   const characters = processTextForVim(sampleText)
@@ -81,6 +82,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
   const [score, setScore] = useState(0)
   const [showConfetti, setShowConfetti] = useState(false)
   const [showExplosion, setShowExplosion] = useState(false)
+  const [timerActive, setTimerActive] = useState<boolean>(false)
   const [explosionIdx, setExplosionIdx] = useState<number | null>(null)
   const [revealedLetters, setRevealedLetters] = useState<Set<number>>(new Set())
   const [levelCompleted, setLevelCompleted] = useState(false)
@@ -99,31 +101,43 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
     }
   }, [cursor])
 
+  // Start timer on first key press
+  const activateTimer = () => {
+    if (!timerActive) {
+      setTimerActive(true)
+    }
+  }
+
   // Key actions (move left/right, and word boundaries, but now just move between squares)
   const keyActions: KeyActionMap = {
     h: () => {
+      activateTimer()
       if (cursor > 0) {
         setcursor(cursor - 1)
         checkTarget(cursor - 1)
       }
     },
     l: () => {
+      activateTimer()
       if (cursor < squares.length - 1) {
         setcursor(cursor + 1)
         checkTarget(cursor + 1)
       }
     },
     w: () => {
+      activateTimer()
       const newPos = moveToNextWordBoundary(characters, cursor)
       setcursor(newPos)
       checkTarget(newPos)
     },
     e: () => {
+      activateTimer()
       const newPos = moveToWordEnd(characters, cursor)
       setcursor(newPos)
       checkTarget(newPos)
     },
     b: () => {
+      activateTimer()
       const newPos = moveToPrevWordBoundary(characters, cursor)
       setcursor(newPos)
       checkTarget(newPos)
@@ -160,7 +174,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
       let availableSquares = squares
         .filter(
           (square, idx) =>
-            !square.isSpace && idx !== cursor && !revealedLetters.has(idx)
+            !square.isSpace && idx !== cursor && !revealedLetters.has(idx),
         )
         .map((square) => square.idx)
 
@@ -182,7 +196,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
     if (revealedLetters.size > 0) {
       const nonSpaceSquares = squares.filter((square) => !square.isSpace)
       const allRevealed = nonSpaceSquares.every((square) =>
-        revealedLetters.has(square.idx)
+        revealedLetters.has(square.idx),
       )
 
       if ((allRevealed && !levelCompleted) || score >= 100) {
@@ -346,6 +360,9 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
             </kbd>
           ))}
         </div>
+
+        {/* Level Timer */}
+        <LevelTimer levelId="2-word-movement" isActive={true} />
       </div>
     </div>
   )

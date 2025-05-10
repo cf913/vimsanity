@@ -6,6 +6,7 @@ import {
 import { processTextForVim } from '../../utils/textUtils'
 import ExplosionEffect from './ExplosionEffect'
 import ConfettiBurst from './ConfettiBurst'
+import LevelTimer from '../common/LevelTimer'
 import { RefreshCw, Zap } from 'lucide-react'
 
 interface LevelProps {
@@ -34,7 +35,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
       isSpace: char === ' ',
       idx,
       char,
-    }))
+    })),
   )
 
   // Group characters into words for each line
@@ -58,7 +59,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
           }
           return acc
         }, [])
-        .filter((word) => word.length > 0) // Remove any empty words
+        .filter((word) => word.length > 0), // Remove any empty words
   )
 
   // Track current line and position within that line
@@ -73,6 +74,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
   const [explosionLineIdx, setExplosionLineIdx] = useState<number | null>(null)
   const [revealedLetters, setRevealedLetters] = useState<Set<string>>(new Set()) // Using "lineIdx-charIdx" format
   const [levelCompleted, setLevelCompleted] = useState(false)
+  const [timerActive, setTimerActive] = useState<boolean>(false)
   const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
 
   // Refs for scrolling
@@ -146,7 +148,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
 
       if (secondaryPositions.length > 0) {
         const randomIndex = Math.floor(
-          Math.random() * secondaryPositions.length
+          Math.random() * secondaryPositions.length,
         )
         const { lineIndex, position } = secondaryPositions[randomIndex]
 
@@ -187,20 +189,31 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
     setNewTarget()
   }, [])
 
+  // Start timer on first key press
+  const activateTimer = () => {
+    if (!timerActive) {
+      setTimerActive(true)
+    }
+  }
+
   // Key actions for movement
   const keyActions: KeyActionMap = {
     0: () => {
+      activateTimer()
       // move cursor to start of line
       setCursor(0)
       checkTarget(0, currentLineIndex)
     },
     _: () => {
-      // move cursor to the first non-whitespace character
-      const firstNonWhitespace = linesOfSquares[currentLineIndex].findIndex(
-        (square) => !square.isSpace
+      activateTimer()
+      // Find the first non-space character in the line
+      const firstNonSpace = linesOfSquares[currentLineIndex].findIndex(
+        (square) => !square.isSpace,
       )
-      setCursor(firstNonWhitespace)
-      checkTarget(firstNonWhitespace, currentLineIndex)
+      if (firstNonSpace !== -1) {
+        setCursor(firstNonSpace)
+        checkTarget(firstNonSpace, currentLineIndex)
+      }
     },
     $: () => {
       // move cursor to end of current line
@@ -208,30 +221,33 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
       checkTarget(linesOfSquares[currentLineIndex].length - 1, currentLineIndex)
     },
     j: () => {
-      setLastKeyPressed('j')
+      activateTimer()
+      // Move down a line
       if (currentLineIndex < linesOfSquares.length - 1) {
-        // Move to next line
         const nextLineIndex = currentLineIndex + 1
-        // Ensure cursor doesn't go beyond the end of the next line
-        const nextLineCursor = Math.min(
-          cursor,
-          linesOfSquares[nextLineIndex].length - 1
-        )
-
         setCurrentLineIndex(nextLineIndex)
-        setCursor(nextLineCursor)
-        checkTarget(nextLineCursor, nextLineIndex)
+
+        // Adjust cursor if needed (if the new line is shorter)
+        const newLineCursorPos = Math.min(
+          cursor,
+          linesOfSquares[nextLineIndex].length - 1,
+        )
+        setCursor(newLineCursorPos)
+
+        // Check if we hit a target
+        checkTarget(newLineCursorPos, nextLineIndex)
       }
     },
     k: () => {
       setLastKeyPressed('k')
       if (currentLineIndex > 0) {
+        // Move up a line
         // Move to previous line
         const prevLineIndex = currentLineIndex - 1
         // Ensure cursor doesn't go beyond the end of the previous line
         const prevLineCursor = Math.min(
           cursor,
-          linesOfSquares[prevLineIndex].length - 1
+          linesOfSquares[prevLineIndex].length - 1,
         )
 
         setCurrentLineIndex(prevLineIndex)
@@ -364,7 +380,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
                         square.idx === target && lineIdx === targetLineIndex
 
                       const isRevealed = revealedLetters.has(
-                        `${lineIdx}-${square.idx}`
+                        `${lineIdx}-${square.idx}`,
                       )
 
                       let base =
@@ -443,6 +459,9 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
             </kbd>
           ))}
         </div>
+
+        {/* Level Timer */}
+        <LevelTimer levelId="3-line-operations" isActive={timerActive} />
       </div>
     </div>
   )

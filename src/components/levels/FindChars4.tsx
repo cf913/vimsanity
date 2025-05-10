@@ -6,6 +6,7 @@ import {
 import { processTextForVim } from '../../utils/textUtils'
 import ExplosionEffect from './ExplosionEffect'
 import ConfettiBurst from './ConfettiBurst'
+import LevelTimer from '../common/LevelTimer'
 import { RefreshCw, Zap, AlertTriangle, X } from 'lucide-react'
 import WarningSplash from '../common/WarningSplash'
 
@@ -86,6 +87,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
   const [lastSearchCommand, setLastSearchCommand] = useState<
     'f' | 'F' | 't' | 'T' | null
   >(null)
+  const [timerActive, setTimerActive] = useState<boolean>(false)
 
   // Refs for scrolling
   const containerRef = useRef<HTMLDivElement>(null)
@@ -132,8 +134,16 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
     setNewTarget()
   }, [])
 
+  // Start timer on first key press
+  const activateTimer = () => {
+    if (!timerActive) {
+      setTimerActive(true)
+    }
+  }
+
   // Function to handle 'f' command
   const handleFCommand = (char: string) => {
+    activateTimer()
     // Find the next occurrence of the character on the current line
     const currentLine = linesOfSquares[currentLineIndex]
     for (let i = cursor + 1; i < currentLine.length; i++) {
@@ -148,6 +158,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
 
   // Function to handle 'F' command (reverse search)
   const handleFReverseCommand = (char: string) => {
+    activateTimer()
     // Find the previous occurrence of the character on the current line
     const currentLine = linesOfSquares[currentLineIndex]
     for (let i = cursor - 1; i >= 0; i--) {
@@ -162,6 +173,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
 
   // Function to handle 't' command
   const handleTCommand = (char: string) => {
+    activateTimer()
     // Move to just before the next occurrence of the character
     const currentLine = linesOfSquares[currentLineIndex]
     for (let i = cursor + 1; i < currentLine.length; i++) {
@@ -176,6 +188,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
 
   // Function to handle 'T' command (reverse search)
   const handleTReverseCommand = (char: string) => {
+    activateTimer()
     // Move to just after the previous occurrence of the character
     const currentLine = linesOfSquares[currentLineIndex]
     for (let i = cursor - 1; i >= 0; i--) {
@@ -216,6 +229,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
 
   // Repeat last search in same direction (;)
   const repeatLastSearch = () => {
+    activateTimer()
     if (!lastSearchChar || !lastSearchCommand) return false
 
     setLastKeyPressed(';')
@@ -236,6 +250,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
 
   // Repeat last search in opposite direction (,)
   const repeatLastSearchReverse = () => {
+    activateTimer()
     if (!lastSearchChar || !lastSearchCommand) return false
 
     setLastKeyPressed(',')
@@ -298,6 +313,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
       if (awaitingCharacter) return handleCharacterInput(';')
       return repeatLastSearch()
     },
+
     ',': () => {
       if (awaitingCharacter) return handleCharacterInput(',')
       return repeatLastSearchReverse()
@@ -305,6 +321,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
     j: () => {
       if (awaitingCharacter) return handleCharacterInput('j')
 
+      activateTimer()
       setLastKeyPressed('j')
       if (currentLineIndex < linesOfSquares.length - 1) {
         // Move to next line
@@ -324,6 +341,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
     k: () => {
       if (awaitingCharacter) return handleCharacterInput('k')
 
+      activateTimer()
       setLastKeyPressed('k')
       if (currentLineIndex > 0) {
         // Move to previous line
@@ -636,6 +654,9 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
           )}
         </div>
       </div>
+      {/* Level Timer */}
+      <LevelTimer levelId="4-find-chars" isActive={timerActive} />
+
       {/* Rolling banner at the bottom */}
       <style>
         {`
