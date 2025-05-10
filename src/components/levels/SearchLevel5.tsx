@@ -753,7 +753,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
                       )
 
                       let base =
-                        'inline-flex items-center justify-center mx-0.5 my-0.5 min-w-6 h-8 transition-all duration-150 rounded-md '
+                        'inline-flex items-center justify-center mx-0.5 my-0.5 min-w-5 h-8 transition-all duration-150 rounded-md '
 
                       if (isPlayer)
                         base +=
@@ -770,7 +770,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
 
                       if (square.isSpace) {
                         let baseSpace =
-                          'inline-block mx-0.5 my-0.5 w-6 h-8 transition-all duration-150 rounded-md '
+                          'inline-block mx-0.5 my-0.5 w-5 h-8 transition-all duration-150 rounded-md '
                         if (isPlayer) {
                           baseSpace +=
                             'bg-emerald-500/25 text-white scale-110 shadow-lg shadow-emerald-500/10 '

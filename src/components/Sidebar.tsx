@@ -19,13 +19,13 @@ interface SidebarProps {
 }
 
 const levels = [
-  {
-    id: 0,
-    title: 'Dev playground, ignore this',
-    description: 'Practice all Vim motions in a free environment',
-    wip: true,
-    locked: false,
-  },
+  // {
+  //   id: 0,
+  //   title: 'Dev playground, ignore this',
+  //   description: 'Practice all Vim motions in a free environment',
+  //   wip: true,
+  //   locked: false,
+  // },
   {
     id: 1,
     title: 'Basic Movement (h, j, k, l)',
