@@ -206,12 +206,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               >
                 {[
                   {
-                    title: 'But why?',
-                    description: 'You want to edit faster. We will make you.',
+                    title: 'Why?',
+                    description:
+                      'Vim motions make coding fast and fun! Learn them now!',
                   },
                   {
-                    title: 'Simple to Start',
-                    description: 'Begin with the most basic movements',
+                    title: 'Where to begin?',
+                    description: 'Start with the most basic movements',
                   },
                   {
                     title: 'Learn by Repetition',
@@ -287,7 +288,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         transition={{ duration: 0.3 }}
       >
         <div className="text-center text-zinc-500 text-sm">
-          <p>VimSanity - Learn keyboard shortcuts through play</p>
+          <p>VimSanity - Learn Vim Motions Fast</p>
         </div>
       </motion.footer>
 
