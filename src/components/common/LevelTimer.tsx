@@ -31,9 +31,11 @@ const LevelTimer: React.FC<LevelTimerProps> = ({ levelId, isActive }) => {
       >
         <Clock
           size={18}
-          className={`${isRunning ? 'text-emerald-400' : 'text-zinc-400'}`}
+          className={`${isRunning ? 'text-emerald-400' : 'text-zinc-600'}`}
         />
-        <span className="font-mono text-lg text-zinc-200">{displayTime}</span>
+        <span className="font-mono text-sm text-zinc-600 hover:text-zinc-300 transition-all">
+          {displayTime}
+        </span>
       </div>
       <style jsx>{`
         .timer-active {

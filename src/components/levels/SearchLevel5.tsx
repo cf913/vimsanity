@@ -326,7 +326,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     const value = e.target.value
     setSearchTerm(value)
     // Don't search on every keystroke to avoid performance issues
-    if (value.length > 2) {
+    if (value.length >= 1) {
       performSearch(value)
     } else if (value.length === 0) {
       setSearchMatches([])
