@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from 'react'
 import {
   KeyActionMap,
   useKeyboardHandler,
-} from "../../hooks/useKeyboardHandler"
+} from '../../hooks/useKeyboardHandler'
 import {
   findLineEnd,
   findLineEndColumn,
@@ -11,7 +11,8 @@ import {
   moveToNextWordBoundary,
   moveToPrevWordBoundary,
   moveToWordEnd,
-} from "../../utils/textUtils"
+} from '../../utils/textUtils'
+import WarningSplash from '../common/WarningSplash'
 
 interface PlaygroundLevelProps {
   isMuted: boolean
@@ -19,11 +20,11 @@ interface PlaygroundLevelProps {
 
 const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
   const [editableText, setEditableText] = useState<string>(
-    "This is a Vim playground. Practice your motions here!\n\nNew levels are being added every week!\n\nYou can use h, j, k, l for movement.\nTry w, e, b for word navigation.\nUse i to enter insert mode, Escape to exit.\nPress x to delete characters."
+    'This is a Vim playground. Practice your motions here!\n\nNew levels are being added every week!\n\nYou can use h, j, k, l for movement.\nTry w, e, b for word navigation.\nUse i to enter insert mode, Escape to exit.\nPress x to delete characters.',
   )
   const [cursorPosition, setCursorPosition] = useState<number>(0)
-  const [mode, setMode] = useState<"normal" | "insert">("normal")
-  const [lines, setLines] = useState<string[]>(editableText.split("\n"))
+  const [mode, setMode] = useState<'normal' | 'insert'>('normal')
+  const [lines, setLines] = useState<string[]>(editableText.split('\n'))
   // Store the "virtual" column for j/k navigation
   const [virtualColumn, setVirtualColumn] = useState<number>(0)
   // Track the pending command for multi-key sequences
@@ -57,7 +58,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
 
   const updateLines = (text: string) => {
     setEditableText(text)
-    setLines(text.split("\n"))
+    setLines(text.split('\n'))
   }
 
   // Helper to get the current column position
@@ -70,19 +71,19 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
   const setCursorToLineAndColumn = (
     lineStart: number,
     targetColumn: number,
-    lineLength: number
+    lineLength: number,
   ) => {
     // For empty lines or if target column exceeds line length, place at line start or end
     if (lineLength === 0) {
-      console.log("nextCursorPosition", lineStart)
+      console.log('nextCursorPosition', lineStart)
       setCursorPosition(lineStart)
     } else {
       // Calculate actual column (bounded by line length)
       const actualColumn = Math.min(
         targetColumn,
-        lineLength > 0 ? lineLength - 1 : 0
+        lineLength > 0 ? lineLength - 1 : 0,
       )
-      console.log("nextCursorPosition", lineStart + actualColumn)
+      console.log('nextCursorPosition', lineStart + actualColumn)
       setCursorPosition(lineStart + actualColumn)
     }
   }
@@ -125,11 +126,11 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
       }
 
       // Find the next line boundaries
-      const currentLineEnd = editableText.indexOf("\n", cursorPosition)
+      const currentLineEnd = editableText.indexOf('\n', cursorPosition)
       if (currentLineEnd === -1) return // Already at the last line
 
       const nextLineStart = currentLineEnd + 1
-      const nextLineEnd = editableText.indexOf("\n", nextLineStart)
+      const nextLineEnd = editableText.indexOf('\n', nextLineStart)
       const nextLineLength =
         (nextLineEnd === -1 ? editableText.length : nextLineEnd) - nextLineStart
 
@@ -154,7 +155,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
 
       // Find the previous line boundaries
       const prevLineEnd = currentLineStart - 1
-      const prevLineStart = editableText.lastIndexOf("\n", prevLineEnd - 1) + 1
+      const prevLineStart = editableText.lastIndexOf('\n', prevLineEnd - 1) + 1
       const prevLineLength = prevLineEnd - prevLineStart
 
       // Set cursor to appropriate position in previous line based on virtual column
@@ -164,22 +165,22 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
       // Clear any pending commands
       setPendingCommand(null)
       setCursorPosition(
-        moveToNextWordBoundary(editableText.split(""), cursorPosition)
+        moveToNextWordBoundary(editableText.split(''), cursorPosition),
       )
     },
     e: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      setCursorPosition(moveToWordEnd(editableText.split(""), cursorPosition))
+      setCursorPosition(moveToWordEnd(editableText.split(''), cursorPosition))
     },
     b: () => {
       // Clear any pending commands
       setPendingCommand(null)
       setCursorPosition(
-        moveToPrevWordBoundary(editableText.split(""), cursorPosition)
+        moveToPrevWordBoundary(editableText.split(''), cursorPosition),
       )
     },
-    "0": () => {
+    '0': () => {
       // Clear any pending commands
       setPendingCommand(null)
       setCursorPosition(findLineStart(editableText, cursorPosition))
@@ -195,14 +196,14 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
     i: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      setMode("insert")
+      setMode('insert')
     },
     I: () => {
       // Clear any pending commands
       setPendingCommand(null)
       setCursorPosition(findLineStart(editableText, cursorPosition))
       setVirtualColumn(0)
-      setMode("insert")
+      setMode('insert')
     },
     a: () => {
       // Clear any pending commands
@@ -211,14 +212,14 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
         setCursorPosition(cursorPosition + 1)
       }
       // Update virtual column when moving horizontally
-      setMode("insert")
+      setMode('insert')
     },
     A: () => {
       // Clear any pending commands
       setPendingCommand(null)
       setCursorPosition(findLineEnd(editableText, cursorPosition) + 1)
       setVirtualColumn(findLineEndColumn(editableText, cursorPosition))
-      setMode("insert")
+      setMode('insert')
     },
     x: () => {
       // Clear any pending commands
@@ -232,7 +233,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
     },
     d: () => {
       // If 'd' is already pending, execute the 'dd' command
-      if (pendingCommand === "d") {
+      if (pendingCommand === 'd') {
         // Get current line start position
         const currentLineStart = findLineStart(editableText, cursorPosition)
 
@@ -242,7 +243,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
         // Check if there is a newline character after the line end position
         const hasNewline =
           lineEndPos + 1 < editableText.length &&
-          editableText[lineEndPos + 1] === "\n"
+          editableText[lineEndPos + 1] === '\n'
         // Real end position including the newline if it exists
         const realLineEnd = hasNewline ? lineEndPos + 1 : lineEndPos
 
@@ -255,19 +256,19 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
 
         if (lines.length === 1) {
           // If there's only one line, clear it but keep an empty line
-          newText = ""
+          newText = ''
           newCursorPosition = 0
         } else if (isLastLine) {
           // If it's the last line, remove the line including the newline before it
           // Find the previous newline character
           const previousNewlinePos = editableText.lastIndexOf(
-            "\n",
-            currentLineStart - 1
+            '\n',
+            currentLineStart - 1,
           )
 
           if (previousNewlinePos === -1) {
             // Edge case: First line is also last line but not the only line
-            newText = ""
+            newText = ''
             newCursorPosition = 0
           } else {
             // Normal last line case - delete up to the previous newline
@@ -293,7 +294,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
         setPendingCommand(null)
       } else {
         // Set 'd' as the pending command
-        setPendingCommand("d")
+        setPendingCommand('d')
       }
     },
     Escape: () => {
@@ -313,7 +314,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
       const nextCursorPosition = Math.max(lineStart, cursorPosition - 1)
       setCursorPosition(nextCursorPosition)
       setVirtualColumn(nextCursorPosition - lineStart)
-      setMode("normal")
+      setMode('normal')
     },
     Backspace: () => {
       // Clear any pending commands
@@ -331,7 +332,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
       setPendingCommand(null)
       const newText =
         editableText.substring(0, cursorPosition) +
-        "\n" +
+        '\n' +
         editableText.substring(cursorPosition)
       updateLines(newText)
       setCursorPosition(cursorPosition + 1)
@@ -341,12 +342,12 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
   // Special handler for character input in insert mode
   const handleCharInput = (key: string) => {
     // Clear any pending commands in insert mode
-    if (mode === "normal" && pendingCommand && key !== pendingCommand) {
+    if (mode === 'normal' && pendingCommand && key !== pendingCommand) {
       setPendingCommand(null)
     }
 
     if (
-      mode === "insert" &&
+      mode === 'insert' &&
       key.length === 1 &&
       !Object.keys(insertModeActions).includes(key)
     ) {
@@ -361,7 +362,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
 
   // Use our custom keyboard handler
   const { lastKeyPressed } = useKeyboardHandler({
-    keyActionMap: mode === "normal" ? normalModeActions : insertModeActions,
+    keyActionMap: mode === 'normal' ? normalModeActions : insertModeActions,
     dependencies: [cursorPosition, editableText, mode],
     onAnyKey: handleCharInput,
   })
@@ -370,7 +371,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
     <div className="w-full">
       <div className="text-center mb-4">
         <p className="text-zinc-400">
-          Vim Playground - {mode === "normal" ? "Normal Mode" : "Insert Mode"}
+          Vim Playground - {mode === 'normal' ? 'Normal Mode' : 'Insert Mode'}
         </p>
       </div>
 
@@ -396,7 +397,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
             {lines.map((line, lineIdx) => {
               // Calculate line start position in the entire text
               const lineStartPosition =
-                editableText.split("\n").slice(0, lineIdx).join("\n").length +
+                editableText.split('\n').slice(0, lineIdx).join('\n').length +
                 (lineIdx > 0 ? 1 : 0)
               // Calculate if cursor is on this line
               const isCursorOnThisLine =
@@ -406,13 +407,13 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
 
               return (
                 <div key={lineIdx} className="min-h-[1.5em] whitespace-pre">
-                  {line.split("").map((char, charIdx) => {
+                  {line.split('').map((char, charIdx) => {
                     const absoluteIdx = lineStartPosition + charIdx
                     const isCursorPosition = absoluteIdx === cursorPosition
                     const isCursorOnLastChar =
                       absoluteIdx + 1 === cursorPosition
 
-                    const isInsertMode = mode === "insert"
+                    const isInsertMode = mode === 'insert'
 
                     const isCursorOnLastCharInInsertMode =
                       isInsertMode &&
@@ -426,17 +427,17 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
                           ref={isCursorPosition ? cursorRef : null}
                           className={`${
                             isCursorPosition
-                              ? mode === "normal"
-                                ? "bg-emerald-500 text-white rounded"
-                                : "bg-amber-500 text-white rounded"
-                              : ""
+                              ? mode === 'normal'
+                                ? 'bg-emerald-500 text-white rounded'
+                                : 'bg-amber-500 text-white rounded'
+                              : ''
                           }`}
                         >
-                          {char === " " ? "\u00A0" : char}
+                          {char === ' ' ? '\u00A0' : char}
                         </span>
                         {isCursorOnLastCharInInsertMode && (
                           <span className="bg-amber-500 text-white rounded">
-                            {"\u00A0"}
+                            {'\u00A0'}
                           </span>
                         )}
                       </>
@@ -449,16 +450,16 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
                       <span
                         ref={cursorRef}
                         className={
-                          mode === "normal"
-                            ? "bg-emerald-500 text-white rounded"
-                            : "bg-amber-500 text-white rounded"
+                          mode === 'normal'
+                            ? 'bg-emerald-500 text-white rounded'
+                            : 'bg-amber-500 text-white rounded'
                         }
                       >
-                        {"\u00A0"}
+                        {'\u00A0'}
                       </span>
                     ) : (
                       <span ref={cursorRef} className="">
-                        {"\u00A0"}
+                        {'\u00A0'}
                       </span>
                     ))}
                 </div>
@@ -482,7 +483,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
               const rowEndIndices = []
               let searchIndex = -1
               while (
-                (searchIndex = editableText.indexOf("\n", searchIndex + 1)) !==
+                (searchIndex = editableText.indexOf('\n', searchIndex + 1)) !==
                 -1
               ) {
                 rowEndIndices.push(searchIndex)
@@ -493,8 +494,8 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
 
               // Calculate current column (1-indexed for display)
               const lastNewlineBeforeCursor = editableText.lastIndexOf(
-                "\n",
-                cursorPosition - 1
+                '\n',
+                cursorPosition - 1,
               )
               const currentCol =
                 cursorPosition -
@@ -510,76 +511,76 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
       </div>
 
       <div className="flex gap-4 text-zinc-400 mt-4 justify-center">
-        {mode === "normal" ? (
+        {mode === 'normal' ? (
           <>
             <kbd
               className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-                lastKeyPressed === "h"
-                  ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110"
-                  : ""
+                lastKeyPressed === 'h'
+                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
+                  : ''
               }`}
             >
               h
             </kbd>
             <kbd
               className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-                lastKeyPressed === "j"
-                  ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110"
-                  : ""
+                lastKeyPressed === 'j'
+                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
+                  : ''
               }`}
             >
               j
             </kbd>
             <kbd
               className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-                lastKeyPressed === "k"
-                  ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110"
-                  : ""
+                lastKeyPressed === 'k'
+                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
+                  : ''
               }`}
             >
               k
             </kbd>
             <kbd
               className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-                lastKeyPressed === "l"
-                  ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110"
-                  : ""
+                lastKeyPressed === 'l'
+                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
+                  : ''
               }`}
             >
               l
             </kbd>
             <kbd
               className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-                lastKeyPressed === "i"
-                  ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110"
-                  : ""
+                lastKeyPressed === 'i'
+                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
+                  : ''
               }`}
             >
               i
             </kbd>
             <kbd
               className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-                lastKeyPressed === "x"
-                  ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110"
-                  : ""
+                lastKeyPressed === 'x'
+                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
+                  : ''
               }`}
             >
               x
             </kbd>
             <kbd
               className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-                lastKeyPressed === "d"
-                  ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110"
-                  : ""
+                lastKeyPressed === 'd'
+                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
+                  : ''
               }`}
             >
               d
             </kbd>
             <kbd
               className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-                lastKeyPressed === "d"
-                  ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110"
-                  : ""
+                lastKeyPressed === 'd'
+                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
+                  : ''
               }`}
             >
               d
@@ -588,15 +589,16 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
         ) : (
           <kbd
             className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-              lastKeyPressed === "Escape"
-                ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110"
-                : ""
+              lastKeyPressed === 'Escape'
+                ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
+                : ''
             }`}
           >
             Esc
           </kbd>
         )}
       </div>
+      <WarningSplash />
     </div>
   )
 }

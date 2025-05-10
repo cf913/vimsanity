@@ -54,7 +54,7 @@ const levels = [
     id: 5,
     title: 'Search Operations (/, ?, n, N)',
     description: 'Search text and navigate matches',
-    wip: true,
+    wip: false,
     locked: false,
   },
 ]
@@ -189,7 +189,9 @@ const Sidebar: React.FC<SidebarProps> = ({
             }`}
           >
             <div className="flex items-center justify-between">
-              <span className="font-medium">Level {level.id}</span>
+              <span className="font-medium">
+                {level.id ? `Level ${level.id}` : 'The Playground'}
+              </span>
               {level.wip ? (
                 <span className="text-amber-600 flex items-center gap-1 font-bold">
                   <Construction size={16} className="text-amber-600" />

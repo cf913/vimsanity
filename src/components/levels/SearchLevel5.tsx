@@ -819,7 +819,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
           ))}
         </div>
       </div>
-      <WarningSplash />
+      {/* <WarningSplash /> */}
     </div>
   )
 }
