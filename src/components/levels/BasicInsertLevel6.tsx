@@ -52,6 +52,13 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
     ]
     setCells(initialCells)
     setActiveCell(0)
+    setHistory([
+      {
+        cells: JSON.parse(JSON.stringify(initialCells)),
+        cursorIndex: 0,
+        activeCell: 0,
+      },
+    ])
   }, [])
 
   // Check if all cells are completed
@@ -123,28 +130,34 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
       }
     },
     u: () => {
-      if (!isInsertMode && history.length > 0) {
+      if (!isInsertMode) {
         setLastKeyPressed('u')
 
-        // Get the last state from history
-        const lastState = history[history.length - 1]
+        if (history.length === 0) return
+
+        let previousState = null
+
+        if (history.length === 1) {
+          // If there's only one state, reset the level
+          previousState = history[0]
+        } else {
+          // Otherwise, get the second last state from history (the last one is the current state)
+          previousState = history[history.length - 2]
+          // state on current cell if it's different
+          if (previousState.activeCell !== activeCell) return
+        }
 
         // Create a deep copy of the cells from history
-        const restoredCells = lastState.cells.map((cell) => ({
-          ...cell,
-          id: cell.id,
-          content: cell.content,
-          expected: cell.expected,
-          completed: cell.completed,
-        }))
-
+        const restoredCells = JSON.parse(JSON.stringify(previousState.cells))
         // Restore the previous state
         setCells(restoredCells)
-        setCursorIndex(lastState.cursorIndex)
-        setActiveCell(lastState.activeCell)
+        setCursorIndex(previousState.cursorIndex)
+        setActiveCell(previousState.activeCell)
 
-        // Remove the used history entry
-        setHistory((prev) => prev.slice(0, -1))
+        if (history.length > 1) {
+          // Remove the old current state from history
+          setHistory((prev) => prev.slice(0, -1))
+        }
       }
     },
 
@@ -152,30 +165,25 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
       if (isInsertMode) {
         setLastKeyPressed('Escape')
 
-        // Save the state to history when exiting insert mode (following Vim behavior)
-        // Create deep copies of cells for history
-        const cellsCopy = cells.map((cell) => ({
-          ...cell,
-          id: cell.id,
-          content: cell.content,
-          expected: cell.expected,
-          completed: cell.completed,
-        }))
-
-        // Save current state to history before switching to normal mode
-        setHistory((prev) => [
-          ...prev,
-          { cells: cellsCopy, cursorIndex, activeCell },
-        ])
-
         setIsInsertMode(false)
         setCursorPosition('normal')
 
         // Move cursor one position to the left when exiting insert mode
         // unless it's at the beginning of the line
+        let newCursorIndex = cursorIndex
         if (cursorIndex > 0) {
-          setCursorIndex(cursorIndex - 1)
+          newCursorIndex = cursorIndex - 1
+          setCursorIndex(newCursorIndex)
         }
+
+        // Save the state to history when exiting insert mode (following Vim behavior)
+        // Create deep copies of cells for history
+        const cellsCopy = JSON.parse(JSON.stringify(cells))
+        // Save current state to history before switching to normal mode
+        setHistory((prev) => [
+          ...prev,
+          { cells: cellsCopy, cursorIndex: newCursorIndex, activeCell },
+        ])
 
         // Check if the current cell is completed
         if (activeCell !== null) {
@@ -200,13 +208,21 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
             // Move to the next cell if available
             const nextCellIndex = activeCell + 1
             if (nextCellIndex < cells.length) {
+              // save the state to history
+              setHistory((prev) => [
+                ...prev,
+                {
+                  cells: JSON.parse(JSON.stringify(cells)),
+                  cursorIndex: 0,
+                  activeCell: nextCellIndex,
+                },
+              ])
               setActiveCell(nextCellIndex)
               // Reset cursor index for the new cell
               setCursorIndex(0)
             }
           }
         }
-        console.log('history', history)
       }
     },
   }
@@ -217,18 +233,14 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
       const updatedCells = [...cells]
       const currentContent = updatedCells[activeCell].content
 
+      const beforeCursor = currentContent.substring(0, cursorIndex)
+      const afterCursor = currentContent.substring(cursorIndex)
+      updatedCells[activeCell].content = beforeCursor + char + afterCursor
+
       if (lastKeyPressed === 'i') {
-        // Insert mode - add at current cursor position
-        const beforeCursor = currentContent.substring(0, cursorIndex)
-        const afterCursor = currentContent.substring(cursorIndex)
-        updatedCells[activeCell].content = beforeCursor + char + afterCursor
         // Move cursor forward
         setCursorIndex(cursorIndex + 1)
       } else if (lastKeyPressed === 'a') {
-        // Append mode - add at cursor position (which should be at the end)
-        const beforeCursor = currentContent.substring(0, cursorIndex)
-        const afterCursor = currentContent.substring(cursorIndex)
-        updatedCells[activeCell].content = beforeCursor + char + afterCursor
         // Move cursor forward
         setCursorIndex(cursorIndex + 1)
       }
