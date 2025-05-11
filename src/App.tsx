@@ -26,7 +26,7 @@ function App() {
     const savedValue = localStorage.getItem(STORAGE_KEYS.SHOW_LANDING_PAGE)
     return savedValue !== null ? savedValue === 'true' : true
   })
-  
+
   const [showMobileWarning, setShowMobileWarning] = useState(() => {
     const savedValue = localStorage.getItem(STORAGE_KEYS.SHOW_MOBILE_WARNING)
     return savedValue !== null ? savedValue === 'true' : false
@@ -34,7 +34,7 @@ function App() {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     const savedValue = localStorage.getItem(STORAGE_KEYS.SIDEBAR_OPEN)
-    return savedValue !== null ? savedValue === 'true' : true
+    return savedValue !== null ? savedValue === 'true' : false
   })
 
   const [isDocSidebarOpen, setIsDocSidebarOpen] = useState(() => {
@@ -56,7 +56,7 @@ function App() {
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEYS.SHOW_LANDING_PAGE,
-      showLandingPage.toString()
+      showLandingPage.toString(),
     )
   }, [showLandingPage])
 
@@ -67,7 +67,7 @@ function App() {
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEYS.DOC_SIDEBAR_OPEN,
-      isDocSidebarOpen.toString()
+      isDocSidebarOpen.toString(),
     )
   }, [isDocSidebarOpen])
 
@@ -78,9 +78,12 @@ function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.IS_MUTED, isMuted.toString())
   }, [isMuted])
-  
+
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.SHOW_MOBILE_WARNING, showMobileWarning.toString())
+    localStorage.setItem(
+      STORAGE_KEYS.SHOW_MOBILE_WARNING,
+      showMobileWarning.toString(),
+    )
   }, [showMobileWarning])
 
   // Custom state setters that update both state and localStorage
@@ -126,7 +129,7 @@ function App() {
       </>
     )
   }
-  
+
   // If showing mobile warning, render that
   if (showMobileWarning) {
     return (
