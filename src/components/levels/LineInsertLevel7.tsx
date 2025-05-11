@@ -5,6 +5,7 @@ import {
 } from '../../hooks/useKeyboardHandler'
 import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
+import Scoreboard from '../common/Scoreboard'
 
 interface LineInsertLevel7Props {
   isMuted: boolean
@@ -227,13 +228,13 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
       setLines(updatedLines)
     }
   }
-  
+
   // Handle backspace key in insert mode
   const handleBackspace = () => {
     if (isInsertMode && activeLine !== null) {
       const updatedLines = [...lines]
       const currentLine = updatedLines[activeLine]
-      
+
       switch (insertCommand) {
         case 'I':
           // Delete at beginning of line
@@ -247,7 +248,7 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
             updatedLines[activeLine].content = currentLine.content.slice(1)
           }
           break
-          
+
         case 'A':
           // Delete at end of line
           if (currentLine.content.includes('\n')) {
@@ -261,7 +262,7 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
             updatedLines[activeLine].content = currentLine.content.slice(0, -1)
           }
           break
-          
+
         case 'o':
           // Delete after the newline
           if (currentLine.content.endsWith('\n')) {
@@ -275,7 +276,7 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
             }
           }
           break
-          
+
         case 'O':
           // Delete before the first line
           if (currentLine.content.startsWith('\n')) {
@@ -289,7 +290,7 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
           }
           break
       }
-      
+
       setLines(updatedLines)
     }
   }
@@ -342,15 +343,7 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
       </div>
 
       {/* Score display */}
-      <div className="relative mb-4">
-        <div
-          className={`text-2xl font-bold ${
-            scoreAnimation ? 'text-emerald-400 scale-125' : 'text-white'
-          } transition-all duration-300`}
-        >
-          Score: {score}
-        </div>
-      </div>
+      <Scoreboard score={score} maxScore={lines.length * 10} />
 
       {/* Challenge lines */}
       <div className="w-full max-w-[90vmin]">
@@ -371,7 +364,7 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
             >
               <div className="font-mono mb-2 whitespace-pre-wrap min-h-[2rem] text-lg">
                 {activeLine === index && cursorPosition === 'start' && (
-                  <span 
+                  <span
                     className={`inline-block w-2 h-5 ${isInsertMode ? 'bg-orange-400' : 'bg-emerald-400'} animate-pulse mr-0.5`}
                   ></span>
                 )}
@@ -384,7 +377,7 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
                 ))}
 
                 {activeLine === index && cursorPosition === 'end' && (
-                  <span 
+                  <span
                     className={`inline-block w-2 h-5 ${isInsertMode ? 'bg-orange-400' : 'bg-emerald-400'} animate-pulse ml-0.5`}
                   ></span>
                 )}

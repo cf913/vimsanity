@@ -5,6 +5,7 @@ import {
 } from '../../hooks/useKeyboardHandler'
 import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
+import Scoreboard from '../common/Scoreboard'
 
 interface BasicInsertLevel6Props {
   isMuted: boolean
@@ -135,13 +136,13 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
       setCells(updatedCells)
     }
   }
-  
+
   // Handle backspace key in insert mode
   const handleBackspace = () => {
     if (isInsertMode && activeCell !== null) {
       const updatedCells = [...cells]
       const currentContent = updatedCells[activeCell].content
-      
+
       if (currentContent.length > 0) {
         // Remove the last character
         updatedCells[activeCell].content = currentContent.slice(0, -1)
@@ -181,10 +182,10 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
   }, [isInsertMode, activeCell, cells, lastKeyPressed])
 
   return (
-    <div className="flex flex-col items-center gap-6">
-      <div className="text-center mb-4">
-        <h3 className="text-xl font-bold mb-2">Basic Insert Mode</h3>
-        <p className="text-zinc-300 mb-4">
+    <div className="flex flex-col items-center gap-4">
+      <div className="text-center">
+        {/* <h3 className="text-xl font-bold mb-2">Basic Insert Mode</h3> */}
+        <p className="text-zinc-400">
           Use <kbd className="px-2 py-1 bg-zinc-800 rounded">i</kbd> to enter
           insert mode before cursor,{' '}
           <kbd className="px-2 py-1 bg-zinc-800 rounded">a</kbd> to append after
@@ -192,26 +193,18 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
           <kbd className="px-2 py-1 bg-zinc-800 rounded">Escape</kbd> to return
           to normal mode.
         </p>
-        <p className="text-zinc-400 text-sm">
-          Edit each cell to match the expected text shown below it.
-        </p>
+        {/* <p className="text-zinc-400 text-sm"> */}
+        {/*   Edit each cell to match the expected text shown below it. */}
+        {/* </p> */}
       </div>
 
       {/* Score display */}
-      <div className="relative mb-4">
-        <div
-          className={`text-2xl font-bold ${
-            scoreAnimation ? 'text-emerald-400 scale-125' : 'text-white'
-          } transition-all duration-300`}
-        >
-          Score: {score}
-        </div>
-      </div>
+      <Scoreboard score={score} maxScore={cells.length * 10} />
 
       {/* Challenge grid */}
-      <div className="w-full max-w-[90vmin] aspect-square">
+      <div className="w-full max-w-[90vmin]">
         <div
-          className="grid grid-cols-2 gap-4 h-full w-full"
+          className="grid grid-cols-4 gap-4 h-full w-full"
           style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}
         >
           {cells.map((cell, index) => (
@@ -231,7 +224,7 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
               <div className="text-2xl font-mono mb-2 min-h-[2rem]">
                 {cell.content}
                 {activeCell === index && (
-                  <span 
+                  <span
                     className={`inline-block w-2 h-5 ${isInsertMode ? 'bg-orange-400' : 'bg-emerald-400'} animate-pulse ml-0.5`}
                   ></span>
                 )}

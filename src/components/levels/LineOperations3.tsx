@@ -8,6 +8,7 @@ import ExplosionEffect from './ExplosionEffect'
 import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
 import { RefreshCw, Zap } from 'lucide-react'
+import Scoreboard from '../common/Scoreboard'
 
 interface LevelProps {
   isMuted: boolean
@@ -331,11 +332,7 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
           </p>
 
           <div className="flex items-center gap-4 mb-2">
-            <div className="bg-zinc-800 px-4 py-2 rounded-lg">
-              <span className="text-zinc-400 mr-2">Score:</span>
-              <span className="text-emerald-400 font-bold">{score}</span>
-              <span className="text-zinc-600 ml-1">/16</span>
-            </div>
+            <Scoreboard score={score} maxScore={16} />
             <button
               onClick={resetLevel}
               className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"

@@ -13,6 +13,7 @@ import ExplosionEffect from './ExplosionEffect'
 import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
 import { RefreshCw, Shuffle, Trophy, Zap } from 'lucide-react'
+import Scoreboard from '../common/Scoreboard'
 
 interface WordMovementLevelProps {
   isMuted: boolean
@@ -243,14 +244,10 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
         <div className="text-center mb-4">
           <p className="text-zinc-400">Use w, e, b to navigate horizontally</p>
           <div className="mt-4 flex items-center justify-center gap-4">
-            <div className="bg-zinc-800 px-4 py-2 rounded-lg">
-              <span className="text-zinc-400 mr-2">Score:</span>
-              <span className="text-emerald-400 font-bold">{score}</span>
-              {/* max score based on length of text minus spaces */}
-              <span className="text-zinc-600 ml-1">
-                /{squares.filter((square) => !square.isSpace).length}
-              </span>
-            </div>
+            <Scoreboard
+              score={score}
+              maxScore={squares.filter((square) => !square.isSpace).length}
+            />
             <button
               onClick={resetLevel}
               className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
