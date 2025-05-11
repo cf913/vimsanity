@@ -23,6 +23,8 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
   const [cells, setCells] = useState<Cell[]>([])
   const [activeCell, setActiveCell] = useState<number | null>(null)
   const [isInsertMode, setIsInsertMode] = useState(false)
+  const [cursorPosition, setCursorPosition] = useState<'normal' | 'append'>('normal')
+  const [cursorIndex, setCursorIndex] = useState(0)
   const [score, setScore] = useState(0)
   const [scoreAnimation, setScoreAnimation] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
@@ -64,19 +66,28 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
     h: () => {
       if (!isInsertMode && activeCell !== null) {
         setLastKeyPressed('h')
-        setActiveCell(Math.max(0, activeCell - 1))
+        // Move cursor left within the cell
+        if (cursorIndex > 0) {
+          setCursorIndex(cursorIndex - 1)
+        }
       }
     },
     l: () => {
       if (!isInsertMode && activeCell !== null) {
         setLastKeyPressed('l')
-        setActiveCell(Math.min(cells.length - 1, activeCell + 1))
+        // Move cursor right within the cell
+        const cellContent = cells[activeCell].content
+        if (cursorIndex < cellContent.length) {
+          setCursorIndex(cursorIndex + 1)
+        }
       }
     },
     i: () => {
       if (!isInsertMode) {
         setLastKeyPressed('i')
         setIsInsertMode(true)
+        setCursorPosition('normal')
+        // Keep cursor at current index for insert mode
       }
     },
     a: () => {
@@ -86,8 +97,10 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
 
         // Move cursor position to end of content for append
         if (activeCell !== null) {
-          // In a real editor, this would move the cursor
-          // For our simplified model, we just set the mode
+          setCursorPosition('append')
+          // Move cursor to the end of the content for append mode
+          const cellContent = cells[activeCell].content
+          setCursorIndex(cellContent.length)
         }
       }
     },
@@ -95,6 +108,7 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
       if (isInsertMode) {
         setLastKeyPressed('Escape')
         setIsInsertMode(false)
+        setCursorPosition('normal')
 
         // Check if the current cell is completed
         if (activeCell !== null) {
@@ -115,6 +129,14 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
             setScore((prev) => prev + 10)
             setScoreAnimation(true)
             setTimeout(() => setScoreAnimation(false), 500)
+            
+            // Move to the next cell if available
+            const nextCellIndex = activeCell + 1
+            if (nextCellIndex < cells.length) {
+              setActiveCell(nextCellIndex)
+              // Reset cursor index for the new cell
+              setCursorIndex(0)
+            }
           }
         }
       }
@@ -125,13 +147,22 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
   const handleCharInput = (char: string) => {
     if (isInsertMode && activeCell !== null) {
       const updatedCells = [...cells]
+      const currentContent = updatedCells[activeCell].content
 
       if (lastKeyPressed === 'i') {
-        // Insert mode - add at current position
-        updatedCells[activeCell].content += char
+        // Insert mode - add at current cursor position
+        const beforeCursor = currentContent.substring(0, cursorIndex)
+        const afterCursor = currentContent.substring(cursorIndex)
+        updatedCells[activeCell].content = beforeCursor + char + afterCursor
+        // Move cursor forward
+        setCursorIndex(cursorIndex + 1)
       } else if (lastKeyPressed === 'a') {
-        // Append mode - add at end
-        updatedCells[activeCell].content += char
+        // Append mode - add at cursor position (which should be at the end)
+        const beforeCursor = currentContent.substring(0, cursorIndex)
+        const afterCursor = currentContent.substring(cursorIndex)
+        updatedCells[activeCell].content = beforeCursor + char + afterCursor
+        // Move cursor forward
+        setCursorIndex(cursorIndex + 1)
       }
 
       setCells(updatedCells)
@@ -140,15 +171,19 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
 
   // Handle backspace key in insert mode
   const handleBackspace = () => {
-    if (isInsertMode && activeCell !== null) {
+    if (isInsertMode && activeCell !== null && cursorIndex > 0) {
       const updatedCells = [...cells]
       const currentContent = updatedCells[activeCell].content
 
-      if (currentContent.length > 0) {
-        // Remove the last character
-        updatedCells[activeCell].content = currentContent.slice(0, -1)
-        setCells(updatedCells)
-      }
+      // Remove character before cursor
+      const beforeCursor = currentContent.substring(0, cursorIndex - 1)
+      const afterCursor = currentContent.substring(cursorIndex)
+      updatedCells[activeCell].content = beforeCursor + afterCursor
+      
+      // Move cursor back
+      setCursorIndex(cursorIndex - 1)
+      
+      setCells(updatedCells)
     }
   }
 
@@ -223,15 +258,22 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
               onClick={() => {
                 if (!isInsertMode) {
                   setActiveCell(index)
+                  // Reset cursor index when selecting a new cell
+                  setCursorIndex(0)
                 }
               }}
             >
               <div className="text-2xl font-mono mb-2 min-h-[2rem]">
-                {cell.content}
-                {activeCell === index && (
-                  <span
-                    className={`inline-block w-2 h-5 ${isInsertMode ? 'bg-orange-400' : 'bg-emerald-400'} animate-pulse ml-0.5`}
-                  ></span>
+                {activeCell === index ? (
+                  <>
+                    {cell.content.substring(0, cursorIndex)}
+                    <span
+                      className={`inline-block w-2 h-5 ${isInsertMode ? 'bg-orange-400' : 'bg-emerald-400'} animate-pulse`}
+                    ></span>
+                    {cell.content.substring(cursorIndex)}
+                  </>
+                ) : (
+                  cell.content
                 )}
               </div>
               <div className="text-sm text-zinc-400 absolute bottom-2">
