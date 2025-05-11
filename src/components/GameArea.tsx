@@ -5,6 +5,8 @@ import WordMovementLevel from './levels/WordMovementLevel'
 import LineOperations3 from './levels/LineOperations3'
 import FindChars4 from './levels/FindChars4'
 import SearchLevel5 from './levels/SearchLevel5'
+import BasicInsertLevel6 from './levels/BasicInsertLevel6'
+import LineInsertLevel7 from './levels/LineInsertLevel7'
 
 interface GameAreaProps {
   level: number
@@ -27,6 +29,10 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
         return <FindChars4 isMuted={isMuted} />
       case 5:
         return <SearchLevel5 isMuted={isMuted} />
+      case 6:
+        return <BasicInsertLevel6 isMuted={isMuted} />
+      case 7:
+        return <LineInsertLevel7 isMuted={isMuted} />
       default:
         return <GridMovementLevel isMuted={isMuted} />
     }

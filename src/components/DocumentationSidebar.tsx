@@ -340,6 +340,96 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             </div>
           </>
         )
+      case 6:
+        return (
+          <>
+            <h3 className="text-lg font-semibold mb-2">Basic Insert Mode</h3>
+            <p className="text-sm mb-3">
+              Insert mode allows you to add and edit text in Vim. These commands enter insert mode:
+            </p>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">i</kbd> - Insert before cursor
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Begin inserting text at the current cursor position
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">a</kbd> - Append after cursor
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Begin inserting text after the current cursor position
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">Escape</kbd> - Exit insert mode
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Return to normal mode after making text changes
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 text-xs text-zinc-400">
+              <p className="italic">
+                Tip: Always remember to press Escape to return to normal mode after making changes.
+                This is one of the most common mistakes for new Vim users!
+              </p>
+            </div>
+          </>
+        )
+      case 7:
+        return (
+          <>
+            <h3 className="text-lg font-semibold mb-2">Line Insert Commands</h3>
+            <p className="text-sm mb-3">
+              These commands let you insert text at specific line positions or create new lines:
+            </p>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">I</kbd> - Insert at line beginning
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Move to the start of the line and enter insert mode
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">A</kbd> - Append at line end
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Move to the end of the line and enter insert mode
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">o</kbd> - Open line below
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Create a new line below the current line and enter insert mode
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">O</kbd> - Open line above
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Create a new line above the current line and enter insert mode
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 text-xs text-zinc-400">
+              <p className="italic">
+                Tip: These commands combine movement and insert mode in one keystroke,
+                making them very efficient for common editing tasks.
+              </p>
+            </div>
+          </>
+        )
       default:
         return (
           <p className="text-sm">Select a level to see its documentation.</p>

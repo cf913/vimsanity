@@ -18,46 +18,68 @@ interface SidebarProps {
   onReturnToLanding: () => void
 }
 
-const levels = [
-  // {
-  //   id: 0,
-  //   title: 'Dev playground, ignore this',
-  //   description: 'Practice all Vim motions in a free environment',
-  //   wip: true,
-  //   locked: false,
-  // },
-  {
-    id: 1,
-    title: 'Basic Movement (h, j, k, l)',
-    description: 'Learn the fundamental vim motions',
-    locked: false,
-  },
-  {
-    id: 2,
-    title: 'Word Movement (w, b, e)',
-    description: 'Navigate through words efficiently',
-    locked: false,
-  },
-  {
-    id: 3,
-    title: 'Line Operations (0, $)',
-    description: 'Move to start and end of lines',
-    locked: false,
-  },
-  {
-    id: 4,
-    title: 'Find Characters (f, t)',
-    description: 'Jump to specific characters',
-    locked: false,
-  },
-  {
-    id: 5,
-    title: 'Search Operations (/, ?, n, N)',
-    description: 'Search text and navigate matches',
-    wip: false,
-    locked: false,
-  },
-]
+const levels = {
+  navigate: [
+    // {
+    //   id: 0,
+    //   title: 'Dev playground, ignore this',
+    //   description: 'Practice all Vim motions in a free environment',
+    //   wip: true,
+    //   locked: false,
+    // },
+    {
+      id: 1,
+      title: 'Basic Movement (h, j, k, l)',
+      description: 'Learn the fundamental vim motions',
+      wip: false,
+      locked: false,
+    },
+    {
+      id: 2,
+      title: 'Word Movement (w, b, e)',
+      description: 'Navigate through words efficiently',
+      wip: false,
+      locked: false,
+    },
+    {
+      id: 3,
+      title: 'Line Operations (0, $)',
+      description: 'Move to start and end of lines',
+      wip: false,
+      locked: false,
+    },
+    {
+      id: 4,
+      title: 'Find Characters (f, t)',
+      description: 'Jump to specific characters',
+      wip: false,
+      locked: false,
+    },
+    {
+      id: 5,
+      title: 'Search Operations (/, ?, n, N)',
+      description: 'Search text and navigate matches',
+      wip: false,
+      locked: false,
+    },
+  ],
+  insert: [
+    {
+      id: 6,
+      title: 'Basic Insert Mode (i, a, Esc)',
+      description: 'Enter insert mode and make text changes',
+      wip: false,
+      locked: false,
+    },
+    {
+      id: 7,
+      title: 'Line Insert Commands (I, A, o, O)',
+      description: 'Insert at line positions and create new lines',
+      wip: false,
+      locked: false,
+    },
+  ],
+}
 
 const Sidebar: React.FC<SidebarProps> = ({
   currentLevel,
@@ -123,6 +145,61 @@ const Sidebar: React.FC<SidebarProps> = ({
     },
   }
 
+  const renderLevel = (level: {
+    id: number
+    title: string
+    description: string
+    wip: boolean
+    locked: boolean
+  }) => {
+    return (
+      <motion.button
+        key={level.id}
+        custom={!!level.locked}
+        initial="initial"
+        whileHover="hover"
+        whileTap="tap"
+        animate={currentLevel === level.id ? 'active' : 'initial'}
+        variants={levelButtonVariants}
+        onClick={() => !level.locked && setCurrentLevel(level.id)}
+        className={`w-full text-left p-3 rounded-lg border transition-all ${
+          currentLevel === level.id
+            ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-emerald-400'
+            : level.locked
+              ? 'bg-zinc-700/50 text-zinc-500 cursor-not-allowed border-zinc-700'
+              : 'bg-zinc-700/80 hover:bg-zinc-700 border-zinc-600 hover:border-zinc-500'
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          <span className="font-medium">
+            {level.id ? `Level ${level.id}` : 'The Playground'}
+          </span>
+          {level.wip ? (
+            <span className="text-amber-600 flex items-center gap-1 font-bold">
+              <Construction size={16} className="text-amber-600" />
+              WIP
+            </span>
+          ) : currentLevel === level.id ? (
+            <motion.div
+              animate={{ x: [0, 3, 0] }}
+              transition={{
+                repeat: Infinity,
+                repeatDelay: 2,
+                duration: 0.5,
+              }}
+            >
+              <ChevronRight size={16} />
+            </motion.div>
+          ) : null}
+        </div>
+        <p className="text-sm mt-1 opacity-90">{level.title}</p>
+        <p className="text-xs mt-1 text-zinc-400 line-clamp-1">
+          {level.description}
+        </p>
+      </motion.button>
+    )
+  }
+
   return (
     <motion.div
       className="w-64 h-full bg-zinc-800 p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-600 scrollbar-track-zinc-800"
@@ -165,57 +242,19 @@ const Sidebar: React.FC<SidebarProps> = ({
       <motion.div className="space-y-3" variants={itemVariants}>
         <motion.div className="mb-4 px-1" variants={itemVariants}>
           <h2 className="text-sm uppercase tracking-wider text-zinc-400 font-semibold mb-2">
-            Levels
+            Move
           </h2>
           <div className="h-1 w-16 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full" />
         </motion.div>
 
-        {levels.map((level) => (
-          <motion.button
-            key={level.id}
-            custom={!!level.locked}
-            initial="initial"
-            whileHover="hover"
-            whileTap="tap"
-            animate={currentLevel === level.id ? 'active' : 'initial'}
-            variants={levelButtonVariants}
-            onClick={() => !level.locked && setCurrentLevel(level.id)}
-            className={`w-full text-left p-3 rounded-lg border transition-all ${
-              currentLevel === level.id
-                ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-emerald-400'
-                : level.locked
-                  ? 'bg-zinc-700/50 text-zinc-500 cursor-not-allowed border-zinc-700'
-                  : 'bg-zinc-700/80 hover:bg-zinc-700 border-zinc-600 hover:border-zinc-500'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="font-medium">
-                {level.id ? `Level ${level.id}` : 'The Playground'}
-              </span>
-              {level.wip ? (
-                <span className="text-amber-600 flex items-center gap-1 font-bold">
-                  <Construction size={16} className="text-amber-600" />
-                  WIP
-                </span>
-              ) : currentLevel === level.id ? (
-                <motion.div
-                  animate={{ x: [0, 3, 0] }}
-                  transition={{
-                    repeat: Infinity,
-                    repeatDelay: 2,
-                    duration: 0.5,
-                  }}
-                >
-                  <ChevronRight size={16} />
-                </motion.div>
-              ) : null}
-            </div>
-            <p className="text-sm mt-1 opacity-90">{level.title}</p>
-            <p className="text-xs mt-1 text-zinc-400 line-clamp-1">
-              {level.description}
-            </p>
-          </motion.button>
-        ))}
+        {levels.navigate.map(renderLevel)}
+        <motion.div className="px-1 my-4" variants={itemVariants}>
+          <h2 className="text-sm uppercase tracking-wider text-zinc-400 font-semibold mb-2">
+            Insert
+          </h2>
+          <div className="h-1 w-16 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full" />
+        </motion.div>
+        {levels.insert.map(renderLevel)}
       </motion.div>
 
       <motion.div
