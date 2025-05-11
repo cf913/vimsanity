@@ -7,6 +7,7 @@ import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
 import Scoreboard from '../common/Scoreboard'
 import ModeIndicator from '../common/ModeIndicator'
+import WarningSplash from '../common/WarningSplash'
 
 interface LineInsertLevel7Props {
   isMuted: boolean
@@ -370,7 +371,9 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
               <div className="font-mono mb-2 whitespace-pre-wrap min-h-[2rem] text-lg">
                 {activeLine === index && cursorPosition === 'start' && (
                   <span
-                    className={`inline-block w-2 h-5 ${isInsertMode ? 'bg-orange-400' : 'bg-emerald-400'} animate-pulse mr-0.5`}
+                    className={`inline-block w-2 h-5 ${
+                      isInsertMode ? 'bg-orange-400' : 'bg-emerald-400'
+                    } animate-pulse mr-0.5`}
                   ></span>
                 )}
 
@@ -383,7 +386,9 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
 
                 {activeLine === index && cursorPosition === 'end' && (
                   <span
-                    className={`inline-block w-2 h-5 ${isInsertMode ? 'bg-orange-400' : 'bg-emerald-400'} animate-pulse ml-0.5`}
+                    className={`inline-block w-2 h-5 ${
+                      isInsertMode ? 'bg-orange-400' : 'bg-emerald-400'
+                    } animate-pulse ml-0.5`}
                   ></span>
                 )}
               </div>
@@ -494,6 +499,7 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
           </p>
         </div>
       )}
+      <WarningSplash />
     </div>
   )
 }

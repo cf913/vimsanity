@@ -57,7 +57,7 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
         expected: 'Insert Here',
         completed: false,
       },
-      { id: '8', content: 'Mood', expected: 'Mode', completed: false },
+      { id: '8', content: 'Mood', expected: 'Mode Normal', completed: false },
     ]
     setCells(initialCells)
     setActiveCell(0)
