@@ -24,7 +24,7 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
   const [activeCell, setActiveCell] = useState<number | null>(null)
   const [isInsertMode, setIsInsertMode] = useState(false)
   const [cursorPosition, setCursorPosition] = useState<'normal' | 'append'>(
-    'normal',
+    'normal'
   )
   const [cursorIndex, setCursorIndex] = useState(0)
   const [score, setScore] = useState(0)
@@ -37,18 +37,27 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
   const [history, setHistory] = useState<
     { cells: Cell[]; cursorIndex: number; activeCell: number | null }[]
   >([])
+  // Redo history state for Ctrl+r functionality
+  const [redoHistory, setRedoHistory] = useState<
+    { cells: Cell[]; cursorIndex: number; activeCell: number | null }[]
+  >([])
 
   // Initialize cells with challenges
   useEffect(() => {
     const initialCells: Cell[] = [
       { id: '1', content: '', expected: 'Hello', completed: false },
       { id: '2', content: 'H', expected: 'Hi', completed: false },
-      { id: '3', content: 'Tex', expected: 'Text', completed: false },
-      { id: '4', content: 'Vim', expected: 'Vim!', completed: false },
-      { id: '5', content: 'Cod', expected: 'Code', completed: false },
-      { id: '6', content: '', expected: 'Edit', completed: false },
-      { id: '7', content: 'Inser', expected: 'Insert', completed: false },
-      { id: '8', content: 'Mod', expected: 'Mode', completed: false },
+      { id: '3', content: 'ext', expected: 'Text', completed: false },
+      { id: '4', content: 'im', expected: 'Vim!', completed: false },
+      { id: '5', content: 'Add(i)', expected: 'Add(1)', completed: false },
+      { id: '6', content: '22=51', expected: '2+2=5-1', completed: false },
+      {
+        id: '7',
+        content: 'Insrt Hre',
+        expected: 'Insert Here',
+        completed: false,
+      },
+      { id: '8', content: 'Mood', expected: 'Mode', completed: false },
     ]
     setCells(initialCells)
     setActiveCell(0)
@@ -155,11 +164,16 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
         setActiveCell(previousState.activeCell)
 
         if (history.length > 1) {
+          // Save the current state to redo history
+          const currentState = history[history.length - 1]
+          setRedoHistory((prev) => [...prev, currentState])
+
           // Remove the old current state from history
           setHistory((prev) => prev.slice(0, -1))
         }
       }
     },
+    // 'ctrl+r' is handled separately with a direct event listener
 
     Escape: () => {
       if (isInsertMode) {
@@ -184,6 +198,9 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
           ...prev,
           { cells: cellsCopy, cursorIndex: newCursorIndex, activeCell },
         ])
+
+        // Clear redo history when making a new change (following Vim behavior)
+        setRedoHistory([])
 
         // Check if the current cell is completed
         if (activeCell !== null) {
@@ -217,6 +234,9 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
                   activeCell: nextCellIndex,
                 },
               ])
+
+              // Clear redo history when making a new change (following Vim behavior)
+              setRedoHistory([])
               setActiveCell(nextCellIndex)
               // Reset cursor index for the new cell
               setCursorIndex(0)
@@ -291,11 +311,47 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
       }
     }
 
+    // Handle Ctrl+r for redo functionality
+    const handleCtrlR = (e: KeyboardEvent) => {
+      // Check if Ctrl+r was pressed
+      if (e.ctrlKey && e.key === 'r') {
+        e.preventDefault() // Prevent browser refresh
+
+        if (!isInsertMode) {
+          setLastKeyPressed('ctrl+r')
+
+          if (redoHistory.length === 0) return
+
+          // Get the last state from redo history
+          const nextState = redoHistory[redoHistory.length - 1]
+
+          // Only redo if we're on the same cell
+          if (nextState.activeCell !== activeCell) return
+
+          // Create a deep copy of the cells from redo history
+          const restoredCells = JSON.parse(JSON.stringify(nextState.cells))
+
+          // Restore the next state
+          setCells(restoredCells)
+          setCursorIndex(nextState.cursorIndex)
+          setActiveCell(nextState.activeCell)
+
+          // Add the restored state back to history
+          setHistory((prev) => [...prev, nextState])
+
+          // Remove the restored state from redo history
+          setRedoHistory((prev) => prev.slice(0, -1))
+        }
+      }
+    }
+
     window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keydown', handleCtrlR)
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keydown', handleCtrlR)
     }
-  }, [isInsertMode, activeCell, cells, lastKeyPressed])
+  }, [isInsertMode, activeCell, cells, lastKeyPressed, redoHistory, history])
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -308,6 +364,11 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
           cursor, and{' '}
           <kbd className="px-2 py-1 bg-zinc-800 rounded">Escape</kbd> to return
           to normal mode.
+        </p>
+        <p className="text-zinc-400 text-sm mt-1">
+          Use <kbd className="px-2 py-1 bg-zinc-800 rounded">u</kbd> to undo and{' '}
+          <kbd className="px-2 py-1 bg-zinc-800 rounded">Ctrl+r</kbd> to redo
+          changes.
         </p>
         {/* <p className="text-zinc-400 text-sm"> */}
         {/*   Edit each cell to match the expected text shown below it. */}
@@ -447,6 +508,15 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
           }`}
         >
           u
+        </kbd>
+        <kbd
+          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+            lastKeyPressed === 'ctrl+r'
+              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
+              : ''
+          }`}
+        >
+          Ctrl+r
         </kbd>
         <kbd
           className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
