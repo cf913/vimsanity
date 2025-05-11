@@ -227,6 +227,72 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
       setLines(updatedLines)
     }
   }
+  
+  // Handle backspace key in insert mode
+  const handleBackspace = () => {
+    if (isInsertMode && activeLine !== null) {
+      const updatedLines = [...lines]
+      const currentLine = updatedLines[activeLine]
+      
+      switch (insertCommand) {
+        case 'I':
+          // Delete at beginning of line
+          if (currentLine.content.includes('\n')) {
+            const parts = currentLine.content.split('\n')
+            if (parts[0].length > 0) {
+              parts[0] = parts[0].slice(0, -1)
+              updatedLines[activeLine].content = parts.join('\n')
+            }
+          } else if (currentLine.content.length > 0) {
+            updatedLines[activeLine].content = currentLine.content.slice(1)
+          }
+          break
+          
+        case 'A':
+          // Delete at end of line
+          if (currentLine.content.includes('\n')) {
+            const parts = currentLine.content.split('\n')
+            const lastPart = parts[parts.length - 1]
+            if (lastPart.length > 0) {
+              parts[parts.length - 1] = lastPart.slice(0, -1)
+              updatedLines[activeLine].content = parts.join('\n')
+            }
+          } else if (currentLine.content.length > 0) {
+            updatedLines[activeLine].content = currentLine.content.slice(0, -1)
+          }
+          break
+          
+        case 'o':
+          // Delete after the newline
+          if (currentLine.content.endsWith('\n')) {
+            // Do nothing if there's just a newline
+          } else if (currentLine.content.includes('\n')) {
+            const parts = currentLine.content.split('\n')
+            const lastPart = parts[parts.length - 1]
+            if (lastPart.length > 0) {
+              parts[parts.length - 1] = lastPart.slice(0, -1)
+              updatedLines[activeLine].content = parts.join('\n')
+            }
+          }
+          break
+          
+        case 'O':
+          // Delete before the first line
+          if (currentLine.content.startsWith('\n')) {
+            // Do nothing if there's just a newline
+          } else if (currentLine.content.includes('\n')) {
+            const parts = currentLine.content.split('\n')
+            if (parts[0].length > 0) {
+              parts[0] = parts[0].slice(0, -1)
+              updatedLines[activeLine].content = parts.join('\n')
+            }
+          }
+          break
+      }
+      
+      setLines(updatedLines)
+    }
+  }
 
   // Register keyboard handler
   const { lastKeyPressed: keyboardLastKey } = useKeyboardHandler({
@@ -241,10 +307,14 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
     //   registerKeyAction(key, action)
     // })
 
-    // Register character input for insert mode
+    // Register character input and backspace for insert mode
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isInsertMode && e.key.length === 1) {
-        handleCharInput(e.key)
+      if (isInsertMode) {
+        if (e.key.length === 1) {
+          handleCharInput(e.key)
+        } else if (e.key === 'Backspace') {
+          handleBackspace()
+        }
       }
     }
 
@@ -300,11 +370,11 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
               }}
             >
               <div className="font-mono mb-2 whitespace-pre-wrap min-h-[2rem] text-lg">
-                {activeLine === index &&
-                  isInsertMode &&
-                  cursorPosition === 'start' && (
-                    <span className="inline-block w-2 h-5 bg-emerald-400 animate-pulse mr-0.5"></span>
-                  )}
+                {activeLine === index && cursorPosition === 'start' && (
+                  <span 
+                    className={`inline-block w-2 h-5 ${isInsertMode ? 'bg-orange-400' : 'bg-emerald-400'} animate-pulse mr-0.5`}
+                  ></span>
+                )}
 
                 {line.content.split('\n').map((part, i, arr) => (
                   <React.Fragment key={i}>
@@ -313,11 +383,11 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
                   </React.Fragment>
                 ))}
 
-                {activeLine === index &&
-                  isInsertMode &&
-                  cursorPosition === 'end' && (
-                    <span className="inline-block w-2 h-5 bg-emerald-400 animate-pulse ml-0.5"></span>
-                  )}
+                {activeLine === index && cursorPosition === 'end' && (
+                  <span 
+                    className={`inline-block w-2 h-5 ${isInsertMode ? 'bg-orange-400' : 'bg-emerald-400'} animate-pulse ml-0.5`}
+                  ></span>
+                )}
               </div>
 
               <div className="text-sm text-zinc-400 mt-2 border-t border-zinc-700 pt-2">

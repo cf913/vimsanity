@@ -135,6 +135,20 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
       setCells(updatedCells)
     }
   }
+  
+  // Handle backspace key in insert mode
+  const handleBackspace = () => {
+    if (isInsertMode && activeCell !== null) {
+      const updatedCells = [...cells]
+      const currentContent = updatedCells[activeCell].content
+      
+      if (currentContent.length > 0) {
+        // Remove the last character
+        updatedCells[activeCell].content = currentContent.slice(0, -1)
+        setCells(updatedCells)
+      }
+    }
+  }
 
   // Register keyboard handler
   const { lastKeyPressed: keyboardLastKey } = useKeyboardHandler({
@@ -149,10 +163,14 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
     //   registerKeyAction(key, action)
     // })
 
-    // Register character input for insert mode
+    // Register character input and backspace for insert mode
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isInsertMode && e.key.length === 1) {
-        handleCharInput(e.key)
+      if (isInsertMode) {
+        if (e.key.length === 1) {
+          handleCharInput(e.key)
+        } else if (e.key === 'Backspace') {
+          handleBackspace()
+        }
       }
     }
 
@@ -212,8 +230,10 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
             >
               <div className="text-2xl font-mono mb-2 min-h-[2rem]">
                 {cell.content}
-                {activeCell === index && isInsertMode && (
-                  <span className="inline-block w-2 h-5 bg-emerald-400 animate-pulse ml-0.5"></span>
+                {activeCell === index && (
+                  <span 
+                    className={`inline-block w-2 h-5 ${isInsertMode ? 'bg-orange-400' : 'bg-emerald-400'} animate-pulse ml-0.5`}
+                  ></span>
                 )}
               </div>
               <div className="text-sm text-zinc-400 absolute bottom-2">

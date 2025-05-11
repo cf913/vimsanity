@@ -171,7 +171,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         }`}
       >
         <div className="flex items-center justify-between">
-          <span className="font-medium">
+          <span className="font-medium text-sm">
             {level.id ? `Level ${level.id}` : 'The Playground'}
           </span>
           {level.wip ? (
