@@ -24,7 +24,7 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
   const [activeCell, setActiveCell] = useState<number | null>(null)
   const [isInsertMode, setIsInsertMode] = useState(false)
   const [cursorPosition, setCursorPosition] = useState<'normal' | 'append'>(
-    'normal'
+    'normal',
   )
   const [cursorIndex, setCursorIndex] = useState(0)
   const [score, setScore] = useState(0)
@@ -33,6 +33,10 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
   const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
   const [completedCells, setCompletedCells] = useState<Set<string>>(new Set())
   const [allCompleted, setAllCompleted] = useState(false)
+  // History state for undo functionality
+  const [history, setHistory] = useState<
+    { cells: Cell[]; cursorIndex: number; activeCell: number | null }[]
+  >([])
 
   // Initialize cells with challenges
   useEffect(() => {
@@ -118,10 +122,52 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
         }
       }
     },
+    u: () => {
+      if (!isInsertMode && history.length > 0) {
+        setLastKeyPressed('u')
+
+        // Get the last state from history
+        const lastState = history[history.length - 1]
+
+        // Create a deep copy of the cells from history
+        const restoredCells = lastState.cells.map((cell) => ({
+          ...cell,
+          id: cell.id,
+          content: cell.content,
+          expected: cell.expected,
+          completed: cell.completed,
+        }))
+
+        // Restore the previous state
+        setCells(restoredCells)
+        setCursorIndex(lastState.cursorIndex)
+        setActiveCell(lastState.activeCell)
+
+        // Remove the used history entry
+        setHistory((prev) => prev.slice(0, -1))
+      }
+    },
 
     Escape: () => {
       if (isInsertMode) {
         setLastKeyPressed('Escape')
+
+        // Save the state to history when exiting insert mode (following Vim behavior)
+        // Create deep copies of cells for history
+        const cellsCopy = cells.map((cell) => ({
+          ...cell,
+          id: cell.id,
+          content: cell.content,
+          expected: cell.expected,
+          completed: cell.completed,
+        }))
+
+        // Save current state to history before switching to normal mode
+        setHistory((prev) => [
+          ...prev,
+          { cells: cellsCopy, cursorIndex, activeCell },
+        ])
+
         setIsInsertMode(false)
         setCursorPosition('normal')
 
@@ -160,6 +206,7 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
             }
           }
         }
+        console.log('history', history)
       }
     },
   }
@@ -379,6 +426,15 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
           }`}
         >
           a
+        </kbd>
+        <kbd
+          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+            lastKeyPressed === 'u'
+              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
+              : ''
+          }`}
+        >
+          u
         </kbd>
         <kbd
           className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${

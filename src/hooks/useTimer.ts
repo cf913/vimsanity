@@ -38,12 +38,9 @@ export const useTimer = (
   const lastUpdateRef = useRef<number>(Date.now())
   const elapsedTimeRef = useRef<number>(elapsedTime)
 
-  console.log('isRunning', isRunning)
-
   // Save timer data to localStorage
   const saveTimerData = useCallback(
     (seconds: number) => {
-      console.log('saving timer data', seconds)
       try {
         const storedData = localStorage.getItem(STORAGE_KEY)
         const timerData: TimerData = storedData ? JSON.parse(storedData) : {}
@@ -57,11 +54,8 @@ export const useTimer = (
     [levelId],
   )
 
-  console.log('intervalRef.current', elapsedTimeRef.current)
-
   // Reset the timer
   const resetTimer = useCallback(() => {
-    console.log('RESETTING TIMER')
     setElapsedTime(0)
     saveTimerData(0)
   }, [saveTimerData])
@@ -100,7 +94,6 @@ export const useTimer = (
 
     // Set a new interval that runs every second
     const tickFn = () => {
-      console.log('💣 TICK', levelId)
       const now = Date.now()
       const deltaTime = (now - lastUpdateRef.current) / 1000
       lastUpdateRef.current = now
@@ -108,7 +101,6 @@ export const useTimer = (
 
       setElapsedTime((prev) => {
         const newTime = prev + deltaTime
-        console.log('newTime', newTime)
         // Only save to localStorage every second to reduce writes
         if (Math.floor(newTime) > Math.floor(prev)) {
           saveTimerData(newTime)
@@ -132,13 +124,11 @@ export const useTimer = (
         const storedData = localStorage.getItem(STORAGE_KEY)
         const timerData: TimerData = storedData ? JSON.parse(storedData) : {}
 
-        console.log('saving timer data', elapsedTimeRef.current)
         timerData[levelId.toString()] = elapsedTimeRef.current
         localStorage.setItem(STORAGE_KEY, JSON.stringify(timerData))
       } catch (error) {
         console.error('Error saving timer data to localStorage:', error)
       }
-      console.log('STOPING TIMER')
       if (intervalRef.current !== null) {
         clearInterval(intervalRef.current)
         intervalRef.current = null
