@@ -6,6 +6,7 @@ import {
 import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
 import Scoreboard from '../common/Scoreboard'
+import ModeIndicator from '../common/ModeIndicator'
 
 interface BasicInsertLevel6Props {
   isMuted: boolean
@@ -198,8 +199,12 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
         {/* </p> */}
       </div>
 
-      {/* Score display */}
-      <Scoreboard score={score} maxScore={cells.length * 10} />
+      <div className="flex items-center gap-4 mb-2">
+        {/* Score display */}
+        <Scoreboard score={score} maxScore={cells.length * 10} />
+        {/* Mode indicator */}
+        <ModeIndicator isInsertMode={isInsertMode} />
+      </div>
 
       {/* Challenge grid */}
       <div className="w-full max-w-[90vmin]">
@@ -240,13 +245,6 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Mode indicator */}
-      <div className="mt-4 text-center">
-        <span className="px-3 py-1 rounded-full bg-zinc-800">
-          Mode: {isInsertMode ? 'Insert' : 'Normal'}
-        </span>
       </div>
 
       {/* Key indicators */}

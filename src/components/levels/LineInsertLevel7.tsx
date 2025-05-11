@@ -6,6 +6,7 @@ import {
 import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
 import Scoreboard from '../common/Scoreboard'
+import ModeIndicator from '../common/ModeIndicator'
 
 interface LineInsertLevel7Props {
   isMuted: boolean
@@ -326,10 +327,9 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
   }, [isInsertMode, activeLine, lines, insertCommand])
 
   return (
-    <div className="flex flex-col items-center gap-6">
-      <div className="text-center mb-4">
-        <h3 className="text-xl font-bold mb-2">Insert at Line Positions</h3>
-        <p className="text-zinc-300 mb-4">
+    <div className="flex flex-col items-center gap-4">
+      <div className="text-center">
+        <p className="text-zinc-400">
           Use <kbd className="px-2 py-1 bg-zinc-800 rounded">I</kbd> to insert
           at line start, <kbd className="px-2 py-1 bg-zinc-800 rounded">A</kbd>{' '}
           to append at line end,{' '}
@@ -337,13 +337,18 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
           below, and <kbd className="px-2 py-1 bg-zinc-800 rounded">O</kbd> to
           open line above.
         </p>
-        <p className="text-zinc-400 text-sm">
-          Edit each line to match the expected text shown below it.
-        </p>
       </div>
 
-      {/* Score display */}
-      <Scoreboard score={score} maxScore={lines.length * 10} />
+      <div className="flex items-center gap-4 mb-2">
+        {/* Score display */}
+        <Scoreboard score={score} maxScore={lines.length * 10} />
+
+        {/* Mode indicator */}
+        <ModeIndicator
+          isInsertMode={isInsertMode}
+          insertCommand={insertCommand}
+        />
+      </div>
 
       {/* Challenge lines */}
       <div className="w-full max-w-[90vmin]">
@@ -403,13 +408,6 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Mode indicator */}
-      <div className="mt-4 text-center">
-        <span className="px-3 py-1 rounded-full bg-zinc-800">
-          Mode: {isInsertMode ? `Insert (${insertCommand})` : 'Normal'}
-        </span>
       </div>
 
       {/* Key indicators */}
