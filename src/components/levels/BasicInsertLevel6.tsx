@@ -266,14 +266,41 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
               <div className="text-2xl font-mono mb-2 min-h-[2rem]">
                 {activeCell === index ? (
                   <>
-                    {cell.content.substring(0, cursorIndex)}
-                    <span
-                      className={`inline-block w-2 h-5 ${isInsertMode ? 'bg-orange-400' : 'bg-emerald-400'} animate-pulse`}
-                    ></span>
-                    {cell.content.substring(cursorIndex)}
+                    {cell.content.split('').map((char, charIdx) => {
+                      const isCursorPosition = charIdx === cursorIndex;
+                      return (
+                        <span
+                          key={charIdx}
+                          className={`${isCursorPosition
+                            ? isInsertMode
+                              ? 'bg-orange-400 text-white rounded'
+                              : 'bg-emerald-400 text-white rounded'
+                            : ''
+                          }`}
+                        >
+                          {char === ' ' ? '\u00A0' : char}
+                        </span>
+                      );
+                    })}
+                    {/* Show cursor at the end if in append mode */}
+                    {cursorPosition === 'append' && isInsertMode && cursorIndex === cell.content.length && (
+                      <span className="bg-orange-400 text-white rounded">
+                        {"\u00A0"}
+                      </span>
+                    )}
+                    {/* Show cursor if content is empty */}
+                    {cell.content.length === 0 && (
+                      <span
+                        className={isInsertMode
+                          ? 'bg-orange-400 text-white rounded'
+                          : 'bg-emerald-400 text-white rounded'}
+                      >
+                        {"\u00A0"}
+                      </span>
+                    )}
                   </>
                 ) : (
-                  cell.content
+                  cell.content || "\u00A0"
                 )}
               </div>
               <div className="text-sm text-zinc-400 absolute bottom-2">
