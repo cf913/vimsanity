@@ -23,7 +23,9 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
   const [cells, setCells] = useState<Cell[]>([])
   const [activeCell, setActiveCell] = useState<number | null>(null)
   const [isInsertMode, setIsInsertMode] = useState(false)
-  const [cursorPosition, setCursorPosition] = useState<'normal' | 'append'>('normal')
+  const [cursorPosition, setCursorPosition] = useState<'normal' | 'append'>(
+    'normal'
+  )
   const [cursorIndex, setCursorIndex] = useState(0)
   const [score, setScore] = useState(0)
   const [scoreAnimation, setScoreAnimation] = useState(false)
@@ -77,7 +79,7 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
         setLastKeyPressed('l')
         // Move cursor right within the cell
         const cellContent = cells[activeCell].content
-        if (cursorIndex < cellContent.length) {
+        if (cursorIndex < cellContent.length - 1) {
           setCursorIndex(cursorIndex + 1)
         }
       }
@@ -95,20 +97,39 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
         setLastKeyPressed('a')
         setIsInsertMode(true)
 
-        // Move cursor position to end of content for append
+        // Move cursor position one to the right for append
         if (activeCell !== null) {
           setCursorPosition('append')
-          // Move cursor to the end of the content for append mode
+          // Get the current cell content
           const cellContent = cells[activeCell].content
-          setCursorIndex(cellContent.length)
+
+          // If the line is empty, keep cursor in the same position
+          if (cellContent.length === 0) {
+            // Keep cursor at index 0 for empty lines
+            setCursorIndex(0)
+          }
+          // If cursor is at the end of the content, keep it there
+          // Otherwise, move it one position to the right
+          else if (cursorIndex < cellContent.length) {
+            setCursorIndex(cursorIndex + 1)
+          } else {
+            setCursorIndex(cellContent.length)
+          }
         }
       }
     },
+
     Escape: () => {
       if (isInsertMode) {
         setLastKeyPressed('Escape')
         setIsInsertMode(false)
         setCursorPosition('normal')
+
+        // Move cursor one position to the left when exiting insert mode
+        // unless it's at the beginning of the line
+        if (cursorIndex > 0) {
+          setCursorIndex(cursorIndex - 1)
+        }
 
         // Check if the current cell is completed
         if (activeCell !== null) {
@@ -129,7 +150,7 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
             setScore((prev) => prev + 10)
             setScoreAnimation(true)
             setTimeout(() => setScoreAnimation(false), 500)
-            
+
             // Move to the next cell if available
             const nextCellIndex = activeCell + 1
             if (nextCellIndex < cells.length) {
@@ -179,10 +200,10 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
       const beforeCursor = currentContent.substring(0, cursorIndex - 1)
       const afterCursor = currentContent.substring(cursorIndex)
       updatedCells[activeCell].content = beforeCursor + afterCursor
-      
+
       // Move cursor back
       setCursorIndex(cursorIndex - 1)
-      
+
       setCells(updatedCells)
     }
   }
@@ -267,40 +288,45 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
                 {activeCell === index ? (
                   <>
                     {cell.content.split('').map((char, charIdx) => {
-                      const isCursorPosition = charIdx === cursorIndex;
+                      const isCursorPosition = charIdx === cursorIndex
                       return (
                         <span
                           key={charIdx}
-                          className={`${isCursorPosition
-                            ? isInsertMode
-                              ? 'bg-orange-400 text-white rounded'
-                              : 'bg-emerald-400 text-white rounded'
-                            : ''
+                          className={`${
+                            isCursorPosition
+                              ? isInsertMode
+                                ? 'bg-orange-400 text-white rounded'
+                                : 'bg-emerald-400 text-white rounded'
+                              : ''
                           }`}
                         >
                           {char === ' ' ? '\u00A0' : char}
                         </span>
-                      );
+                      )
                     })}
                     {/* Show cursor at the end if in append mode */}
-                    {cursorPosition === 'append' && isInsertMode && cursorIndex === cell.content.length && (
-                      <span className="bg-orange-400 text-white rounded">
-                        {"\u00A0"}
-                      </span>
-                    )}
+                    {isInsertMode &&
+                      cursorIndex === cell.content.length &&
+                      cursorIndex > 0 && (
+                        <span className="bg-orange-400 text-white rounded">
+                          {'\u00A0'}
+                        </span>
+                      )}
                     {/* Show cursor if content is empty */}
                     {cell.content.length === 0 && (
                       <span
-                        className={isInsertMode
-                          ? 'bg-orange-400 text-white rounded'
-                          : 'bg-emerald-400 text-white rounded'}
+                        className={
+                          isInsertMode
+                            ? 'bg-orange-400 text-white rounded'
+                            : 'bg-emerald-400 text-white rounded'
+                        }
                       >
-                        {"\u00A0"}
+                        {'\u00A0'}
                       </span>
                     )}
                   </>
                 ) : (
-                  cell.content || "\u00A0"
+                  cell.content || '\u00A0'
                 )}
               </div>
               <div className="text-sm text-zinc-400 absolute bottom-2">
