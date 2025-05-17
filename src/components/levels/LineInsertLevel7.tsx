@@ -14,6 +14,7 @@ import {
   findLineEndColumn,
   findLineStart,
 } from '../../utils/textUtils'
+import { RefreshCw } from 'lucide-react'
 
 interface LineInsertLevel7Props {
   isMuted: boolean
@@ -22,9 +23,49 @@ interface LineInsertLevel7Props {
 interface TextLine {
   id: string
   content: string
+  startIndex: number
   expected: string
   completed: boolean
 }
+
+const initialCells: TextLine[] = [
+  {
+    id: '1',
+    content: "<- Don't worry, be happy.",
+    expected: "PREFIX <- Don't worry, be happy.",
+    startIndex: 15,
+    completed: false,
+  },
+  {
+    id: '2',
+    content: 'Surely there is a faster way to insert here -> ',
+    expected: 'Surely there is a faster way to insert here -> SUFFIX',
+    startIndex: 0,
+    completed: false,
+  },
+  {
+    id: '3',
+    content: 'middle',
+    expected: 'ABOVE\nmiddle\nBELOW',
+    startIndex: 5,
+    completed: false,
+  },
+  {
+    id: '4',
+    content: 'Vim is actually quite',
+    expected: 'ABOVE\nVim is actually quite FUN',
+    startIndex: 7,
+    completed: false,
+  },
+  {
+    id: '5',
+    content: 'console.log("hello world!");\n// Output: "hello world!"',
+    expected:
+      'BEFORE console.log("hello world!"); END\nBETWEEN\n// Output: "hello world!"\nBELOW',
+    startIndex: 0,
+    completed: false,
+  },
+]
 
 const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
   const [cells, setCells] = useState<TextLine[]>([])
@@ -46,24 +87,8 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
 
   // Initialize cells with challenges
   useEffect(() => {
-    const initialCells: TextLine[] = [
-      { id: '1', content: 'text', expected: 'PREFIX text', completed: false },
-      { id: '2', content: 'line', expected: 'line SUFFIX', completed: false },
-      {
-        id: '3',
-        content: 'middle',
-        expected: 'ABOVE\nmiddle\nBELOW',
-        completed: false,
-      },
-      { id: '4', content: 'vim', expected: 'NEW LINE\nvim', completed: false },
-      {
-        id: '5',
-        content: 'editor',
-        expected: 'editor\nAFTER LINE',
-        completed: false,
-      },
-    ]
     setCells(initialCells)
+    setCursorIndex(initialCells[0].startIndex)
     setActiveCell(0)
   }, [])
 
@@ -344,7 +369,7 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
           setCompletedCells((prev) => new Set([...prev, currentCell.id]))
 
           // Update score
-          setScore((prev) => prev + 15)
+          setScore((prev) => prev + 10)
           setScoreAnimation(true)
           setTimeout(() => setScoreAnimation(false), 500)
 
@@ -353,7 +378,7 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
           if (nextCellIndex < cells.length) {
             setActiveCell(nextCellIndex)
             // Reset cursor index for the new cell
-            setCursorIndex(1)
+            setCursorIndex(cells[nextCellIndex].startIndex)
           }
         }
       }
@@ -435,6 +460,14 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
   // }, [isInsertMode, activeCell, cells, insertCommand])
   //
   //
+  //
+
+  const resetLevel = () => {
+    setCursorIndex(cells[0].startIndex)
+    setActiveCell(0)
+    setScore(0)
+    setCells(initialCells)
+  }
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -453,6 +486,13 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
         {/* Score display */}
         <Scoreboard score={score} maxScore={cells.length * 10} />
 
+        <button
+          onClick={resetLevel}
+          className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
+          aria-label="Reset Level"
+        >
+          <RefreshCw size={18} className="text-zinc-400" />
+        </button>
         {/* Mode indicator */}
         <ModeIndicator
           isInsertMode={isInsertMode}
@@ -585,24 +625,6 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
       <div className="flex gap-4 text-zinc-400 mt-4 justify-center flex-wrap">
         <kbd
           className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'j'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          j
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'k'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          k
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
             lastKeyPressed === 'I'
               ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
               : ''
@@ -639,6 +661,42 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
         </kbd>
         <kbd
           className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+            lastKeyPressed === 'h'
+              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
+              : ''
+          }`}
+        >
+          h
+        </kbd>
+        <kbd
+          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+            lastKeyPressed === 'j'
+              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
+              : ''
+          }`}
+        >
+          j
+        </kbd>
+        <kbd
+          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+            lastKeyPressed === 'k'
+              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
+              : ''
+          }`}
+        >
+          k
+        </kbd>
+        <kbd
+          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+            lastKeyPressed === 'l'
+              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
+              : ''
+          }`}
+        >
+          l
+        </kbd>
+        <kbd
+          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
             lastKeyPressed === 'Escape'
               ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
               : ''
@@ -665,7 +723,6 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
           </p>
         </div>
       )}
-      <WarningSplash />
     </div>
   )
 }

@@ -75,7 +75,7 @@ const levels = {
       id: 7,
       title: 'Line Insert Commands (I, A, o, O)',
       description: 'Insert at line positions and create new lines',
-      wip: true,
+      wip: false,
       locked: false,
     },
   ],
@@ -166,8 +166,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           currentLevel === level.id
             ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-emerald-400'
             : level.locked
-            ? 'bg-zinc-700/50 text-zinc-500 cursor-not-allowed border-zinc-700'
-            : 'bg-zinc-700/80 hover:bg-zinc-700 border-zinc-600 hover:border-zinc-500'
+              ? 'bg-zinc-700/50 text-zinc-500 cursor-not-allowed border-zinc-700'
+              : 'bg-zinc-700/80 hover:bg-zinc-700 border-zinc-600 hover:border-zinc-500'
         }`}
       >
         <div className="flex items-center justify-between">
