@@ -8,6 +8,12 @@ import LevelTimer from '../common/LevelTimer'
 import Scoreboard from '../common/Scoreboard'
 import ModeIndicator from '../common/ModeIndicator'
 import WarningSplash from '../common/WarningSplash'
+import { VIM_MODES } from '../../utils/constants'
+import {
+  findLineEnd,
+  findLineEndColumn,
+  findLineStart,
+} from '../../utils/textUtils'
 
 interface LineInsertLevel7Props {
   isMuted: boolean
@@ -22,19 +28,21 @@ interface TextLine {
 
 const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
   const [cells, setCells] = useState<TextLine[]>([])
+  const [mode, setMode] = useState<string>(VIM_MODES.NORMAL)
   const [activeCell, setActiveCell] = useState<number | null>(null)
-  const [isInsertMode, setIsInsertMode] = useState(false)
   const [insertCommand, setInsertCommand] = useState<string>('')
   const [score, setScore] = useState(0)
   const [scoreAnimation, setScoreAnimation] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
   const [completedCells, setCompletedCells] = useState<Set<string>>(new Set())
-  const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
   const [allCompleted, setAllCompleted] = useState(false)
   const [cursorPosition, setCursorPosition] = useState<
     'start' | 'end' | 'normal'
   >('normal')
   const [cursorIndex, setCursorIndex] = useState(1)
+  const [virtualColumn, setVirtualColumn] = useState(1)
+
+  const isInsertMode = mode === VIM_MODES.INSERT
 
   // Initialize cells with challenges
   useEffect(() => {
@@ -72,162 +80,310 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
     }
   }, [cells])
 
+  const setCursorToLineAndColumn = (
+    lineStart: number,
+    targetColumn: number,
+    lineLength: number,
+  ) => {
+    // For empty lines or if target column exceeds line length, place at line start or end
+    if (lineLength === 0) {
+      console.log('nextCursorPosition', lineStart)
+      setCursorIndex(lineStart)
+    } else {
+      // Calculate actual column (bounded by line length)
+      const actualColumn = Math.min(
+        targetColumn,
+        lineLength > 0 ? lineLength - 1 : 0,
+      )
+      console.log('nextCursorPosition', lineStart + actualColumn)
+      setCursorIndex(lineStart + actualColumn)
+    }
+  }
+
+  // Helper to get the current column position
+  const getCurrentColumn = () => {
+    if (activeCell !== null) {
+      const cellContent = cells[activeCell].content
+      const lineStart = findLineStart(cellContent, cursorIndex)
+      return cursorIndex - lineStart
+    }
+    return 0
+  }
+
   // Define key actions
-  const keyActions: KeyActionMap = {
+  const normalModeActions: KeyActionMap = {
     h: () => {
-      if (!isInsertMode && activeCell !== null) {
-        setLastKeyPressed('h')
+      if (activeCell !== null) {
+        // Only move left if not at the beginning of a line
+        const cellContent = cells[activeCell].content
+        const lineStart = findLineStart(cellContent, cursorIndex)
         // Move cursor left within the cell
-        if (cursorIndex > 0) {
+        if (cursorIndex > lineStart) {
           setCursorIndex(cursorIndex - 1)
+          setVirtualColumn(getCurrentColumn() - 1)
         }
       }
     },
     l: () => {
-      if (!isInsertMode && activeCell !== null) {
-        setLastKeyPressed('l')
+      if (activeCell !== null) {
         // Move cursor right within the cell
         const cellContent = cells[activeCell].content
-        if (cursorIndex < cellContent.length - 1) {
+        // Only move right if not at the end of a line
+        const lineEnd = findLineEnd(cellContent, cursorIndex)
+        if (cursorIndex < lineEnd) {
           setCursorIndex(cursorIndex + 1)
+          setVirtualColumn(getCurrentColumn() + 1)
         }
       }
     },
     j: () => {
-      if (!isInsertMode && activeCell !== null) {
-        setLastKeyPressed('j')
+      if (activeCell !== null) {
         // setActiveCell(Math.min(cells.length - 1, activeCell + 1))
+        // got to the next line
+        const cellContent = cells[activeCell].content
+        const currentLineStart = findLineStart(cellContent, cursorIndex)
+        const currentColumn = cursorIndex - currentLineStart
+
+        // Remember this column if it's not already saved
+        // or if horizontal movement has changed it
+        if (currentColumn > virtualColumn) {
+          setVirtualColumn(currentColumn)
+        }
+
+        // Find the next line boundaries
+        const currentLineEnd = cellContent.indexOf('\n', cursorIndex)
+        if (currentLineEnd === -1) return // Already at the last line
+
+        const nextLineStart = currentLineEnd + 1
+        const nextLineEnd = cellContent.indexOf('\n', nextLineStart)
+        const nextLineLength =
+          (nextLineEnd === -1 ? cellContent.length : nextLineEnd) -
+          nextLineStart
+
+        // Set cursor to appropriate position in next line based on virtual column
+        setCursorToLineAndColumn(nextLineStart, virtualColumn, nextLineLength)
       }
     },
     k: () => {
-      if (!isInsertMode && activeCell !== null) {
-        setLastKeyPressed('k')
-        // setActiveCell(Math.max(0, activeCell - 1))
+      if (activeCell !== null) {
+        // Move up a line
+        const cellContent = cells[activeCell].content
+        const lineStart = findLineStart(cellContent, cursorIndex)
+        const currentColumn = cursorIndex - lineStart
+
+        if (currentColumn > virtualColumn) {
+          console.log('currentColumn', currentColumn)
+          console.log('virtualColumn', virtualColumn)
+          setVirtualColumn(currentColumn)
+        }
+
+        // Cannot go up if already at first line
+        if (lineStart <= 0) return
+
+        // Find the previous line boundaries
+        const prevLineEnd = lineStart - 1
+        const prevLineStart = cellContent.lastIndexOf('\n', prevLineEnd - 1) + 1
+        const prevLineLength = prevLineEnd - prevLineStart
+
+        // Set cursor to appropriate position in previous line based on virtual column
+        setCursorToLineAndColumn(prevLineStart, virtualColumn, prevLineLength)
+      }
+    },
+    i: () => {
+      if (!isInsertMode) {
+        setMode(VIM_MODES.INSERT)
+        setCursorPosition('normal')
+        // Keep cursor at current index for insert mode
+      }
+    },
+    a: () => {
+      if (!isInsertMode) {
+        setMode(VIM_MODES.INSERT)
+
+        // Move cursor position one to the right for append
+        if (activeCell !== null) {
+          // setCursorPosition('append')
+          // Get the current cell content
+          const cellContent = cells[activeCell].content
+
+          // If the line is empty, keep cursor in the same position
+          if (cellContent.length === 0) {
+            // Keep cursor at index 0 for empty lines
+            setCursorIndex(0)
+          }
+          // If cursor is at the end of the content, keep it there
+          // Otherwise, move it one position to the right
+          else if (cursorIndex < cellContent.length) {
+            setCursorIndex(cursorIndex + 1)
+          } else {
+            setCursorIndex(cellContent.length)
+          }
+        }
       }
     },
     I: () => {
-      if (!isInsertMode) {
-        setLastKeyPressed('I')
-        setIsInsertMode(true)
+      if (activeCell !== null) {
+        setMode(VIM_MODES.INSERT)
         setCursorPosition('start')
+
+        const cellContent = cells[activeCell].content
+        const lineStart = findLineStart(cellContent, cursorIndex)
         // move cursor to start of line
-        setCursorIndex(0)
+        setCursorIndex(lineStart)
+        setVirtualColumn(0)
       }
     },
     A: () => {
-      if (!isInsertMode) {
-        setLastKeyPressed('A')
-        setIsInsertMode(true)
+      if (activeCell !== null) {
+        setMode(VIM_MODES.INSERT)
         setCursorPosition('end')
-        // move cursor to end of line
-        if (activeCell !== null) {
-          const currentCell = cells[activeCell]
-          // Split the content into lines
-          const lines = currentCell.content.split('\n')
-          const currentLineIndex = Math.min(cursorIndex, lines.length - 1)
-          // move cursor to end of currentLine
-          setCursorIndex(lines[currentLineIndex].length)
-        }
+        const cellContent = cells[activeCell].content
+        const lineEnd = findLineEnd(cellContent, cursorIndex)
+        // move cursor to end of currentLine
+        setCursorIndex(lineEnd + 1) // +1 because appending to the end of a line
+        setVirtualColumn(findLineEndColumn(cellContent, cursorIndex))
       }
     },
     o: () => {
-      if (!isInsertMode) {
-        setLastKeyPressed('o')
+      if (activeCell !== null) {
         setInsertCommand('o')
-        setIsInsertMode(true)
+        setMode(VIM_MODES.INSERT)
 
-        if (activeCell !== null) {
-          const currentCell = cells[activeCell]
+        const updatedCells = [...cells]
+        const currentContent = updatedCells[activeCell].content
 
-          // Split the content into lines
-          const lines = currentCell.content.split('\n')
-          const currentLineIndex = Math.min(cursorIndex, lines.length - 1)
+        // Insert newline after current line
+        const lineEnd = findLineEnd(currentContent, cursorIndex)
+        const newContent =
+          currentContent.substring(0, lineEnd + 1) +
+          '\n' +
+          currentContent.substring(lineEnd + 1)
 
-          // add a new line at the end of the current line
-          const newLine = lines[currentLineIndex] + '\n'
-          currentCell.content =
-            lines.slice(0, currentLineIndex).join('\n') + newLine
+        updatedCells[activeCell].content = newContent
+        setCells(updatedCells)
 
-          // Move cursor to the start of the new line
-          setCursorIndex(lines[currentLineIndex].length + 1)
-          // setCursorPosition('start')
-        }
+        // Move cursor to start of new line
+        setCursorIndex(lineEnd + 2) // +1 for newline, +1 to move to start of new line
+        setVirtualColumn(0)
       }
     },
     O: () => {
-      if (!isInsertMode) {
-        setLastKeyPressed('O')
+      if (activeCell !== null) {
         setInsertCommand('O')
-        setIsInsertMode(true)
+        setMode(VIM_MODES.INSERT)
 
-        // In a real editor, this would create a new line above
-        if (activeCell !== null) {
+        const updatedCells = [...cells]
+        const currentContent = updatedCells[activeCell].content
+
+        const lineStart = findLineStart(currentContent, cursorIndex)
+
+        // Insert newline before current line
+        const newContent =
+          currentContent.substring(0, lineStart) +
+          '\n' +
+          currentContent.substring(lineStart)
+
+        updatedCells[activeCell].content = newContent
+        setCells(updatedCells)
+
+        setCursorIndex(lineStart) // -1 to move to start of new line above
+        setVirtualColumn(0)
+      }
+    },
+  }
+
+  const insertModeActions: KeyActionMap = {
+    // Enter: () => {
+    //   if (activeCell === null) return
+    //   // Clear any pending commands
+    //   // setPendingCommand(null)
+    //   const updatedCells = [...cells]
+    //   const currentContent = updatedCells[activeCell].content
+    //   updatedCells[activeCell].content =
+    //     currentContent.substring(0, cursorIndex) +
+    //     '\n' +
+    //     currentContent.substring(cursorIndex)
+    //
+    //   setCells(updatedCells)
+    //   setCursorIndex((prev) => prev + 1)
+    //   setVirtualColumn(0)
+    // },
+    Escape: () => {
+      setMode(VIM_MODES.NORMAL)
+      setCursorPosition('normal')
+
+      // Move cursor one position to the left when exiting insert mode
+      // unless it's at the beginning of the line
+
+      // Check if the current line is completed
+      if (activeCell !== null) {
+        let newCursorIndex = cursorIndex
+        const editableText = cells[activeCell].content
+        const lineStart = findLineStart(editableText, cursorIndex)
+        if (cursorIndex > 0) {
+          newCursorIndex = Math.max(lineStart, cursorIndex - 1)
+          setCursorIndex(newCursorIndex)
+          setVirtualColumn(newCursorIndex - lineStart)
+        }
+        const currentLine = cells[activeCell]
+
+        // Normalize line breaks for comparison
+        const normalizedContent = currentLine.content.replace(/\r\n/g, '\n')
+        const normalizedExpected = currentLine.expected.replace(/\r\n/g, '\n')
+
+        const currentCell = cells[activeCell]
+        if (
+          normalizedContent === normalizedExpected &&
+          !currentLine.completed
+        ) {
+          // Mark as completed
           const updatedCells = [...cells]
+          updatedCells[activeCell].completed = true
+          setCells(updatedCells)
 
-          // For our simulation, we'll add a newline character at the beginning
-          if (!updatedCells[activeCell].content.includes('\n')) {
-            updatedCells[activeCell].content =
-              '\n' + updatedCells[activeCell].content
-            setCells(updatedCells)
+          setCompletedCells((prev) => new Set([...prev, currentCell.id]))
+
+          // Update score
+          setScore((prev) => prev + 15)
+          setScoreAnimation(true)
+          setTimeout(() => setScoreAnimation(false), 500)
+
+          // Move to the next cell if available
+          const nextCellIndex = activeCell + 1
+          if (nextCellIndex < cells.length) {
+            setActiveCell(nextCellIndex)
+            // Reset cursor index for the new cell
+            setCursorIndex(1)
           }
         }
       }
     },
-    Escape: () => {
-      if (isInsertMode) {
-        setLastKeyPressed('Escape')
-        setIsInsertMode(false)
-        setCursorPosition('normal')
+    Backspace: () => {
+      if (activeCell !== null && cursorIndex > 0) {
+        const updatedCells = [...cells]
+        const currentContent = updatedCells[activeCell].content
 
-        // Move cursor one position to the left when exiting insert mode
-        // unless it's at the beginning of the line
-        let newCursorIndex = cursorIndex
-        if (cursorIndex > 0) {
-          newCursorIndex = cursorIndex - 1
-          setCursorIndex(newCursorIndex)
-        }
+        // Remove character before cursor
+        const beforeCursor = currentContent.substring(0, cursorIndex - 1)
+        const afterCursor = currentContent.substring(cursorIndex)
+        updatedCells[activeCell].content = beforeCursor + afterCursor
 
-        // Check if the current line is completed
-        if (activeCell !== null) {
-          const currentLine = cells[activeCell]
+        // Move cursor back
+        setCursorIndex(cursorIndex - 1)
 
-          // Normalize line breaks for comparison
-          const normalizedContent = currentLine.content.replace(/\r\n/g, '\n')
-          const normalizedExpected = currentLine.expected.replace(/\r\n/g, '\n')
-
-          const currentCell = cells[activeCell]
-          if (
-            normalizedContent === normalizedExpected &&
-            !currentLine.completed
-          ) {
-            // Mark as completed
-            const updatedCells = [...cells]
-            updatedCells[activeCell].completed = true
-            setCells(updatedCells)
-
-            setCompletedCells((prev) => new Set([...prev, currentCell.id]))
-
-            // Update score
-            setScore((prev) => prev + 15)
-            setScoreAnimation(true)
-            setTimeout(() => setScoreAnimation(false), 500)
-
-            // Move to the next cell if available
-            const nextCellIndex = activeCell + 1
-            if (nextCellIndex < cells.length) {
-              setActiveCell(nextCellIndex)
-              // Reset cursor index for the new cell
-              setCursorIndex(2)
-            }
-          }
-        }
+        setCells(updatedCells)
       }
     },
   }
 
   // Handle character input in insert mode
   const handleCharInput = (char: string) => {
-    if (isInsertMode && activeCell !== null) {
+    if (
+      isInsertMode &&
+      activeCell !== null &&
+      char.length === 1 &&
+      !Object.keys(insertModeActions).includes(char)
+    ) {
       const updatedCells = [...cells]
       const currentContent = updatedCells[activeCell].content
 
@@ -242,120 +398,43 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
       //   // Move cursor forward
       //   setCursorIndex(cursorIndex + 1)
       // }
-
       setCells(updatedCells)
     }
-  }
-
-  // Handle backspace key in insert mode
-  const handleBackspace = () => {
-    if (isInsertMode && activeCell !== null && cursorIndex > 0) {
-      const updatedCells = [...cells]
-      const currentContent = updatedCells[activeCell].content
-
-      // Remove character before cursor
-      const beforeCursor = currentContent.substring(0, cursorIndex - 1)
-      const afterCursor = currentContent.substring(cursorIndex)
-      updatedCells[activeCell].content = beforeCursor + afterCursor
-
-      // Move cursor back
-      setCursorIndex(cursorIndex - 1)
-
-      setCells(updatedCells)
-    }
-    // if (isInsertMode && activeCell !== null) {
-    //   const updatedCells = [...cells]
-    //   const currentLine = updatedCells[activeCell]
-    //
-    //   switch (insertCommand) {
-    //     case 'I':
-    //       // Delete at beginning of line
-    //       if (currentLine.content.includes('\n')) {
-    //         const parts = currentLine.content.split('\n')
-    //         if (parts[0].length > 0) {
-    //           parts[0] = parts[0].slice(0, -1)
-    //           updatedCells[activeCell].content = parts.join('\n')
-    //         }
-    //       } else if (currentLine.content.length > 0) {
-    //         updatedCells[activeCell].content = currentLine.content.slice(1)
-    //       }
-    //       break
-    //
-    //     case 'A':
-    //       // Delete at end of line
-    //       if (currentLine.content.includes('\n')) {
-    //         const parts = currentLine.content.split('\n')
-    //         const lastPart = parts[parts.length - 1]
-    //         if (lastPart.length > 0) {
-    //           parts[parts.length - 1] = lastPart.slice(0, -1)
-    //           updatedCells[activeCell].content = parts.join('\n')
-    //         }
-    //       } else if (currentLine.content.length > 0) {
-    //         updatedCells[activeCell].content = currentLine.content.slice(0, -1)
-    //       }
-    //       break
-    //
-    //     case 'o':
-    //       // Delete after the newline
-    //       if (currentLine.content.endsWith('\n')) {
-    //         // Do nothing if there's just a newline
-    //       } else if (currentLine.content.includes('\n')) {
-    //         const parts = currentLine.content.split('\n')
-    //         const lastPart = parts[parts.length - 1]
-    //         if (lastPart.length > 0) {
-    //           parts[parts.length - 1] = lastPart.slice(0, -1)
-    //           updatedCells[activeCell].content = parts.join('\n')
-    //         }
-    //       }
-    //       break
-    //
-    //     case 'O':
-    //       // Delete before the first line
-    //       if (currentLine.content.startsWith('\n')) {
-    //         // Do nothing if there's just a newline
-    //       } else if (currentLine.content.includes('\n')) {
-    //         const parts = currentLine.content.split('\n')
-    //         if (parts[0].length > 0) {
-    //           parts[0] = parts[0].slice(0, -1)
-    //           updatedCells[activeCell].content = parts.join('\n')
-    //         }
-    //       }
-    //       break
-    //   }
-    //
-    //   setCells(updatedCells)
-    // }
   }
 
   // Register keyboard handler
-  const { lastKeyPressed: keyboardLastKey } = useKeyboardHandler({
-    keyActionMap: keyActions,
-    dependencies: [isInsertMode, activeCell, cells, lastKeyPressed],
+  const { lastKeyPressed } = useKeyboardHandler({
+    keyActionMap:
+      mode === VIM_MODES.NORMAL ? normalModeActions : insertModeActions,
+    dependencies: [isInsertMode, activeCell, cells, mode, cursorPosition],
+    onAnyKey: handleCharInput,
   })
 
   // Register all key actions
-  useEffect(() => {
-    // Register normal mode actions
-    // Object.entries(keyActions).forEach(([key, action]) => {
-    //   registerKeyAction(key, action)
-    // })
-
-    // Register character input and backspace for insert mode
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (isInsertMode) {
-        if (e.key.length === 1) {
-          handleCharInput(e.key)
-        } else if (e.key === 'Backspace') {
-          handleBackspace()
-        }
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [isInsertMode, activeCell, cells, insertCommand])
+  // useEffect(() => {
+  //   // Register normal mode actions
+  //   // Object.entries(keyActions).forEach(([key, action]) => {
+  //   //   registerKeyAction(key, action)
+  //   // })
+  //
+  //   // Register character input and backspace for insert mode
+  //   const handleKeyDown = (e: KeyboardEvent) => {
+  //     if (isInsertMode) {
+  //       if (e.key.length === 1) {
+  //         handleCharInput(e.key)
+  //       } else if (e.key === 'Backspace') {
+  //         handleBackspace()
+  //       }
+  //     }
+  //   }
+  //
+  //   window.addEventListener('keydown', handleKeyDown)
+  //   return () => {
+  //     window.removeEventListener('keydown', handleKeyDown)
+  //   }
+  // }, [isInsertMode, activeCell, cells, insertCommand])
+  //
+  //
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -384,86 +463,121 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
       {/* Challenge cells */}
       <div className="w-full max-w-[90vmin]">
         <div className="flex flex-col gap-4">
-          {cells.map((cell, index) => (
-            <div
-              key={cell.id}
-              className={`relative p-4 rounded-lg transition-all duration-200 ${
-                activeCell === index
-                  ? 'bg-zinc-700 ring-2 ring-emerald-500 shadow-lg'
-                  : 'bg-zinc-800'
-              } ${cell.completed ? 'border-2 border-emerald-500' : ''}`}
-              onClick={() => {
-                if (!isInsertMode) {
-                  setActiveCell(index)
-                  setCursorIndex(2)
-                }
-              }}
-            >
-              <div className="font-mono mb-2 whitespace-pre-wrap min-h-[2rem] text-lg">
-                {activeCell === index ? (
-                  <>
-                    {cell.content.split('').map((char, charIdx) => {
-                      const isCursorPosition = charIdx === cursorIndex
-                      return (
-                        <span
-                          key={charIdx}
-                          className={`${
-                            isCursorPosition
-                              ? isInsertMode
-                                ? 'bg-orange-400 text-white rounded'
-                                : 'bg-emerald-400 text-white rounded'
-                              : ''
-                          }`}
-                        >
-                          {char === ' ' ? '\u00A0' : char}
-                        </span>
-                      )
-                    })}
-                    {/* Show cursor at the end if in append mode */}
-                    {isInsertMode &&
-                      cursorIndex === cell.content.length &&
-                      cursorIndex > 0 && (
-                        <span className="bg-orange-400 text-white rounded">
-                          {'\u00A0'}
-                        </span>
-                      )}
-                    {/* Show cursor if content is empty */}
-                    {cell.content.length === 0 && (
-                      <span
-                        className={
-                          isInsertMode
-                            ? 'bg-orange-400 text-white rounded'
-                            : 'bg-emerald-400 text-white rounded'
-                        }
-                      >
-                        {'\u00A0'}
-                      </span>
-                    )}
-                  </>
-                ) : (
-                  cell.content || '\u00A0'
+          {cells.map((cell, index) => {
+            const editableText = cell.content
+
+            const lines = editableText.split('\n')
+            return (
+              <div
+                key={cell.id}
+                className={`relative p-4 rounded-lg transition-all duration-200 ${
+                  activeCell === index
+                    ? 'bg-zinc-700 ring-2 ring-emerald-500 shadow-lg'
+                    : 'bg-zinc-800'
+                } ${cell.completed ? 'border-2 border-emerald-500' : ''}`}
+                onClick={() => {
+                  if (!isInsertMode) {
+                    setActiveCell(index)
+                    setCursorIndex(2)
+                  }
+                }}
+              >
+                <div className="font-mono mb-2 whitespace-pre-wrap min-h-[2rem] text-lg">
+                  {activeCell === index
+                    ? lines.map((line, lineIdx) => {
+                        // Calculate line start position in the entire text
+                        const lineStartPosition =
+                          editableText.split('\n').slice(0, lineIdx).join('\n')
+                            .length + (lineIdx > 0 ? 1 : 0)
+                        // Calculate if cursor is on this line
+                        const isCursorOnThisLine =
+                          cursorIndex >= lineStartPosition &&
+                          (lineIdx === lines.length - 1 ||
+                            cursorIndex < lineStartPosition + line.length + 1)
+
+                        return (
+                          <div
+                            key={lineIdx}
+                            className="min-h-[1.5em] whitespace-pre"
+                          >
+                            {line.split('').map((char, charIdx) => {
+                              const absoluteIdx = lineStartPosition + charIdx
+                              const isCursorPosition =
+                                absoluteIdx === cursorIndex
+                              const isCursorOnLastChar =
+                                absoluteIdx + 1 === cursorIndex
+
+                              const isInsertMode = mode === 'insert'
+
+                              const isCursorOnLastCharInInsertMode =
+                                isInsertMode &&
+                                isCursorOnLastChar &&
+                                charIdx === line.length - 1
+
+                              return (
+                                <>
+                                  <span
+                                    key={charIdx}
+                                    className={`${
+                                      isCursorPosition
+                                        ? mode === 'normal'
+                                          ? 'bg-emerald-500 text-white rounded'
+                                          : 'bg-amber-500 text-white rounded'
+                                        : ''
+                                    }`}
+                                  >
+                                    {char === ' ' ? '\u00A0' : char}
+                                  </span>
+                                  {isCursorOnLastCharInInsertMode && (
+                                    <span className="bg-amber-500 text-white rounded">
+                                      {'\u00A0'}
+                                    </span>
+                                  )}
+                                </>
+                              )
+                            })}
+                            {/* empty line */}
+                            {/* Display cursor on empty line */}
+                            {line.length === 0 &&
+                              (isCursorOnThisLine ? (
+                                <span
+                                  className={
+                                    mode === 'normal'
+                                      ? 'bg-emerald-500 text-white rounded'
+                                      : 'bg-amber-500 text-white rounded'
+                                  }
+                                >
+                                  {'\u00A0'}
+                                </span>
+                              ) : (
+                                <span className="">{'\u00A0'}</span>
+                              ))}
+                          </div>
+                        )
+                      })
+                    : cell.content || '\u00A0'}
+                </div>
+
+                <div className="text-sm text-zinc-400 mt-2 border-t border-zinc-700 pt-2">
+                  <div className="font-semibold mb-1">Expected:</div>
+                  <div className="whitespace-pre-wrap">
+                    {cell.expected.split('\n').map((part, i, arr) => (
+                      <React.Fragment key={i}>
+                        {part}
+                        {i < arr.length - 1 && <br />}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+
+                {cell.completed && (
+                  <div className="absolute top-2 right-2">
+                    <span className="text-emerald-500 text-xl">✓</span>
+                  </div>
                 )}
               </div>
-
-              <div className="text-sm text-zinc-400 mt-2 border-t border-zinc-700 pt-2">
-                <div className="font-semibold mb-1">Expected:</div>
-                <div className="whitespace-pre-wrap">
-                  {cell.expected.split('\n').map((part, i, arr) => (
-                    <React.Fragment key={i}>
-                      {part}
-                      {i < arr.length - 1 && <br />}
-                    </React.Fragment>
-                  ))}
-                </div>
-              </div>
-
-              {cell.completed && (
-                <div className="absolute top-2 right-2">
-                  <span className="text-emerald-500 text-xl">✓</span>
-                </div>
-              )}
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 

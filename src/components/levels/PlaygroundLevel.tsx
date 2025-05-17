@@ -13,6 +13,7 @@ import {
   moveToWordEnd,
 } from '../../utils/textUtils'
 import WarningSplash from '../common/WarningSplash'
+import { VIM_MODES } from '../../utils/constants'
 
 interface PlaygroundLevelProps {
   isMuted: boolean
@@ -347,7 +348,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
     }
 
     if (
-      mode === 'insert' &&
+      mode === VIM_MODES.INSERT &&
       key.length === 1 &&
       !Object.keys(insertModeActions).includes(key)
     ) {
