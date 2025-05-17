@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, use } from 'react'
 import {
   useKeyboardHandler,
   KeyActionMap,
@@ -21,22 +21,24 @@ interface TextLine {
 }
 
 const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
-  const [lines, setLines] = useState<TextLine[]>([])
-  const [activeLine, setActiveLine] = useState<number | null>(null)
+  const [cells, setCells] = useState<TextLine[]>([])
+  const [activeCell, setActiveCell] = useState<number | null>(null)
   const [isInsertMode, setIsInsertMode] = useState(false)
   const [insertCommand, setInsertCommand] = useState<string>('')
   const [score, setScore] = useState(0)
   const [scoreAnimation, setScoreAnimation] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [completedCells, setCompletedCells] = useState<Set<string>>(new Set())
   const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
   const [allCompleted, setAllCompleted] = useState(false)
   const [cursorPosition, setCursorPosition] = useState<
     'start' | 'end' | 'normal'
   >('normal')
+  const [cursorIndex, setCursorIndex] = useState(1)
 
-  // Initialize lines with challenges
+  // Initialize cells with challenges
   useEffect(() => {
-    const initialLines: TextLine[] = [
+    const initialCells: TextLine[] = [
       { id: '1', content: 'text', expected: 'PREFIX text', completed: false },
       { id: '2', content: 'line', expected: 'line SUFFIX', completed: false },
       {
@@ -53,13 +55,13 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
         completed: false,
       },
     ]
-    setLines(initialLines)
-    setActiveLine(0)
+    setCells(initialCells)
+    setActiveCell(0)
   }, [])
 
-  // Check if all lines are completed
+  // Check if all cells are completed
   useEffect(() => {
-    if (lines.length > 0 && lines.every((line) => line.completed)) {
+    if (cells.length > 0 && cells.every((line) => line.completed)) {
       setAllCompleted(true)
       setShowConfetti(true)
 
@@ -68,36 +70,64 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
         setShowConfetti(false)
       }, 3000)
     }
-  }, [lines])
+  }, [cells])
 
   // Define key actions
   const keyActions: KeyActionMap = {
+    h: () => {
+      if (!isInsertMode && activeCell !== null) {
+        setLastKeyPressed('h')
+        // Move cursor left within the cell
+        if (cursorIndex > 0) {
+          setCursorIndex(cursorIndex - 1)
+        }
+      }
+    },
+    l: () => {
+      if (!isInsertMode && activeCell !== null) {
+        setLastKeyPressed('l')
+        // Move cursor right within the cell
+        const cellContent = cells[activeCell].content
+        if (cursorIndex < cellContent.length - 1) {
+          setCursorIndex(cursorIndex + 1)
+        }
+      }
+    },
     j: () => {
-      if (!isInsertMode && activeLine !== null) {
+      if (!isInsertMode && activeCell !== null) {
         setLastKeyPressed('j')
-        setActiveLine(Math.min(lines.length - 1, activeLine + 1))
+        // setActiveCell(Math.min(cells.length - 1, activeCell + 1))
       }
     },
     k: () => {
-      if (!isInsertMode && activeLine !== null) {
+      if (!isInsertMode && activeCell !== null) {
         setLastKeyPressed('k')
-        setActiveLine(Math.max(0, activeLine - 1))
+        // setActiveCell(Math.max(0, activeCell - 1))
       }
     },
     I: () => {
       if (!isInsertMode) {
         setLastKeyPressed('I')
-        setInsertCommand('I')
         setIsInsertMode(true)
         setCursorPosition('start')
+        // move cursor to start of line
+        setCursorIndex(0)
       }
     },
     A: () => {
       if (!isInsertMode) {
         setLastKeyPressed('A')
-        setInsertCommand('A')
         setIsInsertMode(true)
         setCursorPosition('end')
+        // move cursor to end of line
+        if (activeCell !== null) {
+          const currentCell = cells[activeCell]
+          // Split the content into lines
+          const lines = currentCell.content.split('\n')
+          const currentLineIndex = Math.min(cursorIndex, lines.length - 1)
+          // move cursor to end of currentLine
+          setCursorIndex(lines[currentLineIndex].length)
+        }
       }
     },
     o: () => {
@@ -106,16 +136,21 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
         setInsertCommand('o')
         setIsInsertMode(true)
 
-        // In a real editor, this would create a new line below
-        if (activeLine !== null) {
-          const updatedLines = [...lines]
-          const parts = updatedLines[activeLine].content.split('\n')
+        if (activeCell !== null) {
+          const currentCell = cells[activeCell]
 
-          // For our simulation, we'll add a newline character
-          if (!updatedLines[activeLine].content.includes('\n')) {
-            updatedLines[activeLine].content += '\n'
-            setLines(updatedLines)
-          }
+          // Split the content into lines
+          const lines = currentCell.content.split('\n')
+          const currentLineIndex = Math.min(cursorIndex, lines.length - 1)
+
+          // add a new line at the end of the current line
+          const newLine = lines[currentLineIndex] + '\n'
+          currentCell.content =
+            lines.slice(0, currentLineIndex).join('\n') + newLine
+
+          // Move cursor to the start of the new line
+          setCursorIndex(lines[currentLineIndex].length + 1)
+          // setCursorPosition('start')
         }
       }
     },
@@ -126,14 +161,14 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
         setIsInsertMode(true)
 
         // In a real editor, this would create a new line above
-        if (activeLine !== null) {
-          const updatedLines = [...lines]
+        if (activeCell !== null) {
+          const updatedCells = [...cells]
 
           // For our simulation, we'll add a newline character at the beginning
-          if (!updatedLines[activeLine].content.includes('\n')) {
-            updatedLines[activeLine].content =
-              '\n' + updatedLines[activeLine].content
-            setLines(updatedLines)
+          if (!updatedCells[activeCell].content.includes('\n')) {
+            updatedCells[activeCell].content =
+              '\n' + updatedCells[activeCell].content
+            setCells(updatedCells)
           }
         }
       }
@@ -144,27 +179,46 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
         setIsInsertMode(false)
         setCursorPosition('normal')
 
+        // Move cursor one position to the left when exiting insert mode
+        // unless it's at the beginning of the line
+        let newCursorIndex = cursorIndex
+        if (cursorIndex > 0) {
+          newCursorIndex = cursorIndex - 1
+          setCursorIndex(newCursorIndex)
+        }
+
         // Check if the current line is completed
-        if (activeLine !== null) {
-          const currentLine = lines[activeLine]
+        if (activeCell !== null) {
+          const currentLine = cells[activeCell]
 
           // Normalize line breaks for comparison
           const normalizedContent = currentLine.content.replace(/\r\n/g, '\n')
           const normalizedExpected = currentLine.expected.replace(/\r\n/g, '\n')
 
+          const currentCell = cells[activeCell]
           if (
             normalizedContent === normalizedExpected &&
             !currentLine.completed
           ) {
             // Mark as completed
-            const updatedLines = [...lines]
-            updatedLines[activeLine].completed = true
-            setLines(updatedLines)
+            const updatedCells = [...cells]
+            updatedCells[activeCell].completed = true
+            setCells(updatedCells)
+
+            setCompletedCells((prev) => new Set([...prev, currentCell.id]))
 
             // Update score
             setScore((prev) => prev + 15)
             setScoreAnimation(true)
             setTimeout(() => setScoreAnimation(false), 500)
+
+            // Move to the next cell if available
+            const nextCellIndex = activeCell + 1
+            if (nextCellIndex < cells.length) {
+              setActiveCell(nextCellIndex)
+              // Reset cursor index for the new cell
+              setCursorIndex(2)
+            }
           }
         }
       }
@@ -173,134 +227,110 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
 
   // Handle character input in insert mode
   const handleCharInput = (char: string) => {
-    if (isInsertMode && activeLine !== null) {
-      const updatedLines = [...lines]
-      const currentLine = updatedLines[activeLine]
+    if (isInsertMode && activeCell !== null) {
+      const updatedCells = [...cells]
+      const currentContent = updatedCells[activeCell].content
 
-      switch (insertCommand) {
-        case 'I':
-          // Insert at beginning of line
-          if (currentLine.content.includes('\n')) {
-            const parts = currentLine.content.split('\n')
-            parts[0] = char + parts[0]
-            updatedLines[activeLine].content = parts.join('\n')
-          } else {
-            updatedLines[activeLine].content = char + currentLine.content
-          }
-          break
+      const beforeCursor = currentContent.substring(0, cursorIndex)
+      const afterCursor = currentContent.substring(cursorIndex)
+      updatedCells[activeCell].content = beforeCursor + char + afterCursor
 
-        case 'A':
-          // Append at end of line
-          if (currentLine.content.includes('\n')) {
-            const parts = currentLine.content.split('\n')
-            parts[parts.length - 1] = parts[parts.length - 1] + char
-            updatedLines[activeLine].content = parts.join('\n')
-          } else {
-            updatedLines[activeLine].content = currentLine.content + char
-          }
-          break
+      // if (lastKeyPressed === 'i') {
+      //   // Move cursor forward
+      setCursorIndex(cursorIndex + 1)
+      // } else if (lastKeyPressed === 'a') {
+      //   // Move cursor forward
+      //   setCursorIndex(cursorIndex + 1)
+      // }
 
-        case 'o':
-          // Add after the newline
-          if (currentLine.content.endsWith('\n')) {
-            updatedLines[activeLine].content += char
-          } else if (currentLine.content.includes('\n')) {
-            const parts = currentLine.content.split('\n')
-            parts[parts.length - 1] += char
-            updatedLines[activeLine].content = parts.join('\n')
-          }
-          break
-
-        case 'O':
-          // Add before the first line
-          if (currentLine.content.startsWith('\n')) {
-            updatedLines[activeLine].content = char + currentLine.content
-          } else if (currentLine.content.includes('\n')) {
-            const parts = currentLine.content.split('\n')
-            if (parts[0] === '') {
-              parts[0] = char
-            } else {
-              parts.unshift(char)
-            }
-            updatedLines[activeLine].content = parts.join('\n')
-          }
-          break
-      }
-
-      setLines(updatedLines)
+      setCells(updatedCells)
     }
   }
 
   // Handle backspace key in insert mode
   const handleBackspace = () => {
-    if (isInsertMode && activeLine !== null) {
-      const updatedLines = [...lines]
-      const currentLine = updatedLines[activeLine]
+    if (isInsertMode && activeCell !== null && cursorIndex > 0) {
+      const updatedCells = [...cells]
+      const currentContent = updatedCells[activeCell].content
 
-      switch (insertCommand) {
-        case 'I':
-          // Delete at beginning of line
-          if (currentLine.content.includes('\n')) {
-            const parts = currentLine.content.split('\n')
-            if (parts[0].length > 0) {
-              parts[0] = parts[0].slice(0, -1)
-              updatedLines[activeLine].content = parts.join('\n')
-            }
-          } else if (currentLine.content.length > 0) {
-            updatedLines[activeLine].content = currentLine.content.slice(1)
-          }
-          break
+      // Remove character before cursor
+      const beforeCursor = currentContent.substring(0, cursorIndex - 1)
+      const afterCursor = currentContent.substring(cursorIndex)
+      updatedCells[activeCell].content = beforeCursor + afterCursor
 
-        case 'A':
-          // Delete at end of line
-          if (currentLine.content.includes('\n')) {
-            const parts = currentLine.content.split('\n')
-            const lastPart = parts[parts.length - 1]
-            if (lastPart.length > 0) {
-              parts[parts.length - 1] = lastPart.slice(0, -1)
-              updatedLines[activeLine].content = parts.join('\n')
-            }
-          } else if (currentLine.content.length > 0) {
-            updatedLines[activeLine].content = currentLine.content.slice(0, -1)
-          }
-          break
+      // Move cursor back
+      setCursorIndex(cursorIndex - 1)
 
-        case 'o':
-          // Delete after the newline
-          if (currentLine.content.endsWith('\n')) {
-            // Do nothing if there's just a newline
-          } else if (currentLine.content.includes('\n')) {
-            const parts = currentLine.content.split('\n')
-            const lastPart = parts[parts.length - 1]
-            if (lastPart.length > 0) {
-              parts[parts.length - 1] = lastPart.slice(0, -1)
-              updatedLines[activeLine].content = parts.join('\n')
-            }
-          }
-          break
-
-        case 'O':
-          // Delete before the first line
-          if (currentLine.content.startsWith('\n')) {
-            // Do nothing if there's just a newline
-          } else if (currentLine.content.includes('\n')) {
-            const parts = currentLine.content.split('\n')
-            if (parts[0].length > 0) {
-              parts[0] = parts[0].slice(0, -1)
-              updatedLines[activeLine].content = parts.join('\n')
-            }
-          }
-          break
-      }
-
-      setLines(updatedLines)
+      setCells(updatedCells)
     }
+    // if (isInsertMode && activeCell !== null) {
+    //   const updatedCells = [...cells]
+    //   const currentLine = updatedCells[activeCell]
+    //
+    //   switch (insertCommand) {
+    //     case 'I':
+    //       // Delete at beginning of line
+    //       if (currentLine.content.includes('\n')) {
+    //         const parts = currentLine.content.split('\n')
+    //         if (parts[0].length > 0) {
+    //           parts[0] = parts[0].slice(0, -1)
+    //           updatedCells[activeCell].content = parts.join('\n')
+    //         }
+    //       } else if (currentLine.content.length > 0) {
+    //         updatedCells[activeCell].content = currentLine.content.slice(1)
+    //       }
+    //       break
+    //
+    //     case 'A':
+    //       // Delete at end of line
+    //       if (currentLine.content.includes('\n')) {
+    //         const parts = currentLine.content.split('\n')
+    //         const lastPart = parts[parts.length - 1]
+    //         if (lastPart.length > 0) {
+    //           parts[parts.length - 1] = lastPart.slice(0, -1)
+    //           updatedCells[activeCell].content = parts.join('\n')
+    //         }
+    //       } else if (currentLine.content.length > 0) {
+    //         updatedCells[activeCell].content = currentLine.content.slice(0, -1)
+    //       }
+    //       break
+    //
+    //     case 'o':
+    //       // Delete after the newline
+    //       if (currentLine.content.endsWith('\n')) {
+    //         // Do nothing if there's just a newline
+    //       } else if (currentLine.content.includes('\n')) {
+    //         const parts = currentLine.content.split('\n')
+    //         const lastPart = parts[parts.length - 1]
+    //         if (lastPart.length > 0) {
+    //           parts[parts.length - 1] = lastPart.slice(0, -1)
+    //           updatedCells[activeCell].content = parts.join('\n')
+    //         }
+    //       }
+    //       break
+    //
+    //     case 'O':
+    //       // Delete before the first line
+    //       if (currentLine.content.startsWith('\n')) {
+    //         // Do nothing if there's just a newline
+    //       } else if (currentLine.content.includes('\n')) {
+    //         const parts = currentLine.content.split('\n')
+    //         if (parts[0].length > 0) {
+    //           parts[0] = parts[0].slice(0, -1)
+    //           updatedCells[activeCell].content = parts.join('\n')
+    //         }
+    //       }
+    //       break
+    //   }
+    //
+    //   setCells(updatedCells)
+    // }
   }
 
   // Register keyboard handler
   const { lastKeyPressed: keyboardLastKey } = useKeyboardHandler({
     keyActionMap: keyActions,
-    dependencies: [isInsertMode, activeLine, lines, lastKeyPressed],
+    dependencies: [isInsertMode, activeCell, cells, lastKeyPressed],
   })
 
   // Register all key actions
@@ -325,7 +355,7 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isInsertMode, activeLine, lines, insertCommand])
+  }, [isInsertMode, activeCell, cells, insertCommand])
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -342,7 +372,7 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
 
       <div className="flex items-center gap-4 mb-2">
         {/* Score display */}
-        <Scoreboard score={score} maxScore={lines.length * 10} />
+        <Scoreboard score={score} maxScore={cells.length * 10} />
 
         {/* Mode indicator */}
         <ModeIndicator
@@ -351,52 +381,74 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
         />
       </div>
 
-      {/* Challenge lines */}
+      {/* Challenge cells */}
       <div className="w-full max-w-[90vmin]">
         <div className="flex flex-col gap-4">
-          {lines.map((line, index) => (
+          {cells.map((cell, index) => (
             <div
-              key={line.id}
+              key={cell.id}
               className={`relative p-4 rounded-lg transition-all duration-200 ${
-                activeLine === index
+                activeCell === index
                   ? 'bg-zinc-700 ring-2 ring-emerald-500 shadow-lg'
                   : 'bg-zinc-800'
-              } ${line.completed ? 'border-2 border-emerald-500' : ''}`}
+              } ${cell.completed ? 'border-2 border-emerald-500' : ''}`}
               onClick={() => {
                 if (!isInsertMode) {
-                  setActiveLine(index)
+                  setActiveCell(index)
+                  setCursorIndex(2)
                 }
               }}
             >
               <div className="font-mono mb-2 whitespace-pre-wrap min-h-[2rem] text-lg">
-                {activeLine === index && cursorPosition === 'start' && (
-                  <span
-                    className={`inline-block w-2 h-5 ${
-                      isInsertMode ? 'bg-orange-400' : 'bg-emerald-400'
-                    } animate-pulse mr-0.5`}
-                  ></span>
-                )}
-
-                {line.content.split('\n').map((part, i, arr) => (
-                  <React.Fragment key={i}>
-                    {part}
-                    {i < arr.length - 1 && <br />}
-                  </React.Fragment>
-                ))}
-
-                {activeLine === index && cursorPosition === 'end' && (
-                  <span
-                    className={`inline-block w-2 h-5 ${
-                      isInsertMode ? 'bg-orange-400' : 'bg-emerald-400'
-                    } animate-pulse ml-0.5`}
-                  ></span>
+                {activeCell === index ? (
+                  <>
+                    {cell.content.split('').map((char, charIdx) => {
+                      const isCursorPosition = charIdx === cursorIndex
+                      return (
+                        <span
+                          key={charIdx}
+                          className={`${
+                            isCursorPosition
+                              ? isInsertMode
+                                ? 'bg-orange-400 text-white rounded'
+                                : 'bg-emerald-400 text-white rounded'
+                              : ''
+                          }`}
+                        >
+                          {char === ' ' ? '\u00A0' : char}
+                        </span>
+                      )
+                    })}
+                    {/* Show cursor at the end if in append mode */}
+                    {isInsertMode &&
+                      cursorIndex === cell.content.length &&
+                      cursorIndex > 0 && (
+                        <span className="bg-orange-400 text-white rounded">
+                          {'\u00A0'}
+                        </span>
+                      )}
+                    {/* Show cursor if content is empty */}
+                    {cell.content.length === 0 && (
+                      <span
+                        className={
+                          isInsertMode
+                            ? 'bg-orange-400 text-white rounded'
+                            : 'bg-emerald-400 text-white rounded'
+                        }
+                      >
+                        {'\u00A0'}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  cell.content || '\u00A0'
                 )}
               </div>
 
               <div className="text-sm text-zinc-400 mt-2 border-t border-zinc-700 pt-2">
                 <div className="font-semibold mb-1">Expected:</div>
                 <div className="whitespace-pre-wrap">
-                  {line.expected.split('\n').map((part, i, arr) => (
+                  {cell.expected.split('\n').map((part, i, arr) => (
                     <React.Fragment key={i}>
                       {part}
                       {i < arr.length - 1 && <br />}
@@ -405,7 +457,7 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
                 </div>
               </div>
 
-              {line.completed && (
+              {cell.completed && (
                 <div className="absolute top-2 right-2">
                   <span className="text-emerald-500 text-xl">✓</span>
                 </div>
