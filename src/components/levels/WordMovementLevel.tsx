@@ -108,6 +108,17 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
     }
   }, [cursor])
 
+  useEffect(() => {
+    if (!levelCompleted) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        resetLevel()
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [levelCompleted])
+
   // Start timer on first key press
   const activateTimer = () => {
     if (!timerActive) {
