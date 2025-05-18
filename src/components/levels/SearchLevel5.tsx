@@ -10,6 +10,7 @@ import LevelTimer from '../common/LevelTimer'
 import { RefreshCw, Zap } from 'lucide-react'
 import WarningSplash from '../common/WarningSplash'
 import Scoreboard from '../common/Scoreboard'
+import { KeysAllowed } from '../common/KeysAllowed'
 
 interface LevelProps {
   isMuted: boolean
@@ -112,7 +113,18 @@ const SearchLevel5: React.FC<LevelProps> = () => {
   // Set a new target randomly
   const setNewTarget = () => {
     // First, find all potential targets that have special patterns (like "search" or "tools")
-    const targetPatterns = ['search', 'vim', 'tools', 'next', 'move']
+    const targetPatterns = [
+      'search',
+      'vim',
+      'tools',
+      'next',
+      'move',
+      'to',
+      'find',
+      'the',
+      'next',
+      'match',
+    ]
     const potentialTargets: Array<{
       lineIdx: number
       charIdx: number
@@ -822,20 +834,10 @@ const SearchLevel5: React.FC<LevelProps> = () => {
             </div>
           </div>
         </div>
-        <div className="flex gap-4 text-zinc-400 mt-4 justify-center">
-          {['/', '?', 'n', 'N', 'h', 'j', 'k', 'l'].map((k) => (
-            <kbd
-              key={k}
-              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-                lastKeyPressed === k
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
-                  : ''
-              }`}
-            >
-              {k}
-            </kbd>
-          ))}
-        </div>
+        <KeysAllowed
+          keys={['/', '?', 'n', 'N', 'h', 'j', 'k', 'l']}
+          lastKeyPressed={lastKeyPressed}
+        />
       </div>
 
       {/* Level Timer */}

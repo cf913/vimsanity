@@ -9,6 +9,7 @@ import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
 import { RefreshCw, Zap } from 'lucide-react'
 import Scoreboard from '../common/Scoreboard'
+import { KeysAllowed } from '../common/KeysAllowed'
 
 interface LevelProps {
   isMuted: boolean
@@ -442,23 +443,17 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
             ))}
           </div>
         </div>
-        <div className="flex gap-4 text-zinc-400 mt-4 justify-center">
-          {['0', '_', '$', 'j', 'k'].map((k) => (
-            <kbd
-              key={k}
-              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-                lastKeyPressed === k
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
-                  : ''
-              }`}
-            >
-              {k}
-            </kbd>
-          ))}
-        </div>
+        <KeysAllowed
+          keys={['0', '_', '$', 'j', 'k']}
+          lastKeyPressed={lastKeyPressed}
+        />
 
         {/* Level Timer */}
-        <LevelTimer levelId="3-line-operations" isActive={timerActive} />
+        <LevelTimer
+          levelId="3-line-operations"
+          isActive={timerActive}
+          isCompleted={levelCompleted}
+        />
       </div>
     </div>
   )

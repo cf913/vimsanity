@@ -1,3 +1,4 @@
+import { isDragActive } from 'framer-motion'
 import { useState, useEffect, useRef, useCallback } from 'react'
 
 // Define a type for the timer data stored in localStorage
@@ -18,6 +19,9 @@ export const useTimer = (
   levelId: string | number,
   isActive: boolean = false,
 ) => {
+  // Track session start time
+  const [sessionElapsedTime, setSessionElapsedTime] = useState<number>(0)
+  const sessionStartRef = useRef<number | null>(null)
   // Get the initial elapsed time from localStorage or start at 0
   const getInitialElapsedTime = useCallback(() => {
     try {
@@ -77,45 +81,65 @@ export const useTimer = (
 
   // Effect to start/stop timer based on isActive prop
   useEffect(() => {
-    // if (isRunning) return
+    // If timer is being started, set session start
+    if (isActive) {
+      sessionStartRef.current = Date.now()
+      setSessionElapsedTime(0)
 
-    // setIsRunning(true)
-    lastUpdateRef.current = Date.now()
-    elapsedTimeRef.current = elapsedTime
+      // if (isRunning) return
 
-    // Clear any existing interval first to prevent duplicates
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current)
-      intervalRef.current = null
-    }
+      // setIsRunning(true)
+      lastUpdateRef.current = Date.now()
+      elapsedTimeRef.current = elapsedTime
 
-    // Immediately save the current elapsed time to ensure it's in localStorage
-    saveTimerData(elapsedTime)
+      // Clear any existing interval first to prevent duplicates
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
 
-    // Set a new interval that runs every second
-    const tickFn = () => {
-      const now = Date.now()
-      const deltaTime = (now - lastUpdateRef.current) / 1000
-      lastUpdateRef.current = now
-      elapsedTimeRef.current = elapsedTimeRef.current + deltaTime
+      // Immediately save the current elapsed time to ensure it's in localStorage
+      saveTimerData(elapsedTime)
 
-      setElapsedTime((prev) => {
-        const newTime = prev + deltaTime
-        // Only save to localStorage every second to reduce writes
-        if (Math.floor(newTime) > Math.floor(prev)) {
-          saveTimerData(newTime)
+      // Set a new interval that runs every second
+      const tickFn = () => {
+        // Update session elapsed time if timer is running
+        if (sessionStartRef.current) {
+          setSessionElapsedTime(
+            (prev) =>
+              (Date.now() - (sessionStartRef.current || Date.now())) / 1000,
+          )
         }
-        return newTime
-      })
+        const now = Date.now()
+        const deltaTime = (now - lastUpdateRef.current) / 1000
+        lastUpdateRef.current = now
+        elapsedTimeRef.current = elapsedTimeRef.current + deltaTime
+
+        setElapsedTime((prev) => {
+          const newTime = prev + deltaTime
+          // Only save to localStorage every second to reduce writes
+          if (Math.floor(newTime) > Math.floor(prev)) {
+            saveTimerData(newTime)
+          }
+          return newTime
+        })
+      }
+
+      // Create the interval
+      const id = setInterval(tickFn, 1000)
+
+      setTimeout(tickFn, 0)
+
+      // Store the interval ID
+      intervalRef.current = id
+    } else if (!isActive && sessionStartRef.current) {
+      // If timer is being stopped, finalize session elapsed
+      setSessionElapsedTime(
+        (prev) =>
+          prev + (Date.now() - (sessionStartRef.current || Date.now())) / 1000,
+      )
+      sessionStartRef.current = null
     }
-
-    // Create the interval
-    const id = setInterval(tickFn, 1000)
-
-    setTimeout(tickFn, 0)
-
-    // Store the interval ID
-    intervalRef.current = id
 
     return () => {
       // Clear the timeout if the component unmounts before it fires
@@ -136,7 +160,7 @@ export const useTimer = (
       }
       setIsRunning(false)
     }
-  }, [levelId])
+  }, [levelId, isActive])
 
   // Initialize localStorage if needed
   useEffect(() => {
@@ -152,9 +176,11 @@ export const useTimer = (
   }, [])
 
   return {
-    elapsedTime,
+    elapsedTime, // all time ever spent on this level
     isRunning,
     resetTimer,
     formattedTime: formatTime(elapsedTime),
+    sessionElapsedTime, // time in this session only
+    sessionFormattedTime: formatTime(sessionElapsedTime),
   }
 }

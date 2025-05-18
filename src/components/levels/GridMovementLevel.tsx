@@ -5,13 +5,38 @@ import {
 } from '../../hooks/useKeyboardHandler'
 import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
+import { KeysAllowed } from '../common/KeysAllowed'
+import Scoreboard from '../common/Scoreboard'
+import { Zap, RefreshCw } from 'lucide-react'
+import SessionHistory from '../common/SessionHistory'
+import { isDragActive } from 'framer-motion'
+import { KBD } from '../common/KBD'
 
 interface GridMovementLevelProps {
   isMuted: boolean
 }
 
 const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
-  // const [timerActive, setTimerActive] = useState<boolean>(false)
+  const LEVEL_ID = '1-grid-movement'
+  // ...existing state...
+  // Add a key listener for Escape to reset
+
+  // Reset all state to initial values
+  function handleRestart() {
+    setPosition({ x: 0, y: 0 })
+    setTarget({ x: 5, y: 5 })
+    setScore(0)
+    setScoreAnimation(false)
+    setLevelCompleted(false)
+    setLastPosition({ x: 0, y: 0 })
+    setShowConfetti(false)
+    setTrail([])
+    setIsMoving(false)
+    setTargetEaten(null)
+    setIsActive(false)
+  }
+
+  const [isActive, setIsActive] = useState(false) // Timer state
   const [position, setPosition] = useState<{ x: number; y: number }>({
     x: 0,
     y: 0,
@@ -22,6 +47,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
   })
   const [score, setScore] = useState(0)
   const [scoreAnimation, setScoreAnimation] = useState(false)
+  const [levelCompleted, setLevelCompleted] = useState(false)
   const [lastPosition, setLastPosition] = useState<{ x: number; y: number }>({
     x: 0,
     y: 0,
@@ -35,7 +61,20 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
     x: number
     y: number
   } | null>(null)
+
   const gridSize = 10
+  const MAX_SCORE = 50 //gridSize * gridSize
+
+  useEffect(() => {
+    if (!levelCompleted) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleRestart()
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [levelCompleted])
 
   // Update trail effect
   useEffect(() => {
@@ -71,16 +110,16 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
   }, [targetEaten])
 
   // Start timer on first key press
-  // const activateTimer = () => {
-  //   if (!timerActive) {
-  //     setTimerActive(true)
-  //   }
-  // }
+  const activateTimer = () => {
+    if (!isActive && !levelCompleted) {
+      setIsActive(true)
+    }
+  }
 
   // Define key actions for the grid movement level
   const keyActions: KeyActionMap = {
     h: () => {
-      // activateTimer()
+      activateTimer()
       setLastPosition(position)
       setIsMoving(true)
       const newPos = { ...position, x: Math.max(0, position.x - 1) }
@@ -91,7 +130,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
       }
     },
     l: () => {
-      // activateTimer()
+      activateTimer()
       setLastPosition(position)
       setIsMoving(true)
       const newPos = { ...position, x: Math.min(gridSize - 1, position.x + 1) }
@@ -102,7 +141,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
       }
     },
     j: () => {
-      // activateTimer()
+      activateTimer()
       setLastPosition(position)
       setIsMoving(true)
       const newPos = { ...position, y: Math.min(gridSize - 1, position.y + 1) }
@@ -113,7 +152,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
       }
     },
     k: () => {
-      // activateTimer()
+      activateTimer()
       setLastPosition(position)
       setIsMoving(true)
       const newPos = { ...position, y: Math.max(0, position.y - 1) }
@@ -136,17 +175,20 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
       // Set target eaten position for animation
       setTargetEaten({ ...target })
 
-      // Animate score and show confetti
-      setScoreAnimation(true)
-      setShowConfetti(true)
-
       setTimeout(() => {
         setScoreAnimation(false)
         setShowConfetti(false)
       }, 1500)
 
+      const nextScore = score + 1
+
+      if (nextScore >= MAX_SCORE) {
+        setLevelCompleted(true)
+        setShowConfetti(true)
+        setIsActive(false)
+      }
       // Increment score
-      setScore(score + 1)
+      setScore(nextScore)
 
       // Set new random target
       setTarget({
@@ -162,90 +204,125 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
     dependencies: [position, target, score],
   })
 
+  // If completed, show session history instead of game area
+  // if (levelCompleted) {
+  //   return (
+  //     <div className="flex flex-col items-center justify-center min-h-[60vh] w-full animate-fade-in">
+  //       <SessionHistory levelId="1-grid-movement" />
+  //       <button
+  //         onClick={handleRestart}
+  //         className="mt-6 px-6 py-3 flex items-center gap-2 bg-gradient-to-r from-purple-500 to-emerald-500 hover:from-emerald-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg transition-all duration-300 text-lg focus:outline-none focus:ring-4 focus:ring-emerald-400/40 active:scale-95"
+  //       >
+  //         <RefreshCw className="mr-2" size={20} />
+  //         Restart (ESC)
+  //       </button>
+  //       <p className="mt-2 text-zinc-400 text-sm">
+  //         Press <kbd className="px-2 py-1 bg-zinc-700 rounded">ESC</kbd> to
+  //         restart
+  //       </p>
+  //     </div>
+  //   )
+  // }
+
   return (
     <div className="w-full h-full flex flex-col justify-center">
       <div className="text-center mb-4">
         <p className="text-zinc-400">
-          Use h, j, k, l to move the cursor to the target
+          Use <KBD>h</KBD>, <KBD>j</KBD>, <KBD>k</KBD>, <KBD>l</KBD> to move the
+          cursor to the target
         </p>
-        <div className="mt-4 flex items-center justify-center gap-4">
-          <div
-            className={`bg-zinc-800 px-4 py-2 rounded-lg transition-all duration-300 ${
-              scoreAnimation
-                ? 'scale-125 bg-emerald-500 text-white shadow-xl shadow-emerald-500/60'
-                : ''
-            }`}
-          >
-            Score: {score}
-            {showConfetti && <ConfettiBurst />}
+        {levelCompleted ? (
+          <div className="flex flex-col items-center justify-center min-h-[60vh] w-full animate-fade-in">
+            {/* HISTORY */}
+            <SessionHistory levelId={LEVEL_ID} />
+            <p className="mt-6 text-zinc-400 text-sm">
+              Press <KBD>ESC</KBD> to restart
+            </p>
           </div>
-        </div>
-      </div>
-
-      <div className="relative flex justify-center">
-        <div
-          className="grid gap-2 w-full max-w-[50vmin] mx-auto"
-          style={{
-            gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
-          }}
-        >
-          {Array.from({ length: gridSize * gridSize }).map((_, index) => {
-            const x = index % gridSize
-            const y = Math.floor(index / gridSize)
-            const isPlayer = x === position.x && y === position.y
-            const isTarget = x === target.x && y === target.y
-            const isTargetEaten =
-              targetEaten && x === targetEaten.x && y === targetEaten.y
-            const trailCell = trail.find((pos) => pos.x === x && pos.y === y)
-            const trailOpacity = trailCell ? trailCell.age / 5 : 0
-
-            return (
+        ) : (
+          <div className="flex flex-col gap-4">
+            {/* GAME */}
+            <div className="mt-4 flex items-center justify-center gap-4">
+              <div>
+                <Scoreboard score={score} maxScore={MAX_SCORE} />
+                {showConfetti && <ConfettiBurst />}
+              </div>
+              <button
+                onClick={handleRestart}
+                className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
+                aria-label="Reset Level"
+              >
+                <RefreshCw size={18} className="text-zinc-400" />
+              </button>
+            </div>
+            <div className="relative flex justify-center">
               <div
-                key={index}
-                className={`aspect-square w-full rounded-md flex items-center justify-center relative ${
-                  isPlayer
-                    ? `bg-emerald-500 shadow-lg shadow-emerald-500/60 scale-110 z-10 ${
-                        isMoving ? 'animate-fade-in' : ''
-                      }`
-                    : isTarget
-                      ? 'bg-purple-500 shadow-lg shadow-purple-500/60 animate-pulse'
-                      : 'bg-zinc-800'
-                }`}
+                className="grid gap-2 w-full max-w-[50vmin] mx-auto"
                 style={{
-                  boxShadow: isPlayer
-                    ? '0 0 20px rgba(16, 185, 129, 0.7)'
-                    : isTarget
-                      ? '0 0 20px rgba(168, 85, 247, 0.7)'
-                      : '',
+                  gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
                 }}
               >
-                {trailCell && !isPlayer && !isTarget && (
-                  <div
-                    className="absolute inset-0 rounded-md bg-emerald-500/40"
-                    style={{
-                      opacity: trailOpacity,
-                      boxShadow: 'inset 0 0 10px rgba(16, 185, 129, 0.5)',
-                    }}
-                  />
-                )}
-                {isTarget && (
-                  <div className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30" />
-                )}
-                {isTargetEaten && (
-                  <div className="absolute inset-0 z-20">
+                {Array.from({ length: gridSize * gridSize }).map((_, index) => {
+                  const x = index % gridSize
+                  const y = Math.floor(index / gridSize)
+                  const isPlayer = x === position.x && y === position.y
+                  const isTarget = x === target.x && y === target.y
+                  const isTargetEaten =
+                    targetEaten && x === targetEaten.x && y === targetEaten.y
+                  const trailCell = trail.find(
+                    (pos) => pos.x === x && pos.y === y,
+                  )
+                  const trailOpacity = trailCell ? trailCell.age / 5 : 0
+
+                  return (
                     <div
-                      className="absolute inset-0 rounded-md bg-white"
+                      key={index}
+                      className={`aspect-square w-full rounded-md flex items-center justify-center relative ${
+                        isPlayer
+                          ? `bg-emerald-500 shadow-lg shadow-emerald-500/60 scale-110 z-10 ${
+                              isMoving ? 'animate-fade-in' : ''
+                            }`
+                          : isTarget
+                            ? 'bg-purple-500 shadow-lg shadow-purple-500/60 animate-pulse'
+                            : 'bg-zinc-800'
+                      }`}
                       style={{
-                        animation: 'explosion-ring 0.3s forwards ease-out',
+                        boxShadow: isPlayer
+                          ? '0 0 20px rgba(16, 185, 129, 0.7)'
+                          : isTarget
+                            ? '0 0 20px rgba(168, 85, 247, 0.7)'
+                            : '',
                       }}
-                    />
-                    <div
-                      className="absolute inset-0 rounded-md bg-purple-500"
-                      style={{
-                        animation: 'explosion-glow 0.3s forwards ease-out',
-                      }}
-                    />
-                    {/* {Array.from({ length: 8 }).map((_, i) => (
+                    >
+                      {trailCell && !isPlayer && !isTarget && (
+                        <div
+                          className="absolute inset-0 rounded-md bg-emerald-500/40"
+                          style={{
+                            opacity: trailOpacity,
+                            boxShadow: 'inset 0 0 10px rgba(16, 185, 129, 0.5)',
+                          }}
+                        />
+                      )}
+                      {isTarget && (
+                        <div className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30" />
+                      )}
+                      {isTargetEaten && (
+                        <div className="absolute inset-0 z-20">
+                          <div
+                            className="absolute inset-0 rounded-md bg-white"
+                            style={{
+                              animation:
+                                'explosion-ring 0.3s forwards ease-out',
+                            }}
+                          />
+                          <div
+                            className="absolute inset-0 rounded-md bg-purple-500"
+                            style={{
+                              animation:
+                                'explosion-glow 0.3s forwards ease-out',
+                            }}
+                          />
+                          {/* {Array.from({ length: 8 }).map((_, i) => (
                       <div 
                         key={i}
                         className="absolute w-2 h-2 bg-white rounded-full"
@@ -257,55 +334,26 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
                         }}
                       />
                     ))} */}
-                  </div>
-                )}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
-            )
-          })}
-        </div>
-      </div>
-
-      <div className="flex gap-4 text-zinc-400 mt-4 justify-center">
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'h'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          h
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'j'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          j
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'k'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          k
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'l'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          l
-        </kbd>
+            </div>
+            <KeysAllowed
+              keys={['h', 'j', 'k', 'l']}
+              lastKeyPressed={lastKeyPressed}
+            />
+          </div>
+        )}
       </div>
       {/* Level Timer */}
-      <LevelTimer levelId="1-grid-movement" isActive={true} />
-
+      <LevelTimer
+        levelId={LEVEL_ID}
+        isActive={isActive}
+        isCompleted={levelCompleted}
+      />
       <style jsx>{`
         @keyframes confetti-fall {
           0% {
