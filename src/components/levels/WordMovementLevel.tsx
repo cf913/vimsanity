@@ -91,7 +91,6 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
   const [revealedLetters, setRevealedLetters] = useState<Set<number>>(new Set())
   const [levelCompleted, setLevelCompleted] = useState(false)
 
-  const MAX_SCORE = 2
   const LEVEL_ID = '2-word-movement'
 
   // Ref for scrolling
@@ -216,6 +215,8 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
       const allRevealed = nonSpaceSquares.every((square) =>
         revealedLetters.has(square.idx),
       )
+
+      const MAX_SCORE = squares.filter((square) => !square.isSpace).length
 
       if ((allRevealed && !levelCompleted) || score >= MAX_SCORE) {
         setLevelCompleted(true)
