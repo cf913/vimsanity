@@ -7,14 +7,15 @@ import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
 import { KeysAllowed } from '../common/KeysAllowed'
 import Scoreboard from '../common/Scoreboard'
-import { Zap } from 'lucide-react'
+import { RefreshCw, Zap } from 'lucide-react'
+import { isDragActive } from 'framer-motion'
 
 interface GridMovementLevelProps {
   isMuted: boolean
 }
 
 const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
-  // const [timerActive, setTimerActive] = useState<boolean>(false)
+  const [isActive, setIsActive] = useState(false) // Timer state
   const [position, setPosition] = useState<{ x: number; y: number }>({
     x: 0,
     y: 0,
@@ -41,7 +42,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
   } | null>(null)
 
   const gridSize = 10
-  const MAX_SCORE = 10 //gridSize * gridSize
+  const MAX_SCORE = 2 //gridSize * gridSize
 
   // Update trail effect
   useEffect(() => {
@@ -77,16 +78,16 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
   }, [targetEaten])
 
   // Start timer on first key press
-  // const activateTimer = () => {
-  //   if (!timerActive) {
-  //     setTimerActive(true)
-  //   }
-  // }
+  const activateTimer = () => {
+    if (!isActive && !levelCompleted) {
+      setIsActive(true)
+    }
+  }
 
   // Define key actions for the grid movement level
   const keyActions: KeyActionMap = {
     h: () => {
-      // activateTimer()
+      activateTimer()
       setLastPosition(position)
       setIsMoving(true)
       const newPos = { ...position, x: Math.max(0, position.x - 1) }
@@ -97,7 +98,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
       }
     },
     l: () => {
-      // activateTimer()
+      activateTimer()
       setLastPosition(position)
       setIsMoving(true)
       const newPos = { ...position, x: Math.min(gridSize - 1, position.x + 1) }
@@ -108,7 +109,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
       }
     },
     j: () => {
-      // activateTimer()
+      activateTimer()
       setLastPosition(position)
       setIsMoving(true)
       const newPos = { ...position, y: Math.min(gridSize - 1, position.y + 1) }
@@ -119,7 +120,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
       }
     },
     k: () => {
-      // activateTimer()
+      activateTimer()
       setLastPosition(position)
       setIsMoving(true)
       const newPos = { ...position, y: Math.max(0, position.y - 1) }
@@ -147,12 +148,15 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
         setShowConfetti(false)
       }, 1500)
 
-      if (score >= MAX_SCORE) {
+      const nextScore = score + 1
+
+      if (nextScore >= MAX_SCORE) {
         setLevelCompleted(true)
         setShowConfetti(true)
+        setIsActive(false)
       }
       // Increment score
-      setScore(score + 1)
+      setScore(nextScore)
 
       // Set new random target
       setTarget({
@@ -168,6 +172,16 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
     dependencies: [position, target, score],
   })
 
+  const resetLevel = () => {
+    setPosition({ x: 0, y: 0 })
+    setTarget({ x: 5, y: 5 })
+    setScore(0)
+    setScoreAnimation(false)
+    setShowConfetti(false)
+    setIsActive(false)
+    setLevelCompleted(false)
+  }
+
   return (
     <div className="w-full h-full flex flex-col justify-center">
       <div className="text-center mb-4">
@@ -179,6 +193,13 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
             <Scoreboard score={score} maxScore={MAX_SCORE} />
             {showConfetti && <ConfettiBurst />}
           </div>
+          <button
+            onClick={resetLevel}
+            className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
+            aria-label="Reset Level"
+          >
+            <RefreshCw size={18} className="text-zinc-400" />
+          </button>
           {levelCompleted && (
             <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
               <Zap size={18} className="text-yellow-300" />
@@ -187,7 +208,6 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
           )}
         </div>
       </div>
-
       <div className="relative flex justify-center">
         <div
           className="grid gap-2 w-full max-w-[50vmin] mx-auto"
@@ -270,7 +290,6 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
           })}
         </div>
       </div>
-
       <KeysAllowed
         keys={['h', 'j', 'k', 'l']}
         lastKeyPressed={lastKeyPressed}
@@ -278,74 +297,9 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
       {/* Level Timer */}
       <LevelTimer
         levelId="1-grid-movement"
-        isActive={true}
+        isActive={isActive}
         isCompleted={levelCompleted}
       />
-
-      <style jsx>{`
-        @keyframes confetti-fall {
-          0% {
-            transform: translateY(0) rotate(0deg);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(100px) rotate(360deg);
-            opacity: 0;
-          }
-        }
-
-        @keyframes fade-in {
-          0% {
-            opacity: 0.7;
-            transform: scale(1.05);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1.1);
-          }
-        }
-
-        @keyframes explosion-ring {
-          0% {
-            transform: scale(0.8);
-            opacity: 0.9;
-          }
-          60% {
-            transform: scale(1.8);
-            opacity: 0.7;
-          }
-          100% {
-            transform: scale(2.5);
-            opacity: 0;
-          }
-        }
-
-        @keyframes explosion-glow {
-          0% {
-            transform: scale(0.8);
-            opacity: 0.9;
-            box-shadow: 0 0 30px 20px rgba(168, 85, 247, 0.8);
-          }
-          100% {
-            transform: scale(1.5);
-            opacity: 0;
-            box-shadow: 0 0 0 0 rgba(168, 85, 247, 0);
-          }
-        }
-
-        @keyframes explosion-particle {
-          0% {
-            opacity: 1;
-            transform: translate(-50%, -50%) rotate(inherit) translateY(-15px)
-              scale(1);
-          }
-          100% {
-            opacity: 0;
-            transform: translate(-50%, -50%) rotate(inherit) translateY(-40px)
-              scale(0);
-          }
-        }
-      `}</style>
     </div>
   )
 }

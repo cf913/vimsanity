@@ -21,7 +21,10 @@ const LevelTimer: React.FC<LevelTimerProps> = ({
   isCompleted,
 }) => {
   const [displayTime, setDisplayTime] = useState<string>('00:00')
-  const { formattedTime, isRunning } = useTimer(levelId, isActive)
+  const { formattedTime, isRunning, sessionFormattedTime } = useTimer(
+    levelId,
+    isActive,
+  )
   const [markedCompleted, setMarkedCompleted] = useState(false)
   const timerRef = useRef<HTMLDivElement>(null)
   const [lastCompletion, setLastCompletion] = useState<LevelCompletion | null>(
@@ -43,11 +46,18 @@ const LevelTimer: React.FC<LevelTimerProps> = ({
 
   // Handle level completion
   useEffect(() => {
-    if (!markedCompleted && isCompleted) {
+    if (!isCompleted) {
+      if (markedCompleted) {
+        setMarkedCompleted(false)
+      }
+      return
+    }
+
+    if (!markedCompleted) {
       const completionTime = new Date().toLocaleTimeString()
       const completionData: LevelCompletion = {
         time: completionTime,
-        duration: formattedTime,
+        duration: sessionFormattedTime,
         timestamp: Date.now(),
         date: new Date().toLocaleDateString(),
       }
