@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useTimer } from '../../hooks/useTimer'
 import { Clock } from 'lucide-react'
+import SessionHistory from './SessionHistory'
 
 interface LevelTimerProps {
   levelId: string | number
@@ -62,14 +63,35 @@ const LevelTimer: React.FC<LevelTimerProps> = ({
         date: new Date().toLocaleDateString(),
       }
 
+      // Save to last completion
       localStorage.setItem(
         `level-${levelId}-completion`,
         JSON.stringify(completionData),
       )
       setLastCompletion(completionData)
       setMarkedCompleted(true)
+
+      // Append to session history
+      const historyKey = `level-${levelId}-history`
+      const prev = localStorage.getItem(historyKey)
+      let arr = []
+      if (prev) {
+        try {
+          arr = JSON.parse(prev)
+        } catch {}
+      }
+      arr.push({ duration: parseDuration(sessionFormattedTime), timestamp: Date.now() })
+      localStorage.setItem(historyKey, JSON.stringify(arr))
     }
-  }, [isCompleted, markedCompleted, formattedTime, levelId])
+  }, [isCompleted, markedCompleted, sessionFormattedTime, levelId])
+
+  // Helper to parse mm:ss or hh:mm:ss to seconds
+  function parseDuration(str: string): number {
+    const parts = str.split(':').map(Number)
+    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2]
+    if (parts.length === 2) return parts[0] * 60 + parts[1]
+    return 0
+  }
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 mt-4 w-full">
@@ -122,6 +144,8 @@ const LevelTimer: React.FC<LevelTimerProps> = ({
           }
         }
       `}</style>
+      {/* Session History Chart */}
+      <SessionHistory levelId={levelId} />
     </div>
   )
 }
