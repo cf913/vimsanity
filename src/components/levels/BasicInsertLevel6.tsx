@@ -7,6 +7,7 @@ import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
 import Scoreboard from '../common/Scoreboard'
 import ModeIndicator from '../common/ModeIndicator'
+import { KeysAllowed } from '../common/KeysAllowed'
 
 interface BasicInsertLevel6Props {
   isMuted: boolean
@@ -24,7 +25,7 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
   const [activeCell, setActiveCell] = useState<number | null>(null)
   const [isInsertMode, setIsInsertMode] = useState(false)
   const [cursorPosition, setCursorPosition] = useState<'normal' | 'append'>(
-    'normal'
+    'normal',
   )
   const [cursorIndex, setCursorIndex] = useState(0)
   const [score, setScore] = useState(0)
@@ -463,71 +464,10 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
       </div>
 
       {/* Key indicators */}
-      <div className="flex gap-4 text-zinc-400 mt-4 justify-center">
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'h'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          h
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'l'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          l
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'i'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          i
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'a'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          a
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'u'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          u
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'ctrl+r'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          Ctrl+r
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'Escape'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          Esc
-        </kbd>
-      </div>
+      <KeysAllowed
+        keys={['i', 'a', 'u', 'h', 'j', 'k', 'l', 'ctrl+r', 'Escape']}
+        lastKeyPressed={lastKeyPressed}
+      />
 
       {/* Level Timer */}
       <LevelTimer levelId="6-basic-insert" isActive={true} />

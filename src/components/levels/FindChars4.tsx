@@ -10,6 +10,7 @@ import LevelTimer from '../common/LevelTimer'
 import { RefreshCw, Zap, AlertTriangle, X } from 'lucide-react'
 import WarningSplash from '../common/WarningSplash'
 import Scoreboard from '../common/Scoreboard'
+import { KeysAllowed } from '../common/KeysAllowed'
 
 interface LevelProps {
   isMuted: boolean
@@ -621,19 +622,10 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
             after moving to a different line!
           </div>
         </div>
-        <div className="flex gap-4 text-zinc-400 mt-4 justify-center">
-          {['f', 'F', 't', 'T', ';', ',', 'j', 'k'].map((k) => (
-            <kbd
-              key={k}
-              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-                lastKeyPressed === k
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
-                  : ''
-              }`}
-            >
-              {k}
-            </kbd>
-          ))}
+        <KeysAllowed
+          keys={['f', 'F', 't', 'T', ';', ',', 'j', 'k']}
+          lastKeyPressed={lastKeyPressed}
+        >
           {pendingCommand && (
             <div className="flex items-center">
               <span className="mx-2">+</span>
@@ -649,7 +641,7 @@ const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
               </span>
             </div>
           )}
-        </div>
+        </KeysAllowed>
       </div>
       {/* Level Timer */}
       <LevelTimer levelId="4-find-chars" isActive={timerActive} />

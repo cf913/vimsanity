@@ -14,6 +14,7 @@ import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
 import { RefreshCw, Shuffle, Trophy, Zap } from 'lucide-react'
 import Scoreboard from '../common/Scoreboard'
+import { KeysAllowed } from '../common/KeysAllowed'
 
 interface WordMovementLevelProps {
   isMuted: boolean
@@ -343,20 +344,10 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
             In reality, you'd have to scroll to see the rest of the line.
           </div>
         </div>
-        <div className="flex gap-4 text-zinc-400 mt-4 justify-center">
-          {['w', 'b', 'e', 'h', 'l'].map((k) => (
-            <kbd
-              key={k}
-              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-                lastKeyPressed === k
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
-                  : ''
-              }`}
-            >
-              {k}
-            </kbd>
-          ))}
-        </div>
+        <KeysAllowed
+          keys={['w', 'b', 'e', 'h', 'l']}
+          lastKeyPressed={lastKeyPressed}
+        />
 
         {/* Level Timer */}
         <LevelTimer levelId="2-word-movement" isActive={true} />

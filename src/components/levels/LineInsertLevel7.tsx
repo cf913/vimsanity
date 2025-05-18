@@ -15,6 +15,7 @@ import {
   findLineStart,
 } from '../../utils/textUtils'
 import { RefreshCw } from 'lucide-react'
+import { KeysAllowed } from '../common/KeysAllowed'
 
 interface LineInsertLevel7Props {
   isMuted: boolean
@@ -622,89 +623,10 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
       </div>
 
       {/* Key indicators */}
-      <div className="flex gap-4 text-zinc-400 mt-4 justify-center flex-wrap">
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'I'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          I
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'A'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          A
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'o'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          o
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'O'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          O
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'h'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          h
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'j'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          j
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'k'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          k
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'l'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          l
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'Escape'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          Esc
-        </kbd>
-      </div>
+      <KeysAllowed
+        keys={['I', 'A', 'o', 'O', 'h', 'j', 'k', 'l']}
+        lastKeyPressed={lastKeyPressed}
+      />
 
       {/* Level Timer */}
       <LevelTimer levelId="7-line-insert" isActive={true} />
