@@ -10,6 +10,7 @@ import Scoreboard from '../common/Scoreboard'
 import { Zap, RefreshCw } from 'lucide-react'
 import SessionHistory from '../common/SessionHistory'
 import { isDragActive } from 'framer-motion'
+import { KBD } from '../common/KBD'
 
 interface GridMovementLevelProps {
   isMuted: boolean
@@ -226,10 +227,12 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
     <div className="w-full h-full flex flex-col justify-center">
       <div className="text-center mb-4">
         <p className="text-zinc-400">
-          Use h, j, k, l to move the cursor to the target
+          Use <KBD>h</KBD>, <KBD>j</KBD>, <KBD>k</KBD>, <KBD>l</KBD> to move the
+          cursor to the target
         </p>
         {levelCompleted ? (
           <div className="flex flex-col items-center justify-center min-h-[60vh] w-full animate-fade-in">
+            {/* HISTORY */}
             <SessionHistory levelId="1-grid-movement" />
             <button
               onClick={handleRestart}
@@ -243,91 +246,90 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
               restart
             </p>
           </div>
-        ) : null}
-        <div className="mt-4 flex items-center justify-center gap-4">
-          <div>
-            <Scoreboard score={score} maxScore={MAX_SCORE} />
-            {showConfetti && <ConfettiBurst />}
-          </div>
-          <button
-            onClick={handleRestart}
-            className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
-            aria-label="Reset Level"
-          >
-            <RefreshCw size={18} className="text-zinc-400" />
-          </button>
-          {levelCompleted && (
-            <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
-              <Zap size={18} className="text-yellow-300" />
-              <span>Level Complete!</span>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {/* GAME */}
+            <div className="mt-4 flex items-center justify-center gap-4">
+              <div>
+                <Scoreboard score={score} maxScore={MAX_SCORE} />
+                {showConfetti && <ConfettiBurst />}
+              </div>
+              <button
+                onClick={handleRestart}
+                className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
+                aria-label="Reset Level"
+              >
+                <RefreshCw size={18} className="text-zinc-400" />
+              </button>
             </div>
-          )}
-        </div>
-      </div>
-      <div className="relative flex justify-center">
-        <div
-          className="grid gap-2 w-full max-w-[50vmin] mx-auto"
-          style={{
-            gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
-          }}
-        >
-          {Array.from({ length: gridSize * gridSize }).map((_, index) => {
-            const x = index % gridSize
-            const y = Math.floor(index / gridSize)
-            const isPlayer = x === position.x && y === position.y
-            const isTarget = x === target.x && y === target.y
-            const isTargetEaten =
-              targetEaten && x === targetEaten.x && y === targetEaten.y
-            const trailCell = trail.find((pos) => pos.x === x && pos.y === y)
-            const trailOpacity = trailCell ? trailCell.age / 5 : 0
-
-            return (
+            <div className="relative flex justify-center">
               <div
-                key={index}
-                className={`aspect-square w-full rounded-md flex items-center justify-center relative ${
-                  isPlayer
-                    ? `bg-emerald-500 shadow-lg shadow-emerald-500/60 scale-110 z-10 ${
-                        isMoving ? 'animate-fade-in' : ''
-                      }`
-                    : isTarget
-                      ? 'bg-purple-500 shadow-lg shadow-purple-500/60 animate-pulse'
-                      : 'bg-zinc-800'
-                }`}
+                className="grid gap-2 w-full max-w-[50vmin] mx-auto"
                 style={{
-                  boxShadow: isPlayer
-                    ? '0 0 20px rgba(16, 185, 129, 0.7)'
-                    : isTarget
-                      ? '0 0 20px rgba(168, 85, 247, 0.7)'
-                      : '',
+                  gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
                 }}
               >
-                {trailCell && !isPlayer && !isTarget && (
-                  <div
-                    className="absolute inset-0 rounded-md bg-emerald-500/40"
-                    style={{
-                      opacity: trailOpacity,
-                      boxShadow: 'inset 0 0 10px rgba(16, 185, 129, 0.5)',
-                    }}
-                  />
-                )}
-                {isTarget && (
-                  <div className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30" />
-                )}
-                {isTargetEaten && (
-                  <div className="absolute inset-0 z-20">
+                {Array.from({ length: gridSize * gridSize }).map((_, index) => {
+                  const x = index % gridSize
+                  const y = Math.floor(index / gridSize)
+                  const isPlayer = x === position.x && y === position.y
+                  const isTarget = x === target.x && y === target.y
+                  const isTargetEaten =
+                    targetEaten && x === targetEaten.x && y === targetEaten.y
+                  const trailCell = trail.find(
+                    (pos) => pos.x === x && pos.y === y,
+                  )
+                  const trailOpacity = trailCell ? trailCell.age / 5 : 0
+
+                  return (
                     <div
-                      className="absolute inset-0 rounded-md bg-white"
+                      key={index}
+                      className={`aspect-square w-full rounded-md flex items-center justify-center relative ${
+                        isPlayer
+                          ? `bg-emerald-500 shadow-lg shadow-emerald-500/60 scale-110 z-10 ${
+                              isMoving ? 'animate-fade-in' : ''
+                            }`
+                          : isTarget
+                            ? 'bg-purple-500 shadow-lg shadow-purple-500/60 animate-pulse'
+                            : 'bg-zinc-800'
+                      }`}
                       style={{
-                        animation: 'explosion-ring 0.3s forwards ease-out',
+                        boxShadow: isPlayer
+                          ? '0 0 20px rgba(16, 185, 129, 0.7)'
+                          : isTarget
+                            ? '0 0 20px rgba(168, 85, 247, 0.7)'
+                            : '',
                       }}
-                    />
-                    <div
-                      className="absolute inset-0 rounded-md bg-purple-500"
-                      style={{
-                        animation: 'explosion-glow 0.3s forwards ease-out',
-                      }}
-                    />
-                    {/* {Array.from({ length: 8 }).map((_, i) => (
+                    >
+                      {trailCell && !isPlayer && !isTarget && (
+                        <div
+                          className="absolute inset-0 rounded-md bg-emerald-500/40"
+                          style={{
+                            opacity: trailOpacity,
+                            boxShadow: 'inset 0 0 10px rgba(16, 185, 129, 0.5)',
+                          }}
+                        />
+                      )}
+                      {isTarget && (
+                        <div className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30" />
+                      )}
+                      {isTargetEaten && (
+                        <div className="absolute inset-0 z-20">
+                          <div
+                            className="absolute inset-0 rounded-md bg-white"
+                            style={{
+                              animation:
+                                'explosion-ring 0.3s forwards ease-out',
+                            }}
+                          />
+                          <div
+                            className="absolute inset-0 rounded-md bg-purple-500"
+                            style={{
+                              animation:
+                                'explosion-glow 0.3s forwards ease-out',
+                            }}
+                          />
+                          {/* {Array.from({ length: 8 }).map((_, i) => (
                       <div 
                         key={i}
                         className="absolute w-2 h-2 bg-white rounded-full"
@@ -339,23 +341,90 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
                         }}
                       />
                     ))} */}
-                  </div>
-                )}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
-            )
-          })}
-        </div>
+            </div>
+            <KeysAllowed
+              keys={['h', 'j', 'k', 'l']}
+              lastKeyPressed={lastKeyPressed}
+            />
+          </div>
+        )}
       </div>
-      <KeysAllowed
-        keys={['h', 'j', 'k', 'l']}
-        lastKeyPressed={lastKeyPressed}
-      />
       {/* Level Timer */}
       <LevelTimer
         levelId="1-grid-movement"
         isActive={isActive}
         isCompleted={levelCompleted}
       />
+      <style jsx>{`
+        @keyframes confetti-fall {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100px) rotate(360deg);
+            opacity: 0;
+          }
+        }
+
+        @keyframes fade-in {
+          0% {
+            opacity: 0.7;
+            transform: scale(1.05);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1.1);
+          }
+        }
+
+        @keyframes explosion-ring {
+          0% {
+            transform: scale(0.8);
+            opacity: 0.9;
+          }
+          60% {
+            transform: scale(1.8);
+            opacity: 0.7;
+          }
+          100% {
+            transform: scale(2.5);
+            opacity: 0;
+          }
+        }
+
+        @keyframes explosion-glow {
+          0% {
+            transform: scale(0.8);
+            opacity: 0.9;
+            box-shadow: 0 0 30px 20px rgba(168, 85, 247, 0.8);
+          }
+          100% {
+            transform: scale(1.5);
+            opacity: 0;
+            box-shadow: 0 0 0 0 rgba(168, 85, 247, 0);
+          }
+        }
+
+        @keyframes explosion-particle {
+          0% {
+            opacity: 1;
+            transform: translate(-50%, -50%) rotate(inherit) translateY(-15px)
+              scale(1);
+          }
+          100% {
+            opacity: 0;
+            transform: translate(-50%, -50%) rotate(inherit) translateY(-40px)
+              scale(0);
+          }
+        }
+      `}</style>
     </div>
   )
 }

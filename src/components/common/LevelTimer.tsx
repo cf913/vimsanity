@@ -80,7 +80,10 @@ const LevelTimer: React.FC<LevelTimerProps> = ({
           arr = JSON.parse(prev)
         } catch {}
       }
-      arr.push({ duration: parseDuration(sessionFormattedTime), timestamp: Date.now() })
+      arr.push({
+        duration: parseDuration(sessionFormattedTime),
+        timestamp: Date.now(),
+      })
       localStorage.setItem(historyKey, JSON.stringify(arr))
     }
   }, [isCompleted, markedCompleted, sessionFormattedTime, levelId])
@@ -98,7 +101,7 @@ const LevelTimer: React.FC<LevelTimerProps> = ({
       {/* Current Timer */}
       <div
         ref={timerRef}
-        className={`flex items-center gap-2 px-4 py-2 bg-zinc-800 rounded-lg shadow-md transition-all duration-300 w-full ${
+        className={`flex items-center gap-2 px-4 py-2 bg-zinc-800 rounded-lg shadow-md transition-all duration-300 ${
           isRunning ? 'timer-active' : ''
         }`}
       >
@@ -113,7 +116,7 @@ const LevelTimer: React.FC<LevelTimerProps> = ({
 
       {/* Last Completion Info */}
       {lastCompletion && (
-        <div className="flex items-center gap-2 px-4 py-2 bg-zinc-800 rounded-lg shadow-md w-full">
+        <div className="flex items-center gap-2 px-4 py-2 bg-zinc-800 rounded-lg shadow-md">
           <Clock size={18} className="text-zinc-400" />
           <div className="flex flex-col">
             <span className="font-mono text-sm text-zinc-400">
@@ -145,7 +148,7 @@ const LevelTimer: React.FC<LevelTimerProps> = ({
         }
       `}</style>
       {/* Session History Chart */}
-      <SessionHistory levelId={levelId} />
+      {/* <SessionHistory levelId={levelId} /> */}
     </div>
   )
 }
