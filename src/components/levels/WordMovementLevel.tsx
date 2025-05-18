@@ -15,6 +15,8 @@ import LevelTimer from '../common/LevelTimer'
 import { RefreshCw, Shuffle, Trophy, Zap } from 'lucide-react'
 import Scoreboard from '../common/Scoreboard'
 import { KeysAllowed } from '../common/KeysAllowed'
+import { KBD } from '../common/KBD'
+import SessionHistory from '../common/SessionHistory'
 
 interface WordMovementLevelProps {
   isMuted: boolean
@@ -88,6 +90,9 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
   const [explosionIdx, setExplosionIdx] = useState<number | null>(null)
   const [revealedLetters, setRevealedLetters] = useState<Set<number>>(new Set())
   const [levelCompleted, setLevelCompleted] = useState(false)
+
+  const MAX_SCORE = 2
+  const LEVEL_ID = '2-word-movement'
 
   // Ref for scrolling
   const containerRef = useRef<HTMLDivElement>(null)
@@ -201,10 +206,11 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
         revealedLetters.has(square.idx),
       )
 
-      if ((allRevealed && !levelCompleted) || score >= 100) {
+      if ((allRevealed && !levelCompleted) || score >= MAX_SCORE) {
         setLevelCompleted(true)
         setShowConfetti(true)
         setTimeout(() => setShowConfetti(false), 3000)
+        setTimerActive(false)
       }
     }
   }, [revealedLetters, squares, levelCompleted])
@@ -226,6 +232,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
       newTarget = Math.floor(Math.random() * squares.length)
     } while (squares[newTarget].isSpace)
     setSquareTarget(newTarget)
+    setTimerActive(false)
   }
 
   const changeText = () => {
@@ -244,113 +251,130 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
       <div className="w-full">
         <div className="text-center mb-4">
           <p className="text-zinc-400">Use w, e, b to navigate horizontally</p>
-          <div className="mt-4 flex items-center justify-center gap-4">
-            <Scoreboard
-              score={score}
-              maxScore={squares.filter((square) => !square.isSpace).length}
-            />
-            <button
-              onClick={resetLevel}
-              className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
-              aria-label="Reset Level"
-            >
-              <RefreshCw size={18} className="text-zinc-400" />
-            </button>
-            <button
-              onClick={changeText}
-              title="New Text"
-              className="bg-zinc-700 hover:bg-zinc-600 p-2 rounded-lg text-zinc-200 transition-all duration-200 flex items-center justify-center hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
-            >
-              <Shuffle size={18} className="text-purple-400" />
-            </button>
-            {levelCompleted && (
-              <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
-                <Zap size={18} className="text-yellow-300" />
-                <span>Level Complete!</span>
+          {levelCompleted ? (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] w-full animate-fade-in">
+              {/* HISTORY */}
+              <SessionHistory levelId={LEVEL_ID} />
+              <p className="mt-6 text-zinc-400 text-sm">
+                Press <KBD>ESC</KBD> to restart
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {/* GAME */}
+              <div className="mt-4 flex items-center justify-center gap-4">
+                <Scoreboard
+                  score={score}
+                  maxScore={squares.filter((square) => !square.isSpace).length}
+                />
+                <button
+                  onClick={resetLevel}
+                  className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
+                  aria-label="Reset Level"
+                >
+                  <RefreshCw size={18} className="text-zinc-400" />
+                </button>
+                <button
+                  onClick={changeText}
+                  title="New Text"
+                  className="bg-zinc-700 hover:bg-zinc-600 p-2 rounded-lg text-zinc-200 transition-all duration-200 flex items-center justify-center hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+                >
+                  <Shuffle size={18} className="text-purple-400" />
+                </button>
+                {levelCompleted && (
+                  <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
+                    <Zap size={18} className="text-yellow-300" />
+                    <span>Level Complete!</span>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-        <div className="relative w-full max-w-4xl bg-zinc-800 p-6 rounded-lg mx-auto overflow-visible">
-          {/* Global Confetti Burst over the game area */}
-          {showConfetti && <ConfettiBurst />}
-          <div
-            ref={containerRef}
-            className="flex flex-row flex-wrap overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 py-2"
-            style={{ scrollBehavior: 'smooth' }}
-          >
-            {words.map((word, wordIdx) => (
-              <div
-                key={`word-${wordIdx}`}
-                className="flex flex-row whitespace-nowrap mb-1"
-              >
-                {word.map((square) => {
-                  const isPlayer = square.idx === cursor
-                  if (square.isSpace) {
-                    return (
-                      <span
-                        key={square.idx}
-                        className={`inline-block w-8 h-8 mx-0.5 my-0.5 transition-all duration-150 rounded-md ${
-                          isPlayer ? 'bg-emerald-500/25' : ''
-                        }`}
-                      ></span>
-                    )
-                  }
-                  const isTarget = square.idx === target
-                  const isRevealed = revealedLetters.has(square.idx)
-                  let base =
-                    'inline-flex items-center justify-center mx-0.5 my-0.5 min-w-8 h-8 transition-all duration-150 rounded-md '
-                  if (isPlayer)
-                    base +=
-                      'bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-500/50 '
-                  else if (isTarget)
-                    base +=
-                      'bg-purple-500 text-white scale-105 shadow-lg shadow-purple-500/60 animate-pulse '
-                  else base += 'bg-zinc-700 text-zinc-300 '
-                  return (
-                    <span
-                      key={square.idx}
-                      ref={isPlayer ? playerRef : undefined}
-                      className={base}
-                      style={{ position: 'relative' }}
+              <div className="relative w-full max-w-4xl bg-zinc-800 p-6 rounded-lg mx-auto overflow-visible">
+                {/* Global Confetti Burst over the game area */}
+                {showConfetti && <ConfettiBurst />}
+                <div
+                  ref={containerRef}
+                  className="flex flex-row flex-wrap overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 py-2"
+                  style={{ scrollBehavior: 'smooth' }}
+                >
+                  {words.map((word, wordIdx) => (
+                    <div
+                      key={`word-${wordIdx}`}
+                      className="flex flex-row whitespace-nowrap mb-1"
                     >
-                      {isTarget && (
-                        <span className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30 z-0"></span>
-                      )}
+                      {word.map((square) => {
+                        const isPlayer = square.idx === cursor
+                        if (square.isSpace) {
+                          return (
+                            <span
+                              key={square.idx}
+                              className={`inline-block w-8 h-8 mx-0.5 my-0.5 transition-all duration-150 rounded-md ${
+                                isPlayer ? 'bg-emerald-500/25' : ''
+                              }`}
+                            ></span>
+                          )
+                        }
+                        const isTarget = square.idx === target
+                        const isRevealed = revealedLetters.has(square.idx)
+                        let base =
+                          'inline-flex items-center justify-center mx-0.5 my-0.5 min-w-8 h-8 transition-all duration-150 rounded-md '
+                        if (isPlayer)
+                          base +=
+                            'bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-500/50 '
+                        else if (isTarget)
+                          base +=
+                            'bg-purple-500 text-white scale-105 shadow-lg shadow-purple-500/60 animate-pulse '
+                        else base += 'bg-zinc-700 text-zinc-300 '
+                        return (
+                          <span
+                            key={square.idx}
+                            ref={isPlayer ? playerRef : undefined}
+                            className={base}
+                            style={{ position: 'relative' }}
+                          >
+                            {isTarget && (
+                              <span className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30 z-0"></span>
+                            )}
 
-                      {/* Show the character if it's been revealed */}
-                      {isRevealed && square.char !== ' ' && (
-                        <span className="z-10 text-lg font-medium font-mono">
-                          {square.char}
-                        </span>
-                      )}
+                            {/* Show the character if it's been revealed */}
+                            {isRevealed && square.char !== ' ' && (
+                              <span className="z-10 text-lg font-medium font-mono">
+                                {square.char}
+                              </span>
+                            )}
 
-                      {/* Explosion effect - moved outside isTarget condition so it can appear even after target changes */}
-                      {showExplosion && explosionIdx === square.idx && (
-                        <div className="absolute inset-0 z-20">
-                          <ExplosionEffect />
-                        </div>
-                      )}
-                    </span>
-                  )
-                })}
+                            {/* Explosion effect - moved outside isTarget condition so it can appear even after target changes */}
+                            {showExplosion && explosionIdx === square.idx && (
+                              <div className="absolute inset-0 z-20">
+                                <ExplosionEffect />
+                              </div>
+                            )}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  ))}
+                </div>
+                <div className="text-xs text-zinc-500 mt-4">
+                  NOTE: this should be one long line but we are wrapping words
+                  to make it easier to spot the next target.
+                  <br />
+                  In reality, you'd have to scroll to see the rest of the line.
+                </div>
               </div>
-            ))}
-          </div>
-          <div className="text-xs text-zinc-500 mt-4">
-            NOTE: this should be one long line but we are wrapping words to make
-            it easier to spot the next target.
-            <br />
-            In reality, you'd have to scroll to see the rest of the line.
-          </div>
+              <KeysAllowed
+                keys={['w', 'b', 'e', 'h', 'l']}
+                lastKeyPressed={lastKeyPressed}
+              />
+            </div>
+          )}
         </div>
-        <KeysAllowed
-          keys={['w', 'b', 'e', 'h', 'l']}
-          lastKeyPressed={lastKeyPressed}
-        />
 
         {/* Level Timer */}
-        <LevelTimer levelId="2-word-movement" isActive={true} />
+        <LevelTimer
+          levelId={LEVEL_ID}
+          isActive={timerActive}
+          isCompleted={levelCompleted}
+        />
       </div>
     </div>
   )

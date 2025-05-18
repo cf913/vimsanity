@@ -60,7 +60,7 @@ const LevelTimer: React.FC<LevelTimerProps> = ({
         time: completionTime,
         duration: sessionFormattedTime,
         timestamp: Date.now(),
-        date: new Date().toLocaleDateString(),
+        date: new Date().toLocaleString(),
       }
 
       // Save to last completion
@@ -119,9 +119,7 @@ const LevelTimer: React.FC<LevelTimerProps> = ({
         <div className="flex items-center gap-2 px-4 py-2 bg-zinc-800 rounded-lg shadow-md text-zinc-600">
           <Clock size={18} className="" />
           <div className="flex flex-col">
-            <span className="font-mono text-sm">
-              {lastCompletion.date} {lastCompletion.time}
-            </span>
+            <span className="font-mono text-sm">{lastCompletion.date}</span>
             <span className="font-mono text-sm">
               Duration: {lastCompletion.duration}
             </span>
