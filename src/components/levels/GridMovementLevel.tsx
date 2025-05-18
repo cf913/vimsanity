@@ -6,6 +6,8 @@ import {
 import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
 import { KeysAllowed } from '../common/KeysAllowed'
+import Scoreboard from '../common/Scoreboard'
+import { Zap } from 'lucide-react'
 
 interface GridMovementLevelProps {
   isMuted: boolean
@@ -23,6 +25,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
   })
   const [score, setScore] = useState(0)
   const [scoreAnimation, setScoreAnimation] = useState(false)
+  const [levelCompleted, setLevelCompleted] = useState(false)
   const [lastPosition, setLastPosition] = useState<{ x: number; y: number }>({
     x: 0,
     y: 0,
@@ -36,7 +39,9 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
     x: number
     y: number
   } | null>(null)
+
   const gridSize = 10
+  const MAX_SCORE = gridSize * gridSize
 
   // Update trail effect
   useEffect(() => {
@@ -137,15 +142,15 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
       // Set target eaten position for animation
       setTargetEaten({ ...target })
 
-      // Animate score and show confetti
-      setScoreAnimation(true)
-      setShowConfetti(true)
-
       setTimeout(() => {
         setScoreAnimation(false)
         setShowConfetti(false)
       }, 1500)
 
+      if (score >= MAX_SCORE) {
+        setLevelCompleted(true)
+        setShowConfetti(true)
+      }
       // Increment score
       setScore(score + 1)
 
@@ -170,16 +175,16 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
           Use h, j, k, l to move the cursor to the target
         </p>
         <div className="mt-4 flex items-center justify-center gap-4">
-          <div
-            className={`bg-zinc-800 px-4 py-2 rounded-lg transition-all duration-300 ${
-              scoreAnimation
-                ? 'scale-125 bg-emerald-500 text-white shadow-xl shadow-emerald-500/60'
-                : ''
-            }`}
-          >
-            Score: {score}
+          <div>
+            <Scoreboard score={score} maxScore={MAX_SCORE} />
             {showConfetti && <ConfettiBurst />}
           </div>
+          {levelCompleted && (
+            <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
+              <Zap size={18} className="text-yellow-300" />
+              <span>Level Complete!</span>
+            </div>
+          )}
         </div>
       </div>
 
