@@ -110,19 +110,19 @@ const LevelTimer: React.FC<LevelTimerProps> = ({
           className={`${isRunning ? 'text-emerald-400' : 'text-zinc-600'}`}
         />
         <span className="font-mono text-sm text-zinc-600 hover:text-zinc-300 transition-all">
-          Current Time: {displayTime}
+          Total Time: {displayTime}
         </span>
       </div>
 
       {/* Last Completion Info */}
       {lastCompletion && (
-        <div className="flex items-center gap-2 px-4 py-2 bg-zinc-800 rounded-lg shadow-md">
-          <Clock size={18} className="text-zinc-400" />
+        <div className="flex items-center gap-2 px-4 py-2 bg-zinc-800 rounded-lg shadow-md text-zinc-600">
+          <Clock size={18} className="" />
           <div className="flex flex-col">
-            <span className="font-mono text-sm text-zinc-400">
-              Last Completed: {lastCompletion.date} {lastCompletion.time}
+            <span className="font-mono text-sm">
+              {lastCompletion.date} {lastCompletion.time}
             </span>
-            <span className="font-mono text-sm text-zinc-400">
+            <span className="font-mono text-sm">
               Duration: {lastCompletion.duration}
             </span>
           </div>

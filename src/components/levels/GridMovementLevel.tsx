@@ -62,7 +62,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
   } | null>(null)
 
   const gridSize = 10
-  const MAX_SCORE = 20 //gridSize * gridSize
+  const MAX_SCORE = 50 //gridSize * gridSize
 
   useEffect(() => {
     if (!levelCompleted) return
@@ -234,16 +234,15 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
           <div className="flex flex-col items-center justify-center min-h-[60vh] w-full animate-fade-in">
             {/* HISTORY */}
             <SessionHistory levelId="1-grid-movement" />
-            <button
-              onClick={handleRestart}
-              className="mt-6 px-6 py-3 flex items-center gap-2 bg-gradient-to-r from-purple-500 to-emerald-500 hover:from-emerald-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg transition-all duration-300 text-lg focus:outline-none focus:ring-4 focus:ring-emerald-400/40 active:scale-95"
-            >
-              <RefreshCw className="mr-2" size={20} />
-              Restart (ESC)
-            </button>
-            <p className="mt-2 text-zinc-400 text-sm">
-              Press <kbd className="px-2 py-1 bg-zinc-700 rounded">ESC</kbd> to
-              restart
+            {/* <button */}
+            {/*   onClick={handleRestart} */}
+            {/*   className="mt-6 px-6 py-3 flex items-center gap-2 bg-gradient-to-r from-purple-500 to-emerald-500 hover:from-emerald-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg transition-all duration-300 text-lg focus:outline-none focus:ring-4 focus:ring-emerald-400/40 active:scale-95" */}
+            {/* > */}
+            {/*   <RefreshCw className="mr-2" size={20} /> */}
+            {/*   Restart (ESC) */}
+            {/* </button> */}
+            <p className="mt-6 text-zinc-400 text-sm">
+              Press <KBD>ESC</KBD> to restart
             </p>
           </div>
         ) : (
