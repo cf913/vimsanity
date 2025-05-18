@@ -5,27 +5,68 @@ import { Clock } from 'lucide-react'
 interface LevelTimerProps {
   levelId: string | number
   isActive: boolean
+  isCompleted?: boolean
 }
 
-const LevelTimer: React.FC<LevelTimerProps> = ({ levelId, isActive }) => {
-  // Use local state to track the displayed time
+interface LevelCompletion {
+  time: string
+  duration: string
+  timestamp: number
+  date: string
+}
+
+const LevelTimer: React.FC<LevelTimerProps> = ({
+  levelId,
+  isActive,
+  isCompleted,
+}) => {
   const [displayTime, setDisplayTime] = useState<string>('00:00')
   const { formattedTime, isRunning } = useTimer(levelId, isActive)
+  const [markedCompleted, setMarkedCompleted] = useState(false)
   const timerRef = useRef<HTMLDivElement>(null)
+  const [lastCompletion, setLastCompletion] = useState<LevelCompletion | null>(
+    null,
+  )
 
   // Update the displayed time whenever formattedTime changes
   useEffect(() => {
     setDisplayTime(formattedTime)
   }, [formattedTime])
 
-  // No longer needed since we're using className directly
-  // This was causing issues with the animation not applying correctly
+  // Load last completion data from localStorage when component mounts
+  useEffect(() => {
+    const storedCompletion = localStorage.getItem(`level-${levelId}-completion`)
+    if (storedCompletion) {
+      setLastCompletion(JSON.parse(storedCompletion))
+    }
+  }, [levelId])
+
+  // Handle level completion
+  useEffect(() => {
+    if (!markedCompleted && isCompleted) {
+      const completionTime = new Date().toLocaleTimeString()
+      const completionData: LevelCompletion = {
+        time: completionTime,
+        duration: formattedTime,
+        timestamp: Date.now(),
+        date: new Date().toLocaleDateString(),
+      }
+
+      localStorage.setItem(
+        `level-${levelId}-completion`,
+        JSON.stringify(completionData),
+      )
+      setLastCompletion(completionData)
+      setMarkedCompleted(true)
+    }
+  }, [isCompleted, markedCompleted, formattedTime, levelId])
 
   return (
-    <div className="flex items-center justify-center mt-4">
+    <div className="flex flex-col items-center justify-center gap-4 mt-4 w-full">
+      {/* Current Timer */}
       <div
         ref={timerRef}
-        className={`flex items-center gap-2 px-4 py-2 bg-zinc-800 rounded-lg shadow-md transition-all duration-300 ${
+        className={`flex items-center gap-2 px-4 py-2 bg-zinc-800 rounded-lg shadow-md transition-all duration-300 w-full ${
           isRunning ? 'timer-active' : ''
         }`}
       >
@@ -34,9 +75,25 @@ const LevelTimer: React.FC<LevelTimerProps> = ({ levelId, isActive }) => {
           className={`${isRunning ? 'text-emerald-400' : 'text-zinc-600'}`}
         />
         <span className="font-mono text-sm text-zinc-600 hover:text-zinc-300 transition-all">
-          {displayTime}
+          Current Time: {displayTime}
         </span>
       </div>
+
+      {/* Last Completion Info */}
+      {lastCompletion && (
+        <div className="flex items-center gap-2 px-4 py-2 bg-zinc-800 rounded-lg shadow-md w-full">
+          <Clock size={18} className="text-zinc-400" />
+          <div className="flex flex-col">
+            <span className="font-mono text-sm text-zinc-400">
+              Last Completed: {lastCompletion.date} {lastCompletion.time}
+            </span>
+            <span className="font-mono text-sm text-zinc-400">
+              Duration: {lastCompletion.duration}
+            </span>
+          </div>
+        </div>
+      )}
+
       <style jsx>{`
         .timer-active {
           box-shadow: 0 0 0 rgba(52, 211, 153, 0.4);

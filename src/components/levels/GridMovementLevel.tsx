@@ -41,7 +41,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
   } | null>(null)
 
   const gridSize = 10
-  const MAX_SCORE = gridSize * gridSize
+  const MAX_SCORE = 10 //gridSize * gridSize
 
   // Update trail effect
   useEffect(() => {
@@ -276,7 +276,11 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
         lastKeyPressed={lastKeyPressed}
       />
       {/* Level Timer */}
-      <LevelTimer levelId="1-grid-movement" isActive={true} />
+      <LevelTimer
+        levelId="1-grid-movement"
+        isActive={true}
+        isCompleted={levelCompleted}
+      />
 
       <style jsx>{`
         @keyframes confetti-fall {

@@ -449,7 +449,11 @@ const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
         />
 
         {/* Level Timer */}
-        <LevelTimer levelId="3-line-operations" isActive={timerActive} />
+        <LevelTimer
+          levelId="3-line-operations"
+          isActive={timerActive}
+          isCompleted={levelCompleted}
+        />
       </div>
     </div>
   )
