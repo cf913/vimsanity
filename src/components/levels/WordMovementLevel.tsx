@@ -216,9 +216,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
         revealedLetters.has(square.idx),
       )
 
-      const MAX_SCORE = squares.filter((square) => !square.isSpace).length
-
-      if ((allRevealed && !levelCompleted) || score >= MAX_SCORE) {
+      if (allRevealed && !levelCompleted) {
         setLevelCompleted(true)
         setShowConfetti(true)
         setTimeout(() => setShowConfetti(false), 3000)
