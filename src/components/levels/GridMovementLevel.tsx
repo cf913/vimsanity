@@ -5,6 +5,7 @@ import {
 } from '../../hooks/useKeyboardHandler'
 import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
+import { KeysAllowed } from '../common/KeysAllowed'
 
 interface GridMovementLevelProps {
   isMuted: boolean
@@ -265,44 +266,10 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
         </div>
       </div>
 
-      <div className="flex gap-4 text-zinc-400 mt-4 justify-center">
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'h'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          h
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'j'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          j
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'k'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          k
-        </kbd>
-        <kbd
-          className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
-            lastKeyPressed === 'l'
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/60 scale-110'
-              : ''
-          }`}
-        >
-          l
-        </kbd>
-      </div>
+      <KeysAllowed
+        keys={['h', 'j', 'k', 'l']}
+        lastKeyPressed={lastKeyPressed}
+      />
       {/* Level Timer */}
       <LevelTimer levelId="1-grid-movement" isActive={true} />
 
