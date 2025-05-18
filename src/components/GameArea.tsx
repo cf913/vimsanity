@@ -14,31 +14,35 @@ interface GameAreaProps {
 }
 
 // Changelog version and message
-const GAME_VERSION = '1.0.0';
-const CHANGELOG_MESSAGE = `
-<b>What's New in 1.0.0:</b><br/>
-- Responsive grid improvements<br/>
-- Bug fixes and polish<br/>
-- More fun coming soon!
-`;
+const GAME_VERSION = '0.0.14'
 
-const CHANGELOG_LOCALSTORAGE_KEY = 'vimsanity_last_seen_version';
+const CHANGELOG_MESSAGE = `
+<b>What's New in ${GAME_VERSION}</b><br/><br/>
+- Changelog 🍾 <br/>
+- Session history for level 1 and 2<br/>
+and coming soon for level 3-7<br/>
+- Level 7 is now complete!<br/>
+- Bug fixes and polish<br/><br/>
+Thanks for playing!
+`
+
+const CHANGELOG_LOCALSTORAGE_KEY = 'vimsanity_last_seen_version'
 
 const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
   // Changelog popup state
-  const [showChangelog, setShowChangelog] = useState(false);
+  const [showChangelog, setShowChangelog] = useState(false)
 
   useEffect(() => {
-    const lastSeen = localStorage.getItem(CHANGELOG_LOCALSTORAGE_KEY);
+    const lastSeen = localStorage.getItem(CHANGELOG_LOCALSTORAGE_KEY)
     if (lastSeen !== GAME_VERSION) {
-      setShowChangelog(true);
+      setShowChangelog(true)
     }
-  }, []);
+  }, [])
 
   const dismissChangelog = () => {
-    localStorage.setItem(CHANGELOG_LOCALSTORAGE_KEY, GAME_VERSION);
-    setShowChangelog(false);
-  };
+    localStorage.setItem(CHANGELOG_LOCALSTORAGE_KEY, GAME_VERSION)
+    setShowChangelog(false)
+  }
 
   // Render the appropriate level component based on the current level
   const renderLevel = () => {
@@ -68,30 +72,31 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
     <div className="flex flex-col items-center gap-8 relative">
       {/* Changelog Popup */}
       {showChangelog && (
-  <div
-    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in"
-    role="dialog"
-    aria-modal="true"
-    tabIndex={-1}
-    onKeyDown={e => { if (e.key === 'Escape') dismissChangelog(); }}
-  >
-    {/* Sparkle animation */}
-    {/* Only a single emerald star accent, no background sparkles */}
-    <div className="relative z-10 bg-zinc-900 bg-opacity-95 rounded-2xl shadow-2xl border-2 border-emerald-500 p-8 max-w-md w-full flex flex-col items-center animate-scale-in">
-      <div className="flex items-center gap-2 mb-2">
-        <svg width="28" height="28" fill="none" viewBox="0 0 28 28"><path fill="#10b981" d="M14 0l2.4 6.4L24 7.2l-4.8 4.7L20.1 20 14 16 7.9 20l1.9-8.1L4 7.2l7.6-.8z"/></svg>
-        <h3 className="text-2xl font-extrabold tracking-tight text-white drop-shadow">What’s New</h3>
-      </div>
-      <div className="text-slate-200 text-base mb-5 leading-relaxed w-full text-left" dangerouslySetInnerHTML={{ __html: CHANGELOG_MESSAGE }} />
-      <button
-        className="mt-2 px-6 py-2 bg-zinc-800 border-2 border-emerald-500 text-emerald-400 font-semibold rounded-xl shadow hover:bg-zinc-700 hover:text-emerald-300 transition-all duration-200 text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50 active:scale-95"
-        onClick={dismissChangelog}
-        autoFocus
-      >
-        Got it!
-      </button>
-    </div>
-    <style>{`
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in"
+          role="dialog"
+          aria-modal="true"
+          tabIndex={-1}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') dismissChangelog()
+          }}
+        >
+          {/* Sparkle animation */}
+          {/* Only a single emerald star accent, no background sparkles */}
+          <div className="relative z-10 bg-zinc-900 bg-opacity-95 rounded-2xl shadow-2xl border-2 border-emerald-500 p-8 max-w-md w-full flex flex-col items-center animate-scale-in font-mono">
+            <div
+              className="text-slate-300 text-base mb-5 leading-relaxed w-full text-left"
+              dangerouslySetInnerHTML={{ __html: CHANGELOG_MESSAGE }}
+            />
+            <button
+              className="mt-4 px-6 py-2 bg-zinc-800 border-2 border-emerald-500 text-emerald-400 font-semibold rounded-xl shadow hover:bg-zinc-700 hover:text-emerald-300 transition-all duration-200 text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50 active:scale-95"
+              onClick={dismissChangelog}
+              autoFocus
+            >
+              Got it!
+            </button>
+          </div>
+          <style>{`
       @keyframes fade-in {
         0% { opacity: 0; }
         100% { opacity: 1; }
@@ -117,14 +122,15 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
       }
       .animate-sparkle2 { animation: sparkle2 3.2s infinite ease-in-out; }
     `}</style>
-  </div>
-)}
+        </div>
+      )}
 
       <div className="text-center">
         <h2 className="text-3xl font-bold mb-2">Level {level}</h2>
       </div>
 
-      {renderLevel()}
+      {/* Only render the level if the changelog is not open */}
+      {!showChangelog && renderLevel()}
       {/* <div> */}
       {/*   <LevelTimer levelId={level} isActive={true} /> */}
       {/* </div> */}
