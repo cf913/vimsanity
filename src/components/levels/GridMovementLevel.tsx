@@ -7,7 +7,8 @@ import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
 import { KeysAllowed } from '../common/KeysAllowed'
 import Scoreboard from '../common/Scoreboard'
-import { RefreshCw, Zap } from 'lucide-react'
+import { Zap, RefreshCw } from 'lucide-react'
+import SessionHistory from '../common/SessionHistory'
 import { isDragActive } from 'framer-motion'
 
 interface GridMovementLevelProps {
@@ -15,6 +16,24 @@ interface GridMovementLevelProps {
 }
 
 const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
+  // ...existing state...
+  // Add a key listener for Escape to reset
+
+  // Reset all state to initial values
+  function handleRestart() {
+    setPosition({ x: 0, y: 0 })
+    setTarget({ x: 5, y: 5 })
+    setScore(0)
+    setScoreAnimation(false)
+    setLevelCompleted(false)
+    setLastPosition({ x: 0, y: 0 })
+    setShowConfetti(false)
+    setTrail([])
+    setIsMoving(false)
+    setTargetEaten(null)
+    setIsActive(false)
+  }
+
   const [isActive, setIsActive] = useState(false) // Timer state
   const [position, setPosition] = useState<{ x: number; y: number }>({
     x: 0,
@@ -42,7 +61,18 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
   } | null>(null)
 
   const gridSize = 10
-  const MAX_SCORE = 2 //gridSize * gridSize
+  const MAX_SCORE = 20 //gridSize * gridSize
+
+  useEffect(() => {
+    if (!levelCompleted) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleRestart()
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [levelCompleted])
 
   // Update trail effect
   useEffect(() => {
@@ -172,15 +202,25 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
     dependencies: [position, target, score],
   })
 
-  const resetLevel = () => {
-    setPosition({ x: 0, y: 0 })
-    setTarget({ x: 5, y: 5 })
-    setScore(0)
-    setScoreAnimation(false)
-    setShowConfetti(false)
-    setIsActive(false)
-    setLevelCompleted(false)
-  }
+  // If completed, show session history instead of game area
+  // if (levelCompleted) {
+  //   return (
+  //     <div className="flex flex-col items-center justify-center min-h-[60vh] w-full animate-fade-in">
+  //       <SessionHistory levelId="1-grid-movement" />
+  //       <button
+  //         onClick={handleRestart}
+  //         className="mt-6 px-6 py-3 flex items-center gap-2 bg-gradient-to-r from-purple-500 to-emerald-500 hover:from-emerald-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg transition-all duration-300 text-lg focus:outline-none focus:ring-4 focus:ring-emerald-400/40 active:scale-95"
+  //       >
+  //         <RefreshCw className="mr-2" size={20} />
+  //         Restart (ESC)
+  //       </button>
+  //       <p className="mt-2 text-zinc-400 text-sm">
+  //         Press <kbd className="px-2 py-1 bg-zinc-700 rounded">ESC</kbd> to
+  //         restart
+  //       </p>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="w-full h-full flex flex-col justify-center">
@@ -188,13 +228,29 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
         <p className="text-zinc-400">
           Use h, j, k, l to move the cursor to the target
         </p>
+        {levelCompleted ? (
+          <div className="flex flex-col items-center justify-center min-h-[60vh] w-full animate-fade-in">
+            <SessionHistory levelId="1-grid-movement" />
+            <button
+              onClick={handleRestart}
+              className="mt-6 px-6 py-3 flex items-center gap-2 bg-gradient-to-r from-purple-500 to-emerald-500 hover:from-emerald-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg transition-all duration-300 text-lg focus:outline-none focus:ring-4 focus:ring-emerald-400/40 active:scale-95"
+            >
+              <RefreshCw className="mr-2" size={20} />
+              Restart (ESC)
+            </button>
+            <p className="mt-2 text-zinc-400 text-sm">
+              Press <kbd className="px-2 py-1 bg-zinc-700 rounded">ESC</kbd> to
+              restart
+            </p>
+          </div>
+        ) : null}
         <div className="mt-4 flex items-center justify-center gap-4">
           <div>
             <Scoreboard score={score} maxScore={MAX_SCORE} />
             {showConfetti && <ConfettiBurst />}
           </div>
           <button
-            onClick={resetLevel}
+            onClick={handleRestart}
             className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
             aria-label="Reset Level"
           >
