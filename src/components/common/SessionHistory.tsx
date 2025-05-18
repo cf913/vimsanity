@@ -29,11 +29,14 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ levelId }) => {
   const [sessions, setSessions] = useState<SessionRecord[]>([])
 
   useEffect(() => {
-    const key = `level-${levelId}-history`
-    const stored = localStorage.getItem(key)
-    if (stored) {
-      setSessions(JSON.parse(stored))
-    }
+    // add a timeout to ensure the component is mounted before fetching the data
+    setTimeout(() => {
+      const key = `level-${levelId}-history`
+      const stored = localStorage.getItem(key)
+      if (stored) {
+        setSessions(JSON.parse(stored))
+      }
+    }, 100)
   }, [levelId])
 
   if (!sessions.length) {
