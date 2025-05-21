@@ -46,9 +46,6 @@ export const isWordEnd = (text: string[], index: number): boolean => {
   const current = text[index]
   const next = text[index + 1]
 
-  console.log('current', current)
-  console.log('next', next)
-
   // Word end conditions
   const isNextSpace = /\s/.test(next)
   const isNextEndOfLine = index >= text.length - 1
@@ -126,6 +123,21 @@ export const findLineStart = (text: string, currentPos: number): number => {
 export const findLineEnd = (text: string, currentPos: number): number => {
   const endOfLine = text.indexOf('\n', currentPos)
   return endOfLine === -1 ? text.length - 1 : endOfLine - 1
+}
+
+export const findPrevLineEnd = (text: string, currentPos: number): number => {
+  const lineStart = findLineStart(text, currentPos)
+  return lineStart - 1
+}
+
+export const findNextLineStart = (text: string, currentPos: number): number => {
+  const lineEnd = findLineEnd(text, currentPos)
+  return lineEnd + 1
+}
+
+export const isLastLine = (text: string, currentPos: number): boolean => {
+  const endOfLine = text.indexOf('\n', currentPos)
+  return endOfLine === -1 ? true : false
 }
 
 export const findLineEndColumn = (text: string, currentPos: number): number => {

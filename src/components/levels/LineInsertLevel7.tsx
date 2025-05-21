@@ -8,7 +8,7 @@ import LevelTimer from '../common/LevelTimer'
 import Scoreboard from '../common/Scoreboard'
 import ModeIndicator from '../common/ModeIndicator'
 import WarningSplash from '../common/WarningSplash'
-import { VIM_MODES } from '../../utils/constants'
+import { VIM_MODES, VimMode } from '../../utils/constants'
 import {
   findLineEnd,
   findLineEndColumn,
@@ -19,6 +19,7 @@ import {
 } from '../../utils/textUtils'
 import { RefreshCw } from 'lucide-react'
 import { KeysAllowed } from '../common/KeysAllowed'
+import { useVimMotions } from '../../hooks/useVimMotions'
 
 interface LineInsertLevel7Props {
   isMuted: boolean
@@ -73,7 +74,7 @@ const initialCells: TextLine[] = [
 
 const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
   const [cells, setCells] = useState<TextLine[]>([])
-  const [mode, setMode] = useState<string>(VIM_MODES.NORMAL)
+  const [mode, setMode] = useState<VimMode>(VIM_MODES.NORMAL)
   const [activeCell, setActiveCell] = useState<number | null>(null)
   const [insertCommand, setInsertCommand] = useState<string>('')
   const [score, setScore] = useState(0)
@@ -88,6 +89,18 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
   const [virtualColumn, setVirtualColumn] = useState(1)
 
   const isInsertMode = mode === VIM_MODES.INSERT
+
+  const text = activeCell !== null ? cells[activeCell].content : ''
+
+  const { keyActionMap } = useVimMotions({
+    setCursorIndex,
+    cursorIndex,
+    setVirtualColumn,
+    virtualColumn,
+    setMode,
+    mode,
+    text,
+  })
 
   // Initialize cells with challenges
   useEffect(() => {
@@ -143,87 +156,26 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
   const normalModeActions: KeyActionMap = {
     h: () => {
       if (activeCell !== null) {
-        // Only move left if not at the beginning of a line
-        const cellContent = cells[activeCell].content
-        const lineStart = findLineStart(cellContent, cursorIndex)
-        // Move cursor left within the cell
-        if (cursorIndex > lineStart) {
-          setCursorIndex(cursorIndex - 1)
-          setVirtualColumn(getCurrentColumn() - 1)
-        }
+        keyActionMap.h()
       }
     },
     l: () => {
       if (activeCell !== null) {
-        // Move cursor right within the cell
-        const cellContent = cells[activeCell].content
-        // Only move right if not at the end of a line
-        const lineEnd = findLineEnd(cellContent, cursorIndex)
-        if (cursorIndex < lineEnd) {
-          setCursorIndex(cursorIndex + 1)
-          setVirtualColumn(getCurrentColumn() + 1)
-        }
+        keyActionMap.l()
       }
     },
     j: () => {
       if (activeCell !== null) {
-        // setActiveCell(Math.min(cells.length - 1, activeCell + 1))
-        // got to the next line
-        const cellContent = cells[activeCell].content
-        const currentLineStart = findLineStart(cellContent, cursorIndex)
-        const currentColumn = cursorIndex - currentLineStart
-
-        // Remember this column if it's not already saved
-        // or if horizontal movement has changed it
-        if (currentColumn > virtualColumn) {
-          setVirtualColumn(currentColumn)
-        }
-
-        // Find the next line boundaries
-        const currentLineEnd = cellContent.indexOf('\n', cursorIndex)
-        if (currentLineEnd === -1) return // Already at the last line
-
-        const nextLineStart = currentLineEnd + 1
-        const nextLineEnd = cellContent.indexOf('\n', nextLineStart)
-        const nextLineLength =
-          (nextLineEnd === -1 ? cellContent.length : nextLineEnd) -
-          nextLineStart
-
-        // Set cursor to appropriate position in next line based on virtual column
-        setCursorToLineAndColumn(nextLineStart, virtualColumn, nextLineLength)
+        keyActionMap.j()
       }
     },
     k: () => {
       if (activeCell !== null) {
-        // Move up a line
-        const cellContent = cells[activeCell].content
-        const lineStart = findLineStart(cellContent, cursorIndex)
-        const currentColumn = cursorIndex - lineStart
-
-        if (currentColumn > virtualColumn) {
-          console.log('currentColumn', currentColumn)
-          console.log('virtualColumn', virtualColumn)
-          setVirtualColumn(currentColumn)
-        }
-
-        // Cannot go up if already at first line
-        if (lineStart <= 0) return
-
-        // Find the previous line boundaries
-        const prevLineEnd = lineStart - 1
-        const prevLineStart = cellContent.lastIndexOf('\n', prevLineEnd - 1) + 1
-        const prevLineLength = prevLineEnd - prevLineStart
-
-        // Set cursor to appropriate position in previous line based on virtual column
-        setCursorToLineAndColumn(prevLineStart, virtualColumn, prevLineLength)
+        keyActionMap.k()
       }
     },
     i: () => {
-      if (!isInsertMode) {
-        setMode(VIM_MODES.INSERT)
-        setCursorPosition('normal')
-        // Keep cursor at current index for insert mode
-      }
+      keyActionMap.i()
     },
     a: () => {
       if (!isInsertMode) {
@@ -321,24 +273,17 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
     },
     w: () => {
       if (activeCell !== null) {
-        const currentContent = cells[activeCell].content
-        setCursorIndex(
-          moveToNextWordBoundary(currentContent.split(''), cursorIndex),
-        )
+        keyActionMap.w()
       }
     },
     b: () => {
       if (activeCell !== null) {
-        const currentContent = cells[activeCell].content
-        setCursorIndex(
-          moveToPrevWordBoundary(currentContent.split(''), cursorIndex),
-        )
+        keyActionMap.b()
       }
     },
     e: () => {
       if (activeCell !== null) {
-        const currentContent = cells[activeCell].content
-        setCursorIndex(moveToWordEnd(currentContent.split(''), cursorIndex))
+        keyActionMap.e()
       }
     },
   }
