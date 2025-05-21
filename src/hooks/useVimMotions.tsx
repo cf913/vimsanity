@@ -161,11 +161,25 @@ export const useVimMotions = ({
       setVirtualColumn(0)
     },
     A: () => {
-      // Insert at line end
+      // Append at line end
       if (isInsertMode) return
       setMode(VIM_MODES.INSERT)
       setCursorIndex(findLineEnd(text, cursorIndex) + 1)
       setVirtualColumn(findLineEndColumn(text, cursorIndex))
+    },
+    o: (text: string, cb: any) => {
+      // Open line below and start insert
+      if (isInsertMode) return
+      setMode(VIM_MODES.INSERT)
+      // Insert newline after current line
+      const lineEnd = findLineEnd(text, cursorIndex)
+      const newContent =
+        text.substring(0, lineEnd + 1) + '\n' + text.substring(lineEnd + 1)
+
+      if (cb) cb(newContent)
+
+      setCursorIndex(lineEnd + 2)
+      setVirtualColumn(0)
     },
   }
 

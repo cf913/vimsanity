@@ -198,24 +198,14 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
     o: () => {
       if (activeCell !== null) {
         setInsertCommand('o')
-        setMode(VIM_MODES.INSERT)
 
         const updatedCells = [...cells]
         const currentContent = updatedCells[activeCell].content
 
-        // Insert newline after current line
-        const lineEnd = findLineEnd(currentContent, cursorIndex)
-        const newContent =
-          currentContent.substring(0, lineEnd + 1) +
-          '\n' +
-          currentContent.substring(lineEnd + 1)
-
-        updatedCells[activeCell].content = newContent
-        setCells(updatedCells)
-
-        // Move cursor to start of new line
-        setCursorIndex(lineEnd + 2) // +1 for newline, +1 to move to start of new line
-        setVirtualColumn(0)
+        keyActionMap.o(currentContent, (res: string) => {
+          updatedCells[activeCell].content = res
+          setCells(updatedCells)
+        })
       }
     },
     O: () => {
