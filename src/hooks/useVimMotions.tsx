@@ -1,9 +1,11 @@
 import { VIM_MODES, VimMode } from '../utils/constants'
 import {
   findLineEnd,
+  findLineEndColumn,
   findLineStart,
   findNextLineStart,
   findPrevLineEnd,
+  isLineEmpty,
   moveToNextWordBoundary,
   moveToPrevWordBoundary,
   moveToWordEnd,
@@ -130,9 +132,40 @@ export const useVimMotions = ({
       setCursorIndex(moveToWordEnd(editableText, cursorIndex))
     },
     i: () => {
-      if (!isInsertMode) {
-        setMode(VIM_MODES.INSERT)
+      // Start insert at current position
+      if (isInsertMode) return
+      setMode(VIM_MODES.INSERT)
+    },
+    a: () => {
+      // Move cursor position one to the right for append
+      if (isInsertMode) return
+      setMode(VIM_MODES.INSERT)
+
+      // If the line is empty, keep cursor in the same position
+      if (isLineEmpty(text, cursorIndex)) {
+        // do nothing
       }
+      // else if cursor is at the end of the content, keep it there
+      else if (cursorIndex < text.length) {
+        setCursorIndex(cursorIndex + 1)
+        // Otherwise, move it one position to the right
+      } else {
+        setCursorIndex(text.length)
+      }
+    },
+    I: () => {
+      // Insert at line start
+      if (isInsertMode) return
+      setMode(VIM_MODES.INSERT)
+      setCursorIndex(findLineStart(text, cursorIndex))
+      setVirtualColumn(0)
+    },
+    A: () => {
+      // Insert at line end
+      if (isInsertMode) return
+      setMode(VIM_MODES.INSERT)
+      setCursorIndex(findLineEnd(text, cursorIndex) + 1)
+      setVirtualColumn(findLineEndColumn(text, cursorIndex))
     },
   }
 

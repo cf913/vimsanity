@@ -175,54 +175,24 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
       }
     },
     i: () => {
-      keyActionMap.i()
+      if (activeCell !== null) {
+        keyActionMap.i()
+      }
     },
     a: () => {
-      if (!isInsertMode) {
-        setMode(VIM_MODES.INSERT)
-
-        // Move cursor position one to the right for append
-        if (activeCell !== null) {
-          // setCursorPosition('append')
-          // Get the current cell content
-          const cellContent = cells[activeCell].content
-
-          // If the line is empty, keep cursor in the same position
-          if (cellContent.length === 0) {
-            // Keep cursor at index 0 for empty lines
-            setCursorIndex(0)
-          }
-          // If cursor is at the end of the content, keep it there
-          // Otherwise, move it one position to the right
-          else if (cursorIndex < cellContent.length) {
-            setCursorIndex(cursorIndex + 1)
-          } else {
-            setCursorIndex(cellContent.length)
-          }
-        }
+      // Move cursor position one to the right for append
+      if (activeCell !== null) {
+        keyActionMap.a()
       }
     },
     I: () => {
       if (activeCell !== null) {
-        setMode(VIM_MODES.INSERT)
-        setCursorPosition('start')
-
-        const cellContent = cells[activeCell].content
-        const lineStart = findLineStart(cellContent, cursorIndex)
-        // move cursor to start of line
-        setCursorIndex(lineStart)
-        setVirtualColumn(0)
+        keyActionMap.I()
       }
     },
     A: () => {
       if (activeCell !== null) {
-        setMode(VIM_MODES.INSERT)
-        setCursorPosition('end')
-        const cellContent = cells[activeCell].content
-        const lineEnd = findLineEnd(cellContent, cursorIndex)
-        // move cursor to end of currentLine
-        setCursorIndex(lineEnd + 1) // +1 because appending to the end of a line
-        setVirtualColumn(findLineEndColumn(cellContent, cursorIndex))
+        keyActionMap.A()
       }
     },
     o: () => {

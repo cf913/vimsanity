@@ -115,70 +115,27 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
     j: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      // Get current line start and column
-      const currentLineStart = findLineStart(editableText, cursorPosition)
-      const currentColumn = cursorPosition - currentLineStart
-
-      // Remember this column if it's not already saved
-      // or if horizontal movement has changed it
-      if (currentColumn > virtualColumn) {
-        setVirtualColumn(currentColumn)
-      }
-
-      // Find the next line boundaries
-      const currentLineEnd = editableText.indexOf('\n', cursorPosition)
-      if (currentLineEnd === -1) return // Already at the last line
-
-      const nextLineStart = currentLineEnd + 1
-      const nextLineEnd = editableText.indexOf('\n', nextLineStart)
-      const nextLineLength =
-        (nextLineEnd === -1 ? editableText.length : nextLineEnd) - nextLineStart
-
-      // Set cursor to appropriate position in next line based on virtual column
-      setCursorToLineAndColumn(nextLineStart, virtualColumn, nextLineLength)
+      keyActionMap.j()
     },
     k: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      // Get current line start and column
-      const currentLineStart = findLineStart(editableText, cursorPosition)
-      const currentColumn = cursorPosition - currentLineStart
-
-      // Remember this column if it's not already saved
-      // or if horizontal movement has changed it
-      if (currentColumn > virtualColumn) {
-        setVirtualColumn(currentColumn)
-      }
-
-      // Cannot go up if already at first line
-      if (currentLineStart <= 0) return
-
-      // Find the previous line boundaries
-      const prevLineEnd = currentLineStart - 1
-      const prevLineStart = editableText.lastIndexOf('\n', prevLineEnd - 1) + 1
-      const prevLineLength = prevLineEnd - prevLineStart
-
-      // Set cursor to appropriate position in previous line based on virtual column
-      setCursorToLineAndColumn(prevLineStart, virtualColumn, prevLineLength)
+      keyActionMap.k()
     },
     w: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      setCursorPosition(
-        moveToNextWordBoundary(editableText.split(''), cursorPosition),
-      )
+      keyActionMap.w()
     },
     e: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      setCursorPosition(moveToWordEnd(editableText.split(''), cursorPosition))
+      keyActionMap.e()
     },
     b: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      setCursorPosition(
-        moveToPrevWordBoundary(editableText.split(''), cursorPosition),
-      )
+      keyActionMap.b()
     },
     '0': () => {
       // Clear any pending commands
@@ -196,7 +153,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
     i: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      setMode('insert')
+      keyActionMap.i()
     },
     I: () => {
       // Clear any pending commands
