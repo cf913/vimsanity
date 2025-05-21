@@ -122,36 +122,6 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
     }
   }, [cells])
 
-  const setCursorToLineAndColumn = (
-    lineStart: number,
-    targetColumn: number,
-    lineLength: number,
-  ) => {
-    // For empty lines or if target column exceeds line length, place at line start or end
-    if (lineLength === 0) {
-      console.log('nextCursorPosition', lineStart)
-      setCursorIndex(lineStart)
-    } else {
-      // Calculate actual column (bounded by line length)
-      const actualColumn = Math.min(
-        targetColumn,
-        lineLength > 0 ? lineLength - 1 : 0,
-      )
-      console.log('nextCursorPosition', lineStart + actualColumn)
-      setCursorIndex(lineStart + actualColumn)
-    }
-  }
-
-  // Helper to get the current column position
-  const getCurrentColumn = () => {
-    if (activeCell !== null) {
-      const cellContent = cells[activeCell].content
-      const lineStart = findLineStart(cellContent, cursorIndex)
-      return cursorIndex - lineStart
-    }
-    return 0
-  }
-
   // Define key actions
   const normalModeActions: KeyActionMap = {
     h: () => {
