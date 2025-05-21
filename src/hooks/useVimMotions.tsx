@@ -195,6 +195,36 @@ export const useVimMotions = ({
       setCursorIndex(lineStart) // the current line because the new line
       setVirtualColumn(0)
     },
+    Escape: () => {
+      setMode(VIM_MODES.NORMAL)
+      let newCursorIndex = cursorIndex
+      const lineStart = findLineStart(text, cursorIndex)
+      if (cursorIndex > 0) {
+        newCursorIndex = Math.max(lineStart, cursorIndex - 1)
+        setCursorIndex(newCursorIndex)
+        setVirtualColumn(newCursorIndex - lineStart)
+      }
+    },
+    Backspace: (text: string, cb: any) => {
+      if (cursorIndex <= 0) return // nothing to delete here
+
+      const beforeCursor = text.substring(0, cursorIndex - 1)
+      const afterCursor = text.substring(cursorIndex)
+      const newText = beforeCursor + afterCursor
+
+      if (cb) cb(newText)
+
+      setCursorIndex(cursorIndex - 1)
+    },
+    char: (text: string, char: string, cb: any) => {
+      const beforeCursor = text.substring(0, cursorIndex)
+      const afterCursor = text.substring(cursorIndex)
+      const newText = beforeCursor + char + afterCursor
+
+      if (cb) cb(newText)
+
+      setCursorIndex(cursorIndex + 1)
+    },
   }
 
   return { keyActionMap }
