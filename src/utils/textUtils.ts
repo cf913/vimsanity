@@ -56,16 +56,17 @@ export const isWordEnd = (text: string[], index: number): boolean => {
     /[.,;:!?()[\]{}'"<>\/\\|+=\-*&^%$#@!~`]/.test(current) && current !== '_'
   const isNextPunctuation =
     /[.,;:!?()[\]{}'"<>\/\\|+=\-*&^%$#@!~`]/.test(next) && next !== '_'
+  const isCurrentSpace = /\s/.test(current)
 
   // End of a word is:
   // 1. Before a space
   // 2. A punctuation before a non-punctuation
-  // 3. A non-punctuation before a punctuation
+  // 3. A non-punctuation and non-space before a punctuation
   return (
     isNextEndOfLine ||
     (isNextSpace && !isCurrentPunctuation) ||
     (!isNextPunctuation && isCurrentPunctuation) ||
-    (isNextPunctuation && !isCurrentPunctuation)
+    (isNextPunctuation && !isCurrentPunctuation && !isCurrentSpace)
   )
 }
 

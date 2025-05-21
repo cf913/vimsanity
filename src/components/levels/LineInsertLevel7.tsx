@@ -14,6 +14,8 @@ import {
   findLineEndColumn,
   findLineStart,
   moveToNextWordBoundary,
+  moveToPrevWordBoundary,
+  moveToWordEnd,
 } from '../../utils/textUtils'
 import { RefreshCw } from 'lucide-react'
 import { KeysAllowed } from '../common/KeysAllowed'
@@ -323,6 +325,20 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
         setCursorIndex(
           moveToNextWordBoundary(currentContent.split(''), cursorIndex),
         )
+      }
+    },
+    b: () => {
+      if (activeCell !== null) {
+        const currentContent = cells[activeCell].content
+        setCursorIndex(
+          moveToPrevWordBoundary(currentContent.split(''), cursorIndex),
+        )
+      }
+    },
+    e: () => {
+      if (activeCell !== null) {
+        const currentContent = cells[activeCell].content
+        setCursorIndex(moveToWordEnd(currentContent.split(''), cursorIndex))
       }
     },
   }
