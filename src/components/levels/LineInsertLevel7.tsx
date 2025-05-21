@@ -13,6 +13,7 @@ import {
   findLineEnd,
   findLineEndColumn,
   findLineStart,
+  moveToNextWordBoundary,
 } from '../../utils/textUtils'
 import { RefreshCw } from 'lucide-react'
 import { KeysAllowed } from '../common/KeysAllowed'
@@ -314,6 +315,14 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
 
         setCursorIndex(lineStart) // -1 to move to start of new line above
         setVirtualColumn(0)
+      }
+    },
+    w: () => {
+      if (activeCell !== null) {
+        const currentContent = cells[activeCell].content
+        setCursorIndex(
+          moveToNextWordBoundary(currentContent.split(''), cursorIndex),
+        )
       }
     },
   }
