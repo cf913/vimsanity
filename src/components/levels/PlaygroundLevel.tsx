@@ -13,7 +13,8 @@ import {
   moveToWordEnd,
 } from '../../utils/textUtils'
 import WarningSplash from '../common/WarningSplash'
-import { VIM_MODES } from '../../utils/constants'
+import { VIM_MODES, VimMode } from '../../utils/constants'
+import { useVimMotions } from '../../hooks/useVimMotions'
 
 interface PlaygroundLevelProps {
   isMuted: boolean
@@ -24,7 +25,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
     'This is a Vim playground. Practice your motions here!\n\nNew levels are being added every week!\n\nYou can use h, j, k, l for movement.\nTry w, e, b for word navigation.\nUse i to enter insert mode, Escape to exit.\nPress x to delete characters.',
   )
   const [cursorPosition, setCursorPosition] = useState<number>(0)
-  const [mode, setMode] = useState<'normal' | 'insert'>('normal')
+  const [mode, setMode] = useState<VimMode>('normal')
   const [lines, setLines] = useState<string[]>(editableText.split('\n'))
   // Store the "virtual" column for j/k navigation
   const [virtualColumn, setVirtualColumn] = useState<number>(0)
@@ -34,6 +35,16 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
   // Refs for auto-scrolling
   const editorRef = useRef<HTMLDivElement>(null)
   const cursorRef = useRef<HTMLSpanElement>(null)
+
+  const { keyActionMap } = useVimMotions({
+    setCursorIndex: setCursorPosition,
+    cursorIndex: cursorPosition,
+    setVirtualColumn,
+    virtualColumn,
+    setMode,
+    mode,
+    text: editableText,
+  })
 
   // Effect to scroll to cursor when position changes
   useEffect(() => {
@@ -94,92 +105,37 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
     h: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      // Only move left if not at the beginning of a line
-      const lineStart = findLineStart(editableText, cursorPosition)
-      if (cursorPosition > lineStart) {
-        setCursorPosition(cursorPosition - 1)
-        // Update virtual column when moving horizontally
-        setVirtualColumn(getCurrentColumn() - 1)
-      }
+      keyActionMap.h()
     },
     l: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      // Only move right if not at the end of a line
-      const lineEnd = findLineEnd(editableText, cursorPosition)
-      if (cursorPosition < lineEnd) {
-        setCursorPosition(cursorPosition + 1)
-        // Update virtual column when moving horizontally
-        setVirtualColumn(getCurrentColumn() + 1)
-      }
+      keyActionMap.l()
     },
     j: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      // Get current line start and column
-      const currentLineStart = findLineStart(editableText, cursorPosition)
-      const currentColumn = cursorPosition - currentLineStart
-
-      // Remember this column if it's not already saved
-      // or if horizontal movement has changed it
-      if (currentColumn > virtualColumn) {
-        setVirtualColumn(currentColumn)
-      }
-
-      // Find the next line boundaries
-      const currentLineEnd = editableText.indexOf('\n', cursorPosition)
-      if (currentLineEnd === -1) return // Already at the last line
-
-      const nextLineStart = currentLineEnd + 1
-      const nextLineEnd = editableText.indexOf('\n', nextLineStart)
-      const nextLineLength =
-        (nextLineEnd === -1 ? editableText.length : nextLineEnd) - nextLineStart
-
-      // Set cursor to appropriate position in next line based on virtual column
-      setCursorToLineAndColumn(nextLineStart, virtualColumn, nextLineLength)
+      keyActionMap.j()
     },
     k: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      // Get current line start and column
-      const currentLineStart = findLineStart(editableText, cursorPosition)
-      const currentColumn = cursorPosition - currentLineStart
-
-      // Remember this column if it's not already saved
-      // or if horizontal movement has changed it
-      if (currentColumn > virtualColumn) {
-        setVirtualColumn(currentColumn)
-      }
-
-      // Cannot go up if already at first line
-      if (currentLineStart <= 0) return
-
-      // Find the previous line boundaries
-      const prevLineEnd = currentLineStart - 1
-      const prevLineStart = editableText.lastIndexOf('\n', prevLineEnd - 1) + 1
-      const prevLineLength = prevLineEnd - prevLineStart
-
-      // Set cursor to appropriate position in previous line based on virtual column
-      setCursorToLineAndColumn(prevLineStart, virtualColumn, prevLineLength)
+      keyActionMap.k()
     },
     w: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      setCursorPosition(
-        moveToNextWordBoundary(editableText.split(''), cursorPosition),
-      )
+      keyActionMap.w()
     },
     e: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      setCursorPosition(moveToWordEnd(editableText.split(''), cursorPosition))
+      keyActionMap.e()
     },
     b: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      setCursorPosition(
-        moveToPrevWordBoundary(editableText.split(''), cursorPosition),
-      )
+      keyActionMap.b()
     },
     '0': () => {
       // Clear any pending commands
@@ -197,7 +153,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
     i: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      setMode('insert')
+      keyActionMap.i()
     },
     I: () => {
       // Clear any pending commands

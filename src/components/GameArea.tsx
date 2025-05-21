@@ -14,17 +14,23 @@ interface GameAreaProps {
 }
 
 // Changelog version and message
-const GAME_VERSION = '0.0.14'
+const GAME_VERSION = '0.0.15'
 
 const CHANGELOG_MESSAGE = `
 <b>What's New in ${GAME_VERSION}</b><br/><br/>
-- Changelog 🍾 <br/>
-- Session history for level 1 and 2<br/>
-and coming soon for level 3-7<br/>
-- Level 7 is now complete!<br/>
-- Bug fixes and polish<br/><br/>
+- Many bug fixes, nothing exciting this week<br/><br/>
 Thanks for playing!
 `
+
+// const CHANGELOG_MESSAGE = `
+// <b>What's New in ${GAME_VERSION}</b><br/><br/>
+// - Changelog 🍾 <br/>
+// - Session history for level 1 and 2<br/>
+// and coming soon for level 3-7<br/>
+// - Level 7 is now complete!<br/>
+// - Bug fixes and polish<br/><br/>
+// Thanks for playing!
+// `
 
 const CHANGELOG_LOCALSTORAGE_KEY = 'vimsanity_last_seen_version'
 
