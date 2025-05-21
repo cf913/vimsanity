@@ -181,6 +181,20 @@ export const useVimMotions = ({
       setCursorIndex(lineEnd + 2)
       setVirtualColumn(0)
     },
+    O: (text: string, cb: any) => {
+      // Open line above and start insert
+      if (isInsertMode) return
+      setMode(VIM_MODES.INSERT)
+      const lineStart = findLineStart(text, cursorIndex)
+      // Insert newline before current line
+      const newContent =
+        text.substring(0, lineStart) + '\n' + text.substring(lineStart)
+
+      if (cb) cb(newContent)
+
+      setCursorIndex(lineStart) // the current line because the new line
+      setVirtualColumn(0)
+    },
   }
 
   return { keyActionMap }
