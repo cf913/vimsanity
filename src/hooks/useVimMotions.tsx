@@ -247,7 +247,7 @@ export const useVimMotions = ({
 
       setCursorIndex(cursorIndex - 1)
     },
-    char: (text: string, char: string, cb: any) => {
+    char: (char: string, cb: any) => {
       const beforeCursor = text.substring(0, cursorIndex)
       const afterCursor = text.substring(cursorIndex)
       const newText = beforeCursor + char + afterCursor
