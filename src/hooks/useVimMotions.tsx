@@ -5,6 +5,7 @@ import {
   findLineStart,
   findNextLineStart,
   findPrevLineEnd,
+  isEndOfLine,
   isLineEmpty,
   moveToNextWordBoundary,
   moveToPrevWordBoundary,
@@ -204,6 +205,25 @@ export const useVimMotions = ({
       if (isLineEmpty(text, cursorIndex)) return
       setCursorIndex(findLineEnd(text, cursorIndex))
       setVirtualColumn(findLineEndColumn(text, cursorIndex))
+    },
+    x: (cb: any) => {
+      // if empty line, do nothing
+      if (isLineEmpty(text, cursorIndex)) {
+        setVirtualColumn(0)
+        return
+      }
+      // delete the char under the cursor
+      const newText =
+        text.substring(0, cursorIndex) + text.substring(cursorIndex + 1)
+
+      if (cb) cb(newText)
+
+      if (isEndOfLine(text, cursorIndex)) {
+        setCursorIndex(cursorIndex - 1)
+        setVirtualColumn(getCurrentColumn() - 1)
+      }
+
+      setVirtualColumn(getCurrentColumn())
     },
     //////////////////////////////
     Escape: () => {

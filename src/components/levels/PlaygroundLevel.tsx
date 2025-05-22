@@ -164,12 +164,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
     x: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      if (cursorPosition < editableText.length) {
-        const newText =
-          editableText.substring(0, cursorPosition) +
-          editableText.substring(cursorPosition + 1)
-        updateLines(newText)
-      }
+      keyActionMap.x(updateLines)
     },
     d: () => {
       // If 'd' is already pending, execute the 'dd' command

@@ -125,6 +125,11 @@ export const findLineEnd = (text: string, currentPos: number): number => {
   return endOfLine === -1 ? text.length - 1 : endOfLine - 1
 }
 
+export const isEndOfLine = (text: string, currentPos: number): boolean => {
+  const lineEnd = findLineEnd(text, currentPos)
+  return currentPos === lineEnd
+}
+
 export const findPrevLineEnd = (text: string, currentPos: number): number => {
   const lineStart = findLineStart(text, currentPos)
   return lineStart - 1
