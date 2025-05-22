@@ -105,9 +105,7 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
             <Cell
               {...{
                 cell,
-                index,
                 isActive: activeCell === index,
-                setActiveCell,
                 setLastKeyPressed,
                 setCompletedCell: () => {
                   const updatedCells = [...cells]

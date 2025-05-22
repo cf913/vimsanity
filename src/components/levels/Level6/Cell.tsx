@@ -15,9 +15,7 @@ export interface Cell {
 
 interface CellProps {
   cell: Cell
-  index: number
   isActive: boolean
-  setActiveCell: (index: number) => void
   setLastKeyPressed: (key: string | null) => void
   setCompletedCell: () => void
   mode: VimMode
@@ -27,9 +25,7 @@ interface CellProps {
 
 export function Cell({
   cell,
-  index,
   isActive = false,
-  setActiveCell,
   setLastKeyPressed,
   setCompletedCell,
   mode,
@@ -227,13 +223,6 @@ export function Cell({
           ? 'bg-zinc-700 ring-2 ring-emerald-500 shadow-lg'
           : 'bg-zinc-800'
       } ${cell.completed ? 'border-2 border-emerald-500' : ''}`}
-      onClick={() => {
-        if (!isInsertMode) {
-          setActiveCell(index)
-          // Reset cursor index when selecting a new cell
-          setCursorIndex(0)
-        }
-      }}
     >
       <div className="text-2xl font-mono mb-2 min-h-[2rem]">
         {isActive ? (
