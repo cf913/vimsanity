@@ -52,6 +52,7 @@ export function Cell({
     setCursorIndex(0)
     setVirtualColumn(0)
     setHistory(initialHistory)
+    setMode(VIM_MODES.NORMAL)
   }, [resetCount])
 
   // History state for undo functionality

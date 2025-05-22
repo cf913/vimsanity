@@ -28,8 +28,8 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
     },
     { id: '8', content: 'Mood', expected: 'Mode Normal', completed: false },
   ]
-  const [cells, setCells] = useState<Cell[]>([])
-  const [activeCell, setActiveCell] = useState<number | null>(null)
+  const [cells, setCells] = useState<Cell[]>(initialCells)
+  const [activeCell, setActiveCell] = useState<number | null>(0)
   const [score, setScore] = useState(0)
   const [showConfetti, setShowConfetti] = useState(false)
   const [allCompleted, setAllCompleted] = useState(false)
@@ -38,19 +38,6 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
   const [resetCount, setResetCount] = useState(0)
 
   const isInsertMode = mode === VIM_MODES.INSERT
-
-  // Initialize cells with challenges
-  useEffect(() => {
-    setCells(initialCells)
-    setActiveCell(0)
-    // setHistory([
-    //   {
-    //     cells: JSON.parse(JSON.stringify(initialCells)),
-    //     cursorIndex: 0,
-    //     activeCell: 0,
-    //   },
-    // ])
-  }, [])
 
   // Check if all cells are completed
   useEffect(() => {
