@@ -195,6 +195,17 @@ export const useVimMotions = ({
       setCursorIndex(lineStart) // the current line because the new line
       setVirtualColumn(0)
     },
+
+    '0': () => {
+      setCursorIndex(findLineStart(text, cursorIndex))
+      setVirtualColumn(0)
+    },
+    $: () => {
+      if (isLineEmpty(text, cursorIndex)) return
+      setCursorIndex(findLineEnd(text, cursorIndex))
+      setVirtualColumn(findLineEndColumn(text, cursorIndex))
+    },
+    //////////////////////////////
     Escape: () => {
       setMode(VIM_MODES.NORMAL)
       let newCursorIndex = cursorIndex

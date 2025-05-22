@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import {
   KeyActionMap,
+  KeyHandler,
   useKeyboardHandler,
 } from '../../hooks/useKeyboardHandler'
 import {
@@ -73,32 +74,17 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
     setLines(text.split('\n'))
   }
 
-  // Helper to get the current column position
-  const getCurrentColumn = () => {
-    const lineStart = findLineStart(editableText, cursorPosition)
-    return cursorPosition - lineStart
-  }
-
-  // Helper to set cursor based on line and virtual column
-  const setCursorToLineAndColumn = (
-    lineStart: number,
-    targetColumn: number,
-    lineLength: number,
-  ) => {
-    // For empty lines or if target column exceeds line length, place at line start or end
-    if (lineLength === 0) {
-      console.log('nextCursorPosition', lineStart)
-      setCursorPosition(lineStart)
-    } else {
-      // Calculate actual column (bounded by line length)
-      const actualColumn = Math.min(
-        targetColumn,
-        lineLength > 0 ? lineLength - 1 : 0,
-      )
-      console.log('nextCursorPosition', lineStart + actualColumn)
-      setCursorPosition(lineStart + actualColumn)
-    }
-  }
+  // const generateKeyActions: () => KeyActionMap = () => {
+  //   const KEYS: string[] = ['h', 'l', 'j', 'k']
+  //   const template = (key: string) => {
+  //     setPendingCommand(null)
+  //     keyActionMap[key]()
+  //   }
+  //
+  //   return KEYS.reduce((acc, next) => {
+  //     return { ...acc, [next]: template(next) }
+  //   }, {})
+  // }
 
   // Define normal mode key actions
   const normalModeActions: KeyActionMap = {
@@ -140,15 +126,12 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
     '0': () => {
       // Clear any pending commands
       setPendingCommand(null)
-      setCursorPosition(findLineStart(editableText, cursorPosition))
-      setVirtualColumn(0)
+      keyActionMap['0']()
     },
     $: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      setCursorPosition(findLineEnd(editableText, cursorPosition))
-      // Update virtual column when moving horizontally
-      setVirtualColumn(findLineEndColumn(editableText, cursorPosition))
+      keyActionMap.$()
     },
     i: () => {
       // Clear any pending commands
@@ -158,25 +141,25 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
     I: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      setCursorPosition(findLineStart(editableText, cursorPosition))
-      setVirtualColumn(0)
-      setMode('insert')
+      keyActionMap.I()
     },
     a: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      if (!isLineEmpty(editableText, cursorPosition)) {
-        setCursorPosition(cursorPosition + 1)
-      }
-      // Update virtual column when moving horizontally
-      setMode('insert')
+      keyActionMap.a()
     },
     A: () => {
       // Clear any pending commands
       setPendingCommand(null)
-      setCursorPosition(findLineEnd(editableText, cursorPosition) + 1)
-      setVirtualColumn(findLineEndColumn(editableText, cursorPosition))
-      setMode('insert')
+      keyActionMap.A()
+    },
+    o: () => {
+      setPendingCommand(null)
+      keyActionMap.o(editableText, updateLines)
+    },
+    O: () => {
+      setPendingCommand(null)
+      keyActionMap.O(editableText, updateLines)
     },
     x: () => {
       // Clear any pending commands

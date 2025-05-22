@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react'
 
 // Define a type for key handlers
-export type KeyHandler = (key: string) => void
+export type KeyHandler = () => void
 
 // Define a type for the key action map
 export interface KeyActionMap {
@@ -61,7 +61,7 @@ export const useKeyboardHandler = ({
       // Check if there's a handler for this key
       const handler = keyActionMap[e.key]
       if (handler) {
-        handler(e.key)
+        handler()
       }
     },
     [keyActionMap, onAnyKey, disabled],
