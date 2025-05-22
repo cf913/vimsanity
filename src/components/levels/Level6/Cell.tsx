@@ -22,6 +22,7 @@ interface CellProps {
   setCompletedCell: () => void
   mode: VimMode
   setMode: (mode: VimMode) => void
+  resetCount: number
 }
 
 export function Cell({
@@ -33,21 +34,33 @@ export function Cell({
   setCompletedCell,
   mode,
   setMode,
+  resetCount,
 }: CellProps) {
   const [cursorIndex, setCursorIndex] = useState(0)
   const [virtualColumn, setVirtualColumn] = useState(0)
-  const [text, setText] = useState(cell.content)
+  const [text, setText] = useState<string>(cell.content)
+  const initialHistory = [
+    {
+      text: cell.content,
+      cursorIndex: 0,
+    },
+  ]
 
-  if (isActive) console.log('text', text)
+  // triggers a cell reset
+  useEffect(() => {
+    setText(cell.content)
+    setCursorIndex(0)
+    setVirtualColumn(0)
+    setHistory(initialHistory)
+  }, [resetCount])
 
   // History state for undo functionality
-  const [history, setHistory] = useState<
-    { cells: Cell[]; cursorIndex: number; activeCell: number | null }[]
-  >([])
+  const [history, setHistory] =
+    useState<{ text: string; cursorIndex: number }[]>(initialHistory)
 
   // Redo history state for Ctrl+r functionality
   const [redoHistory, setRedoHistory] = useState<
-    { cells: Cell[]; cursorIndex: number; activeCell: number | null }[]
+    { text: string; cursorIndex: number }[]
   >([])
 
   const { keyActionMap } = useVimMotions({
@@ -82,39 +95,37 @@ export function Cell({
     I: () => {
       keyActionMap.I()
     },
-    // u: () => {
-    //   if (!isInsertMode) {
-    //     if (history.length === 0) return
-    //
-    //     let previousState = null
-    //
-    //     if (history.length === 1) {
-    //       // If there's only one state, reset the level
-    //       previousState = history[0]
-    //     } else {
-    //       // Otherwise, get the second last state from history (the last one is the current state)
-    //       previousState = history[history.length - 2]
-    //       // state on current cell if it's different
-    //       if (previousState.activeCell !== activeCell) return
-    //     }
-    //
-    //     // Create a deep copy of the cells from history
-    //     const restoredCells = JSON.parse(JSON.stringify(previousState.cells))
-    //     // Restore the previous state
-    //     setCells(restoredCells)
-    //     setCursorIndex(previousState.cursorIndex)
-    //     setActiveCell(previousState.activeCell)
-    //
-    //     if (history.length > 1) {
-    //       // Save the current state to redo history
-    //       const currentState = history[history.length - 1]
-    //       setRedoHistory((prev) => [...prev, currentState])
-    //
-    //       // Remove the old current state from history
-    //       setHistory((prev) => prev.slice(0, -1))
-    //     }
-    //   }
-    // },
+    u: () => {
+      if (!isInsertMode) {
+        if (history.length === 0) return
+
+        let previousState = null
+
+        if (history.length === 1) {
+          // If there's only one state, reset the level
+          previousState = history[0]
+        } else {
+          // Otherwise, get the second last state from history (the last one is the current state)
+          previousState = history[history.length - 2]
+          // state on current cell if it's different
+          // TODO: test this
+          // if (previousState.activeCell !== activeCell) return
+        }
+
+        // Restore the previous state
+        setText(previousState.text)
+        setCursorIndex(previousState.cursorIndex)
+
+        if (history.length > 1) {
+          // Save the current state to redo history
+          const currentState = history[history.length - 1]
+          setRedoHistory((prev) => [...prev, currentState])
+
+          // Remove the old current state from history
+          setHistory((prev) => prev.slice(0, -1))
+        }
+      }
+    },
   }
 
   const insertModeActions: KeyActionMap = {
@@ -128,16 +139,16 @@ export function Cell({
         newCursorIndex = cursorIndex - 1
       }
 
-      // const cellsCopy = JSON.parse(JSON.stringify(cells))
-      // // Save current state to history before switching to normal mode
-      // setHistory((prev) => [
-      //   ...prev,
-      //   { cells: cellsCopy, cursorIndex: newCursorIndex, activeCell },
-      // ])
-      //
-      // // Clear redo history when making a new change (following Vim behavior)
-      // setRedoHistory([])
-      //
+      const textCopy = text
+      // Save current state to history before switching to normal mode
+      setHistory((prev) => [
+        ...prev,
+        { text: textCopy, cursorIndex: newCursorIndex },
+      ])
+
+      // Clear redo history when making a new change (following Vim behavior)
+      setRedoHistory([])
+
       // Check if the current cell is completed
       if (text === cell.expected && !cell.completed) {
         // Mark as completed
@@ -163,36 +174,35 @@ export function Cell({
 
   const handleCtrlR = (e: KeyboardEvent) => {
     // Check if Ctrl+r was pressed
-    // if (e.ctrlKey && e.key === 'r') {
-    //   console.log('ctrl+r')
-    //   e.preventDefault() // Prevent browser refresh
-    //
-    //   if (!isInsertMode) {
-    //     // setLastKeyPressed('ctrl+r')
-    //
-    //     if (redoHistory.length === 0) return
-    //
-    //     // Get the last state from redo history
-    //     const nextState = redoHistory[redoHistory.length - 1]
-    //
-    //     // Only redo if we're on the same cell
-    //     if (nextState.activeCell !== activeCell) return
-    //
-    //     // Create a deep copy of the cells from redo history
-    //     const restoredCells = JSON.parse(JSON.stringify(nextState.cells))
-    //
-    //     // Restore the next state
-    //     // setCells(restoredCells)
-    //     // setCursorIndex(nextState.cursorIndex)
-    //     // setActiveCell(nextState.activeCell)
-    //     //
-    //     // // Add the restored state back to history
-    //     // setHistory((prev) => [...prev, nextState])
-    //     //
-    //     // // Remove the restored state from redo history
-    //     // setRedoHistory((prev) => prev.slice(0, -1))
-    //   }
-    // }
+    if (e.ctrlKey && e.key === 'r') {
+      console.log('ctrl+r')
+      e.preventDefault() // Prevent browser refresh
+
+      if (!isInsertMode) {
+        // setLastKeyPressed('ctrl+r')
+
+        if (redoHistory.length === 0) return
+
+        // Get the last state from redo history
+        const nextState = redoHistory[redoHistory.length - 1]
+
+        // Only redo if we're on the same cell
+        // TODO: test this
+        // if (nextState.activeCell !== activeCell) return
+
+        // Create a deep copy of the cells from redo history
+
+        // Restore the next state
+        setCursorIndex(nextState.cursorIndex)
+        setText(nextState.text)
+        //
+        // Add the restored state back to history
+        setHistory((prev) => [...prev, nextState])
+        //
+        // Remove the restored state from redo history
+        setRedoHistory((prev) => prev.slice(0, -1))
+      }
+    }
   }
 
   // Register keyboard handler

@@ -6,12 +6,28 @@ import ModeIndicator from '../common/ModeIndicator'
 import { KeysAllowed } from '../common/KeysAllowed'
 import { VimMode, VIM_MODES } from '../../utils/constants'
 import { Cell } from './Level6/Cell'
+import { RefreshCw } from 'lucide-react'
 
 interface BasicInsertLevel6Props {
   isMuted: boolean
 }
 
 const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
+  const initialCells: Cell[] = [
+    { id: '1', content: '', expected: 'Hello', completed: false },
+    { id: '2', content: 'H', expected: 'Hi', completed: false },
+    { id: '3', content: 'ext', expected: 'Text', completed: false },
+    { id: '4', content: 'im', expected: 'Vim!', completed: false },
+    { id: '5', content: 'Add(i)', expected: 'Add(1)', completed: false },
+    { id: '6', content: '22=51', expected: '2+2=5-1', completed: false },
+    {
+      id: '7',
+      content: 'Insrt Hre',
+      expected: 'Insert Here',
+      completed: false,
+    },
+    { id: '8', content: 'Mood', expected: 'Mode Normal', completed: false },
+  ]
   const [cells, setCells] = useState<Cell[]>([])
   const [activeCell, setActiveCell] = useState<number | null>(null)
   const [score, setScore] = useState(0)
@@ -19,26 +35,12 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
   const [allCompleted, setAllCompleted] = useState(false)
   const [lastKeyPressed, setLastKeyPressed] = useState<string | null>(null)
   const [mode, setMode] = useState<VimMode>(VIM_MODES.NORMAL)
+  const [resetCount, setResetCount] = useState(0)
 
   const isInsertMode = mode === VIM_MODES.INSERT
 
   // Initialize cells with challenges
   useEffect(() => {
-    const initialCells: Cell[] = [
-      { id: '1', content: '', expected: 'Hello', completed: false },
-      { id: '2', content: 'H', expected: 'Hi', completed: false },
-      { id: '3', content: 'ext', expected: 'Text', completed: false },
-      { id: '4', content: 'im', expected: 'Vim!', completed: false },
-      { id: '5', content: 'Add(i)', expected: 'Add(1)', completed: false },
-      { id: '6', content: '22=51', expected: '2+2=5-1', completed: false },
-      {
-        id: '7',
-        content: 'Insrt Hre',
-        expected: 'Insert Here',
-        completed: false,
-      },
-      { id: '8', content: 'Mood', expected: 'Mode Normal', completed: false },
-    ]
     setCells(initialCells)
     setActiveCell(0)
     // setHistory([
@@ -63,6 +65,13 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
     }
   }, [cells])
 
+  const resetLevel = () => {
+    setActiveCell(0)
+    setScore(0)
+    setCells(initialCells)
+    setResetCount((prev) => prev + 1)
+  }
+
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="text-center">
@@ -75,11 +84,11 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
           <kbd className="px-2 py-1 bg-zinc-800 rounded">Escape</kbd> to return
           to normal mode.
         </p>
-        {/* <p className="text-zinc-400 text-sm mt-1"> */}
-        {/*   Use <kbd className="px-2 py-1 bg-zinc-800 rounded">u</kbd> to undo and{' '} */}
-        {/*   <kbd className="px-2 py-1 bg-zinc-800 rounded">Ctrl+r</kbd> to redo */}
-        {/*   changes. */}
-        {/* </p> */}
+        <p className="text-zinc-400 text-sm mt-1">
+          Use <kbd className="px-2 py-1 bg-zinc-800 rounded">u</kbd> to undo and{' '}
+          <kbd className="px-2 py-1 bg-zinc-800 rounded">Ctrl+r</kbd> to redo
+          changes.
+        </p>
         {/* <p className="text-zinc-400 text-sm"> */}
         {/*   Edit each cell to match the expected text shown below it. */}
         {/* </p> */}
@@ -88,6 +97,13 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
       <div className="flex items-center gap-4 mb-2">
         {/* Score display */}
         <Scoreboard score={score} maxScore={cells.length * 10} />
+        <button
+          onClick={resetLevel}
+          className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
+          aria-label="Reset Level"
+        >
+          <RefreshCw size={18} className="text-zinc-400" />
+        </button>
         {/* Mode indicator */}
         <ModeIndicator isInsertMode={isInsertMode} />
       </div>
@@ -116,6 +132,7 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
                 },
                 mode,
                 setMode,
+                resetCount,
               }}
             />
           ))}
