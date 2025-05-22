@@ -74,23 +74,15 @@ export function Cell({
 
   // Define key actions
   const keyActions: KeyActionMap = {
-    h: () => {
-      keyActionMap.h()
-    },
-    l: () => {
-      keyActionMap.l()
-    },
-    i: () => {
-      keyActionMap.i()
-    },
-    a: () => {
-      keyActionMap.a()
-    },
-    A: () => {
-      keyActionMap.A()
-    },
-    I: () => {
-      keyActionMap.I()
+    h: keyActionMap.h,
+    l: keyActionMap.l,
+    i: keyActionMap.i,
+    a: keyActionMap.a,
+    A: keyActionMap.A,
+    I: keyActionMap.I,
+    $: keyActionMap.$,
+    x: () => {
+      keyActionMap.x(setText)
     },
     u: () => {
       if (!isInsertMode) {
