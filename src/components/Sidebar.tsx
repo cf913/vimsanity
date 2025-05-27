@@ -79,6 +79,15 @@ const levels = {
       locked: false,
     },
   ],
+  recap: [
+    {
+      id: 8,
+      title: 'A Quick Recap',
+      description: 'All the motions seen so far',
+      wip: true,
+      locked: false,
+    },
+  ],
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -255,6 +264,13 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div className="h-1 w-16 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full" />
         </motion.div>
         {levels.insert.map(renderLevel)}
+        <motion.div className="px-1 my-4" variants={itemVariants}>
+          <h2 className="text-sm uppercase tracking-wider text-zinc-400 font-semibold mb-2">
+            Recap
+          </h2>
+          <div className="h-1 w-16 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full" />
+        </motion.div>
+        {levels.recap.map(renderLevel)}
       </motion.div>
 
       <motion.div
