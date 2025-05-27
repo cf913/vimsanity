@@ -68,6 +68,7 @@ export function Cell({
     setMode,
     mode,
     text,
+    setText,
   })
 
   const isInsertMode = mode === VIM_MODES.INSERT
@@ -81,9 +82,7 @@ export function Cell({
     A: keyActionMap.A,
     I: keyActionMap.I,
     $: keyActionMap.$,
-    x: () => {
-      keyActionMap.x(setText)
-    },
+    x: keyActionMap.x,
     u: () => {
       if (!isInsertMode) {
         if (history.length === 0) return
@@ -145,9 +144,7 @@ export function Cell({
       }
     },
     Enter: () => {},
-    Backspace: () => {
-      keyActionMap['Backspace'](text, setText)
-    },
+    Backspace: keyActionMap['Backspace'],
   }
 
   // Handle character input in insert mode
@@ -157,7 +154,7 @@ export function Cell({
       char.length === 1 &&
       !Object.keys(insertModeActions).includes(char)
     ) {
-      keyActionMap['char'](char, setText)
+      keyActionMap['char'](char)
     }
   }
 

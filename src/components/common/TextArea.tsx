@@ -1,71 +1,15 @@
-import { Fragment, useState } from 'react'
-import { VIM_MODES, VimMode } from '../../../utils/constants'
-import { useVimMotions } from '../../../hooks/useVimMotions'
-import {
-  KeyActionMap,
-  useKeyboardHandler,
-} from '../../../hooks/useKeyboardHandler'
+import { VimMode } from '../../utils/constants'
 
 interface TextAreaProps {
-  initialText: string
+  lines: string[]
+  text: string
+  cursorIndex: number
   mode: VimMode
-  setMode: (mode: VimMode) => void
 }
 
-export function TextArea({ initialText, mode, setMode }: TextAreaProps) {
-  const [cursorIndex, setCursorIndex] = useState(0)
-  const [virtualColumn, setVirtualColumn] = useState(0)
-  const [text, setText] = useState<string>(initialText)
-
-  const lines = text.split('\n')
-
-  const isInsertMode = mode === VIM_MODES.INSERT
-
-  // TODO: make this a hook: useHistory()
-  const initialHistory = [
-    {
-      text: initialText,
-      cursorIndex: 0,
-    },
-  ]
-
-  const { keyActionMap } = useVimMotions({
-    setCursorIndex,
-    cursorIndex,
-    setVirtualColumn,
-    virtualColumn,
-    setMode,
-    mode,
-    text,
-  })
-
-  const keyActions: KeyActionMap = {
-    h: keyActionMap.h,
-    l: keyActionMap.l,
-    k: keyActionMap.k,
-    j: keyActionMap.j,
-    i: keyActionMap.i,
-    a: keyActionMap.a,
-    A: keyActionMap.A,
-    I: keyActionMap.I,
-    $: keyActionMap.$,
-    0: keyActionMap['0'],
-    o: () => keyActionMap.o(text, setText),
-  }
-
-  const insertModeActions: KeyActionMap = {
-    Escape: keyActionMap['Escape'],
-  }
-
-  // Register keyboard handler
-  const { lastKeyPressed } = useKeyboardHandler({
-    keyActionMap: mode === VIM_MODES.INSERT ? insertModeActions : keyActions,
-    dependencies: [isInsertMode],
-    // onAnyKey: handleCharInput,
-    // onCtrlKeys: handleCtrlR,
-    // disabled: !isActive,
-  })
-
+export function TextArea({ lines, text, cursorIndex, mode }: TextAreaProps) {
+  const isInsertMode = mode === 'insert'
+  const isNormalMode = mode === 'normal'
   return (
     <div
       className={`relative flex flex-col justify-center items-center p-4 rounded-lg transition-all duration-200`}
@@ -118,7 +62,7 @@ export function TextArea({ initialText, mode, setMode }: TextAreaProps) {
                 (isCursorOnThisLine ? (
                   <span
                     className={
-                      mode === 'normal'
+                      isNormalMode
                         ? 'bg-emerald-500 text-white rounded'
                         : 'bg-amber-500 text-white rounded'
                     }

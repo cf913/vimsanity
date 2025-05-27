@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { VimMode, VIM_MODES } from '../../../utils/constants'
 import ModeIndicator from '../../common/ModeIndicator'
 import Scoreboard from '../../common/Scoreboard'
-import { TextArea } from './TextArea'
+import { TextEditor } from './TextEditor'
 
 export default function Recap8() {
   const [score, setScore] = useState(0)
@@ -18,8 +18,12 @@ export default function Recap8() {
     alert('reset level')
   }
 
-  const textAreaProps = {
-    initialText: 'This is the init text for the prototype',
+  const textEditorProps = {
+    initialText: `const insertModeActions: KeyActionMap = {
+  Escape: keyActionMap['Escape'],
+  Backspace: keyActionMap['Backspace'],
+  Enter: keyActionMap['Enter'],
+}`,
     mode,
     setMode,
   }
@@ -49,7 +53,7 @@ export default function Recap8() {
         <ModeIndicator isInsertMode={isInsertMode} />
       </div>
       {/* GAME AREA */}
-      <TextArea {...textAreaProps} />
+      <TextEditor {...textEditorProps} />
     </div>
   )
 }

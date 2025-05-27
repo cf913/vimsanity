@@ -20,6 +20,7 @@ interface UseVimMotionsProps {
   setMode: (mode: VimMode) => void
   mode: VimMode
   text: string
+  setText: (text: string) => void
 }
 
 export const useVimMotions = ({
@@ -30,6 +31,7 @@ export const useVimMotions = ({
   setMode,
   mode,
   text,
+  setText,
 }: UseVimMotionsProps) => {
   const isInsertMode = mode === VIM_MODES.INSERT
   const isNormalMode = mode === VIM_MODES.NORMAL
@@ -168,7 +170,7 @@ export const useVimMotions = ({
       setCursorIndex(findLineEnd(text, cursorIndex) + 1)
       setVirtualColumn(findLineEndColumn(text, cursorIndex))
     },
-    o: (text: string, cb: any) => {
+    o: () => {
       // Open line below and start insert
       if (isInsertMode) return
       setMode(VIM_MODES.INSERT)
@@ -177,12 +179,11 @@ export const useVimMotions = ({
       const newContent =
         text.substring(0, lineEnd + 1) + '\n' + text.substring(lineEnd + 1)
 
-      if (cb) cb(newContent)
-
+      setText(newContent)
       setCursorIndex(lineEnd + 2)
       setVirtualColumn(0)
     },
-    O: (text: string, cb: any) => {
+    O: () => {
       // Open line above and start insert
       if (isInsertMode) return
       setMode(VIM_MODES.INSERT)
@@ -191,7 +192,7 @@ export const useVimMotions = ({
       const newContent =
         text.substring(0, lineStart) + '\n' + text.substring(lineStart)
 
-      if (cb) cb(newContent)
+      setText(newContent)
 
       setCursorIndex(lineStart) // the current line because the new line
       setVirtualColumn(0)
@@ -206,7 +207,7 @@ export const useVimMotions = ({
       setCursorIndex(findLineEnd(text, cursorIndex))
       setVirtualColumn(findLineEndColumn(text, cursorIndex))
     },
-    x: (cb: any) => {
+    x: () => {
       // if empty line, do nothing
       if (isLineEmpty(text, cursorIndex)) {
         setVirtualColumn(0)
@@ -216,7 +217,7 @@ export const useVimMotions = ({
       const newText =
         text.substring(0, cursorIndex) + text.substring(cursorIndex + 1)
 
-      if (cb) cb(newText)
+      setText(newText)
 
       if (isEndOfLine(text, cursorIndex)) {
         setCursorIndex(cursorIndex - 1)
@@ -236,24 +237,34 @@ export const useVimMotions = ({
         setVirtualColumn(newCursorIndex - lineStart)
       }
     },
-    Backspace: (text: string, cb: any) => {
+    Backspace: () => {
       if (cursorIndex <= 0) return // nothing to delete here
 
       const beforeCursor = text.substring(0, cursorIndex - 1)
       const afterCursor = text.substring(cursorIndex)
       const newText = beforeCursor + afterCursor
 
-      if (cb) cb(newText)
+      setText(newText)
 
       setCursorIndex(cursorIndex - 1)
     },
-    char: (char: string, cb: any) => {
+    char: (char: string) => {
+      if (!isInsertMode) return
+      if (char.length !== 1) return
+      if (['Escape', 'Backspace', 'Enter'].includes(char)) return
+
       const beforeCursor = text.substring(0, cursorIndex)
       const afterCursor = text.substring(cursorIndex)
       const newText = beforeCursor + char + afterCursor
 
-      if (cb) cb(newText)
+      setText(newText)
 
+      setCursorIndex(cursorIndex + 1)
+    },
+    Enter: () => {
+      const newText =
+        text.substring(0, cursorIndex) + '\n' + text.substring(cursorIndex)
+      setText(newText)
       setCursorIndex(cursorIndex + 1)
     },
   }

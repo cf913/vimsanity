@@ -45,6 +45,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
     setMode,
     mode,
     text: editableText,
+    setText: setEditableText,
   })
 
   // Effect to scroll to cursor when position changes
