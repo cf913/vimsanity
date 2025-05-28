@@ -19,6 +19,8 @@ export const isWordBoundary = (text: string[], index: number): boolean => {
   const current = text[index]
   const prev = text[index - 1]
 
+  console.log({ prev, current })
+
   // Word boundary conditions
   const isPrevSpace = /\s/.test(prev)
   const isPrevPunctuation =
@@ -26,12 +28,15 @@ export const isWordBoundary = (text: string[], index: number): boolean => {
   const isCurrentPunctuation =
     /[.,;:!?()[\]{}'"<>\/\\|+=\-*&^%$#@!~`]/.test(current) && current !== '_'
   const isCurrentSpace = /\s/.test(current)
+  const isCurrentEscapeChar = current === '\n'
+  const isPrevEscapeChar = prev === '\n'
 
   // Start of a word is:
   // 1. After a space
   // 2. A punctuation after a non-punctuation
   // 4. A non-space and non-punctuation after a punctuation
   return (
+    (isPrevEscapeChar && isCurrentEscapeChar) ||
     (isPrevSpace && !isCurrentPunctuation && !isCurrentSpace) ||
     (isCurrentPunctuation && !isPrevPunctuation) ||
     (!isCurrentPunctuation && isPrevPunctuation && !isCurrentSpace)
@@ -61,7 +66,7 @@ export const isWordEnd = (text: string[], index: number): boolean => {
   // 3. A non-punctuation and non-space before a punctuation
   return (
     isNextEndOfLine ||
-    (isNextSpace && !isCurrentPunctuation) ||
+    (isNextSpace && !isCurrentPunctuation && !isCurrentSpace) ||
     (!isNextPunctuation && isCurrentPunctuation) ||
     (isNextPunctuation && !isCurrentPunctuation && !isCurrentSpace)
   )
