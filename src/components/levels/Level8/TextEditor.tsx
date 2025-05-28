@@ -41,30 +41,34 @@ export function TextEditor({ initialText, mode, setMode }: TextEditorProps) {
     setText,
   })
 
+  // generate keyActions from an array of keys
+  const keys: string[] = [
+    'h',
+    'l',
+    'k',
+    'j',
+    'w',
+    'e',
+    'b',
+    '0',
+    '_',
+    '^',
+    '$',
+    'i',
+    'a',
+    'A',
+    'I',
+    'o',
+    'O',
+    'x',
+  ]
+
+  const keyActionsDefault: KeyActionMap = Object.fromEntries(
+    keys.map((key) => [key, keyActionMap[key]]),
+  )
+
   const keyActions: KeyActionMap = {
-    // move - arrow keys
-    h: keyActionMap.h,
-    l: keyActionMap.l,
-    k: keyActionMap.k,
-    j: keyActionMap.j,
-    // move - word navigation
-    w: keyActionMap.w,
-    e: keyActionMap.e,
-    b: keyActionMap.b,
-    // move - line navigation
-    0: keyActionMap['0'],
-    _: keyActionMap['_'],
-    '^': keyActionMap['^'],
-    $: keyActionMap.$,
-    // insert
-    i: keyActionMap.i,
-    a: keyActionMap.a,
-    A: keyActionMap.A,
-    I: keyActionMap.I,
-    o: keyActionMap.o,
-    O: keyActionMap.O,
-    // delete
-    x: keyActionMap.x,
+    ...keyActionsDefault,
   }
 
   const insertModeActions: KeyActionMap = {

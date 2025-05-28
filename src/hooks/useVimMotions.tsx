@@ -62,7 +62,7 @@ export const useVimMotions = ({
     }
   }
 
-  const keyActionMap = {
+  const keyActionMap: Record<string, (args?: any) => void> = {
     h: () => {
       // Move left
       const lineStart = findLineStart(text, cursorIndex)
