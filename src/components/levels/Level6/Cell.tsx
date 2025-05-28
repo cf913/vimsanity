@@ -6,6 +6,7 @@ import {
   useKeyboardHandler,
 } from '../../../hooks/useKeyboardHandler'
 import { TextArea } from '../../common/TextArea'
+import { TextEditor, TextEditorProps } from '../Level8/TextEditor'
 
 export interface Cell {
   id: string
@@ -62,143 +63,158 @@ export function Cell({
     { text: string; cursorIndex: number }[]
   >([])
 
-  const { keyActionMap } = useVimMotions({
-    setCursorIndex,
-    cursorIndex,
-    setVirtualColumn,
-    virtualColumn,
-    setMode,
+  // const { keyActionMap } = useVimMotions({
+  //   setCursorIndex,
+  //   cursorIndex,
+  //   setVirtualColumn,
+  //   virtualColumn,
+  //   setMode,
+  //   mode,
+  //   text,
+  //   setText,
+  // })
+  //
+  // const isInsertMode = mode === VIM_MODES.INSERT
+  //
+  // // Define key actions
+  // const keyActions: KeyActionMap = {
+  //   h: keyActionMap.h,
+  //   l: keyActionMap.l,
+  //   i: keyActionMap.i,
+  //   a: keyActionMap.a,
+  //   A: keyActionMap.A,
+  //   I: keyActionMap.I,
+  //   $: keyActionMap.$,
+  //   x: keyActionMap.x,
+  //   u: () => {
+  //     if (!isInsertMode) {
+  //       if (history.length === 0) return
+  //
+  //       let previousState = null
+  //
+  //       if (history.length === 1) {
+  //         // If there's only one state, reset the level
+  //         previousState = history[0]
+  //       } else {
+  //         // Otherwise, get the second last state from history (the last one is the current state)
+  //         previousState = history[history.length - 2]
+  //         // state on current cell if it's different
+  //         // TODO: test this
+  //         // if (previousState.activeCell !== activeCell) return
+  //       }
+  //
+  //       // Restore the previous state
+  //       setText(previousState.text)
+  //       setCursorIndex(previousState.cursorIndex)
+  //
+  //       if (history.length > 1) {
+  //         // Save the current state to redo history
+  //         const currentState = history[history.length - 1]
+  //         setRedoHistory((prev) => [...prev, currentState])
+  //
+  //         // Remove the old current state from history
+  //         setHistory((prev) => prev.slice(0, -1))
+  //       }
+  //     }
+  //   },
+  // }
+  //
+  // const insertModeActions: KeyActionMap = {
+  //   Escape: () => {
+  //     keyActionMap['Escape']()
+  //     // Save the state to history when exiting insert mode (following Vim behavior)
+  //     // Create deep copies of cells for history
+  //     let newCursorIndex = cursorIndex
+  //
+  //     if (cursorIndex > 0) {
+  //       newCursorIndex = cursorIndex - 1
+  //     }
+  //
+  //     const textCopy = text
+  //     // Save current state to history before switching to normal mode
+  //     setHistory((prev) => [
+  //       ...prev,
+  //       { text: textCopy, cursorIndex: newCursorIndex },
+  //     ])
+  //
+  //     // Clear redo history when making a new change (following Vim behavior)
+  //     setRedoHistory([])
+  //
+  //     // Check if the current cell is completed
+  //     if (text === cell.expected && !cell.completed) {
+  //       // Mark as completed
+  //       setCompletedCell()
+  //     }
+  //   },
+  //   Enter: () => {},
+  //   Backspace: keyActionMap['Backspace'],
+  // }
+  //
+  // // Handle character input in insert mode
+  // const handleCharInput = (char: string) => {
+  //   keyActionMap['char'](char)
+  // }
+  //
+  // const handleCtrlR = (e: KeyboardEvent) => {
+  //   // Check if Ctrl+r was pressed
+  //   if (e.ctrlKey && e.key === 'r') {
+  //     console.log('ctrl+r')
+  //     e.preventDefault() // Prevent browser refresh
+  //
+  //     if (!isInsertMode) {
+  //       // setLastKeyPressed('ctrl+r')
+  //
+  //       if (redoHistory.length === 0) return
+  //
+  //       // Get the last state from redo history
+  //       const nextState = redoHistory[redoHistory.length - 1]
+  //
+  //       // Only redo if we're on the same cell
+  //       // TODO: test this
+  //       // if (nextState.activeCell !== activeCell) return
+  //
+  //       // Create a deep copy of the cells from redo history
+  //
+  //       // Restore the next state
+  //       setCursorIndex(nextState.cursorIndex)
+  //       setText(nextState.text)
+  //       //
+  //       // Add the restored state back to history
+  //       setHistory((prev) => [...prev, nextState])
+  //       //
+  //       // Remove the restored state from redo history
+  //       setRedoHistory((prev) => prev.slice(0, -1))
+  //     }
+  //   }
+  // }
+  //
+  // // Register keyboard handler
+  // const { lastKeyPressed } = useKeyboardHandler({
+  //   keyActionMap: mode === VIM_MODES.INSERT ? insertModeActions : keyActions,
+  //   dependencies: [isInsertMode, isActive],
+  //   onAnyKey: handleCharInput,
+  //   onCtrlKeys: handleCtrlR,
+  //   disabled: !isActive,
+  // })
+  //
+  // useEffect(() => {
+  //   setLastKeyPressed(lastKeyPressed)
+  // }, [lastKeyPressed])
+
+  const textEditorProps: TextEditorProps = {
+    initialText: cell.content,
     mode,
-    text,
-    setText,
-  })
-
-  const isInsertMode = mode === VIM_MODES.INSERT
-
-  // Define key actions
-  const keyActions: KeyActionMap = {
-    h: keyActionMap.h,
-    l: keyActionMap.l,
-    i: keyActionMap.i,
-    a: keyActionMap.a,
-    A: keyActionMap.A,
-    I: keyActionMap.I,
-    $: keyActionMap.$,
-    x: keyActionMap.x,
-    u: () => {
-      if (!isInsertMode) {
-        if (history.length === 0) return
-
-        let previousState = null
-
-        if (history.length === 1) {
-          // If there's only one state, reset the level
-          previousState = history[0]
-        } else {
-          // Otherwise, get the second last state from history (the last one is the current state)
-          previousState = history[history.length - 2]
-          // state on current cell if it's different
-          // TODO: test this
-          // if (previousState.activeCell !== activeCell) return
-        }
-
-        // Restore the previous state
-        setText(previousState.text)
-        setCursorIndex(previousState.cursorIndex)
-
-        if (history.length > 1) {
-          // Save the current state to redo history
-          const currentState = history[history.length - 1]
-          setRedoHistory((prev) => [...prev, currentState])
-
-          // Remove the old current state from history
-          setHistory((prev) => prev.slice(0, -1))
-        }
-      }
-    },
-  }
-
-  const insertModeActions: KeyActionMap = {
-    Escape: () => {
-      keyActionMap['Escape']()
-      // Save the state to history when exiting insert mode (following Vim behavior)
-      // Create deep copies of cells for history
-      let newCursorIndex = cursorIndex
-
-      if (cursorIndex > 0) {
-        newCursorIndex = cursorIndex - 1
-      }
-
-      const textCopy = text
-      // Save current state to history before switching to normal mode
-      setHistory((prev) => [
-        ...prev,
-        { text: textCopy, cursorIndex: newCursorIndex },
-      ])
-
-      // Clear redo history when making a new change (following Vim behavior)
-      setRedoHistory([])
-
+    setMode,
+    setLastKeyPressed,
+    activeKeys: ['h', 'l', 'j', 'k', 'i', 'a'],
+    onCompleted: ({ newText }: Record<string, any>) => {
       // Check if the current cell is completed
-      if (text === cell.expected && !cell.completed) {
-        // Mark as completed
+      if (newText === cell.expected && !cell.completed) {
         setCompletedCell()
+        setText(newText)
       }
     },
-    Enter: () => {},
-    Backspace: keyActionMap['Backspace'],
   }
-
-  // Handle character input in insert mode
-  const handleCharInput = (char: string) => {
-    keyActionMap['char'](char)
-  }
-
-  const handleCtrlR = (e: KeyboardEvent) => {
-    // Check if Ctrl+r was pressed
-    if (e.ctrlKey && e.key === 'r') {
-      console.log('ctrl+r')
-      e.preventDefault() // Prevent browser refresh
-
-      if (!isInsertMode) {
-        // setLastKeyPressed('ctrl+r')
-
-        if (redoHistory.length === 0) return
-
-        // Get the last state from redo history
-        const nextState = redoHistory[redoHistory.length - 1]
-
-        // Only redo if we're on the same cell
-        // TODO: test this
-        // if (nextState.activeCell !== activeCell) return
-
-        // Create a deep copy of the cells from redo history
-
-        // Restore the next state
-        setCursorIndex(nextState.cursorIndex)
-        setText(nextState.text)
-        //
-        // Add the restored state back to history
-        setHistory((prev) => [...prev, nextState])
-        //
-        // Remove the restored state from redo history
-        setRedoHistory((prev) => prev.slice(0, -1))
-      }
-    }
-  }
-
-  // Register keyboard handler
-  const { lastKeyPressed } = useKeyboardHandler({
-    keyActionMap: mode === VIM_MODES.INSERT ? insertModeActions : keyActions,
-    dependencies: [isInsertMode, isActive],
-    onAnyKey: handleCharInput,
-    onCtrlKeys: handleCtrlR,
-    disabled: !isActive,
-  })
-
-  useEffect(() => {
-    setLastKeyPressed(lastKeyPressed)
-  }, [lastKeyPressed])
 
   return (
     <div
@@ -210,16 +226,7 @@ export function Cell({
       } ${cell.completed ? 'border-2 border-emerald-500' : ''}`}
     >
       <div className="text-2xl font-mono mb-2 min-h-[2rem]">
-        {isActive ? (
-          <TextArea
-            lines={text.split('\n')}
-            text={text}
-            cursorIndex={cursorIndex}
-            mode={mode}
-          />
-        ) : (
-          text || '\u00A0'
-        )}
+        {isActive ? <TextEditor {...textEditorProps} /> : text || '\u00A0'}
       </div>
       <div className="text-sm text-zinc-400 absolute bottom-2">
         Expected: {cell.expected}

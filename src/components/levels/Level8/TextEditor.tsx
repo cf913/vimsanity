@@ -7,13 +7,23 @@ import {
 } from '../../../hooks/useKeyboardHandler'
 import { TextArea } from '../../common/TextArea'
 
-interface TextEditorProps {
+export interface TextEditorProps {
   initialText: string
   mode: VimMode
   setMode: (mode: VimMode) => void
+  setLastKeyPressed: (key: string | null) => void
+  activeKeys: string[]
+  onCompleted?: ({ newText }: Record<string, any>) => void
 }
 
-export function TextEditor({ initialText, mode, setMode }: TextEditorProps) {
+export function TextEditor({
+  initialText,
+  mode,
+  setMode,
+  setLastKeyPressed,
+  activeKeys = ['h', 'l', 'j', 'k'],
+  onCompleted,
+}: TextEditorProps) {
   const [cursorIndex, setCursorIndex] = useState(0)
   const [virtualColumn, setVirtualColumn] = useState(0)
   const [text, setText] = useState<string>(initialText)
@@ -40,26 +50,7 @@ export function TextEditor({ initialText, mode, setMode }: TextEditorProps) {
   })
 
   // generate keyActions from an array of keys
-  const keys: string[] = [
-    'h',
-    'l',
-    'k',
-    'j',
-    'w',
-    'e',
-    'b',
-    '0',
-    '_',
-    '^',
-    '$',
-    'i',
-    'a',
-    'A',
-    'I',
-    'o',
-    'O',
-    'x',
-  ]
+  const keys: string[] = activeKeys
 
   const keyActionsDefault: KeyActionMap = Object.fromEntries(
     keys.map((key) => [key, keyActionMap[key]]),
@@ -70,7 +61,12 @@ export function TextEditor({ initialText, mode, setMode }: TextEditorProps) {
   }
 
   const insertModeActions: KeyActionMap = {
-    Escape: keyActionMap['Escape'],
+    Escape: () => {
+      keyActionMap['Escape']()
+      if (onCompleted) {
+        onCompleted({ newText: text })
+      }
+    },
     Backspace: keyActionMap['Backspace'],
     Enter: keyActionMap['Enter'],
   }
@@ -85,6 +81,7 @@ export function TextEditor({ initialText, mode, setMode }: TextEditorProps) {
     keyActionMap: mode === VIM_MODES.INSERT ? insertModeActions : keyActions,
     dependencies: [isInsertMode],
     onAnyKey: handleCharInput,
+    onSetLastKeyPressed: setLastKeyPressed,
     // onCtrlKeys: handleCtrlR,
     // disabled: !isActive,
   })

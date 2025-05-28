@@ -3,11 +3,13 @@ import { useState } from 'react'
 import { VimMode, VIM_MODES } from '../../../utils/constants'
 import ModeIndicator from '../../common/ModeIndicator'
 import Scoreboard from '../../common/Scoreboard'
-import { TextEditor } from './TextEditor'
+import { TextEditor, TextEditorProps } from './TextEditor'
+import { KeysAllowed } from '../../common/KeysAllowed'
 
 export default function Recap8() {
   const [score, setScore] = useState(0)
   const [mode, setMode] = useState<VimMode>(VIM_MODES.NORMAL)
+  const [lastKeyPressed, setLastKeyPressed] = useState<string | null>(null)
 
   const isInsertMode = mode === VIM_MODES.INSERT
 
@@ -18,7 +20,9 @@ export default function Recap8() {
     alert('reset level')
   }
 
-  const textEditorProps = {
+  const ACTIVE_KEYS = ['i', 'a', 'u', 'h', 'j', 'k', 'l', 'ctrl+r', 'Escape']
+
+  const textEditorProps: TextEditorProps = {
     initialText: `const insertModeActions: KeyActionMap = {
   Escape: keyActionMap['Escape'],
   Backspace: keyActionMap['Backspace'],
@@ -26,6 +30,8 @@ export default function Recap8() {
 }`,
     mode,
     setMode,
+    setLastKeyPressed,
+    activeKeys: ACTIVE_KEYS,
   }
 
   return (
@@ -54,6 +60,8 @@ export default function Recap8() {
       </div>
       {/* GAME AREA */}
       <TextEditor {...textEditorProps} />
+      {/* Key indicators */}
+      <KeysAllowed keys={ACTIVE_KEYS} lastKeyPressed={lastKeyPressed} />
     </div>
   )
 }

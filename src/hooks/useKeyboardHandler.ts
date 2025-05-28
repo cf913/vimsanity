@@ -13,6 +13,7 @@ interface UseKeyboardHandlerProps {
   dependencies?: unknown[]
   onAnyKey?: (key: string) => void
   onCtrlKeys?: (e: KeyboardEvent) => void
+  onSetLastKeyPressed?: (key: string | null) => void
   disabled?: boolean
 }
 
@@ -21,6 +22,7 @@ export const useKeyboardHandler = ({
   dependencies = [],
   onAnyKey,
   onCtrlKeys,
+  onSetLastKeyPressed,
   disabled = false,
 }: UseKeyboardHandlerProps) => {
   const [lastKeyPressed, setLastKeyPressed] = useState<string | null>(null)
@@ -43,10 +45,16 @@ export const useKeyboardHandler = ({
 
       // Set the last key pressed for animation
       setLastKeyPressed(e.key)
+      if (onSetLastKeyPressed) {
+        onSetLastKeyPressed(e.key)
+      }
 
       // Reset the animation after a short delay
       setTimeout(() => {
         setLastKeyPressed(null)
+        if (onSetLastKeyPressed) {
+          onSetLastKeyPressed(null)
+        }
       }, 150)
 
       // Call the onAnyKey handler if provided
