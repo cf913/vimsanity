@@ -1,11 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useVimMotions } from '../../../hooks/useVimMotions'
-import { VimMode, VIM_MODES } from '../../../utils/constants'
-import {
-  KeyActionMap,
-  useKeyboardHandler,
-} from '../../../hooks/useKeyboardHandler'
-import { TextArea } from '../../common/TextArea'
+import { VIM_MODES, VimMode } from '../../../utils/constants'
 import { TextEditor, TextEditorProps } from '../Level8/TextEditor'
 
 export interface Cell {
@@ -34,8 +28,6 @@ export function Cell({
   setMode,
   resetCount,
 }: CellProps) {
-  const [cursorIndex, setCursorIndex] = useState(0)
-  const [virtualColumn, setVirtualColumn] = useState(0)
   const [text, setText] = useState<string>(cell.content)
 
   const initialHistory = [
@@ -48,8 +40,6 @@ export function Cell({
   // triggers a cell reset
   useEffect(() => {
     setText(cell.content)
-    setCursorIndex(0)
-    setVirtualColumn(0)
     setHistory(initialHistory)
     setMode(VIM_MODES.NORMAL)
   }, [resetCount])
