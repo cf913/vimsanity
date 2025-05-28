@@ -63,29 +63,8 @@ export function Cell({
     { text: string; cursorIndex: number }[]
   >([])
 
-  // const { keyActionMap } = useVimMotions({
-  //   setCursorIndex,
-  //   cursorIndex,
-  //   setVirtualColumn,
-  //   virtualColumn,
-  //   setMode,
-  //   mode,
-  //   text,
-  //   setText,
-  // })
-  //
-  // const isInsertMode = mode === VIM_MODES.INSERT
-  //
   // // Define key actions
   // const keyActions: KeyActionMap = {
-  //   h: keyActionMap.h,
-  //   l: keyActionMap.l,
-  //   i: keyActionMap.i,
-  //   a: keyActionMap.a,
-  //   A: keyActionMap.A,
-  //   I: keyActionMap.I,
-  //   $: keyActionMap.$,
-  //   x: keyActionMap.x,
   //   u: () => {
   //     if (!isInsertMode) {
   //       if (history.length === 0) return
@@ -146,13 +125,6 @@ export function Cell({
   //       setCompletedCell()
   //     }
   //   },
-  //   Enter: () => {},
-  //   Backspace: keyActionMap['Backspace'],
-  // }
-  //
-  // // Handle character input in insert mode
-  // const handleCharInput = (char: string) => {
-  //   keyActionMap['char'](char)
   // }
   //
   // const handleCtrlR = (e: KeyboardEvent) => {
@@ -188,18 +160,6 @@ export function Cell({
   //   }
   // }
   //
-  // // Register keyboard handler
-  // const { lastKeyPressed } = useKeyboardHandler({
-  //   keyActionMap: mode === VIM_MODES.INSERT ? insertModeActions : keyActions,
-  //   dependencies: [isInsertMode, isActive],
-  //   onAnyKey: handleCharInput,
-  //   onCtrlKeys: handleCtrlR,
-  //   disabled: !isActive,
-  // })
-  //
-  // useEffect(() => {
-  //   setLastKeyPressed(lastKeyPressed)
-  // }, [lastKeyPressed])
 
   const textEditorProps: TextEditorProps = {
     initialText: cell.content,
