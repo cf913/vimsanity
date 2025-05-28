@@ -53,7 +53,8 @@ export function TextEditor({ initialText, mode, setMode }: TextEditorProps) {
     b: keyActionMap.b,
     // move - line navigation
     0: keyActionMap['0'],
-    // '_': keyActionMap['_'],
+    _: keyActionMap['_'],
+    '^': keyActionMap['^'],
     $: keyActionMap.$,
     // insert
     i: keyActionMap.i,

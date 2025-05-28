@@ -122,6 +122,19 @@ export const findLineStart = (text: string, currentPos: number): number => {
   return lineStart === 0 && text.charAt(0) === '\n' ? 1 : lineStart
 }
 
+export const findLineStartNonBlank = (
+  text: string,
+  currentPos: number,
+): number => {
+  // go to the first non-blank character in the line
+  // if the current position is already at the first non-blank character, return the current position
+  let lineStart = findLineStart(text, currentPos)
+  while (lineStart < text.length && text[lineStart] === ' ') {
+    lineStart++
+  }
+  return lineStart
+}
+
 /**
  * Find the end of the current line
  */

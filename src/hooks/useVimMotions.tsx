@@ -3,6 +3,7 @@ import {
   findLineEnd,
   findLineEndColumn,
   findLineStart,
+  findLineStartNonBlank,
   findNextLineStart,
   findPrevLineEnd,
   isEndOfLine,
@@ -156,11 +157,21 @@ export const useVimMotions = ({
         setCursorIndex(text.length)
       }
     },
+    _: () => {
+      // Move to the first non-blank character in the line
+      setCursorIndex(findLineStartNonBlank(text, cursorIndex))
+      setVirtualColumn(0)
+    },
+    '^': () => {
+      // Move to the first non-blank character in the line
+      setCursorIndex(findLineStartNonBlank(text, cursorIndex))
+      setVirtualColumn(0)
+    },
     I: () => {
-      // Insert at line start
+      // Insert at first non-blank character in line
       if (isInsertMode) return
       setMode(VIM_MODES.INSERT)
-      setCursorIndex(findLineStart(text, cursorIndex))
+      setCursorIndex(findLineStartNonBlank(text, cursorIndex))
       setVirtualColumn(0)
     },
     A: () => {
