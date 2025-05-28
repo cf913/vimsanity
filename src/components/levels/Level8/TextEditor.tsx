@@ -18,8 +18,6 @@ export function TextEditor({ initialText, mode, setMode }: TextEditorProps) {
   const [virtualColumn, setVirtualColumn] = useState(0)
   const [text, setText] = useState<string>(initialText)
 
-  const lines = text.split('\n')
-
   const isInsertMode = mode === VIM_MODES.INSERT
 
   // TODO: make this a hook: useHistory()
@@ -92,10 +90,11 @@ export function TextEditor({ initialText, mode, setMode }: TextEditorProps) {
   })
 
   const textAreaProps = {
-    lines,
+    lines: text.split('\n'),
     text,
     cursorIndex,
     mode,
   }
+
   return <TextArea {...textAreaProps} />
 }

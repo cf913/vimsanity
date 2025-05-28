@@ -5,6 +5,7 @@ import {
   KeyActionMap,
   useKeyboardHandler,
 } from '../../../hooks/useKeyboardHandler'
+import { TextArea } from '../../common/TextArea'
 
 export interface Cell {
   id: string
@@ -35,6 +36,7 @@ export function Cell({
   const [cursorIndex, setCursorIndex] = useState(0)
   const [virtualColumn, setVirtualColumn] = useState(0)
   const [text, setText] = useState<string>(cell.content)
+
   const initialHistory = [
     {
       text: cell.content,
@@ -149,13 +151,7 @@ export function Cell({
 
   // Handle character input in insert mode
   const handleCharInput = (char: string) => {
-    if (
-      isInsertMode &&
-      char.length === 1 &&
-      !Object.keys(insertModeActions).includes(char)
-    ) {
-      keyActionMap['char'](char)
-    }
+    keyActionMap['char'](char)
   }
 
   const handleCtrlR = (e: KeyboardEvent) => {
@@ -215,43 +211,12 @@ export function Cell({
     >
       <div className="text-2xl font-mono mb-2 min-h-[2rem]">
         {isActive ? (
-          <>
-            {text.split('').map((char, charIdx) => {
-              const isCursorPosition = charIdx === cursorIndex
-              return (
-                <span
-                  key={charIdx}
-                  className={`${
-                    isCursorPosition
-                      ? isInsertMode
-                        ? 'bg-orange-400 text-white rounded'
-                        : 'bg-emerald-400 text-white rounded'
-                      : ''
-                  }`}
-                >
-                  {char === ' ' ? '\u00A0' : char}
-                </span>
-              )
-            })}
-            {/* Show cursor at the end if in append mode */}
-            {isInsertMode && cursorIndex === text.length && cursorIndex > 0 && (
-              <span className="bg-orange-400 text-white rounded">
-                {'\u00A0'}
-              </span>
-            )}
-            {/* Show cursor if content is empty */}
-            {text.length === 0 && (
-              <span
-                className={
-                  isInsertMode
-                    ? 'bg-orange-400 text-white rounded'
-                    : 'bg-emerald-400 text-white rounded'
-                }
-              >
-                {'\u00A0'}
-              </span>
-            )}
-          </>
+          <TextArea
+            lines={text.split('\n')}
+            text={text}
+            cursorIndex={cursorIndex}
+            mode={mode}
+          />
         ) : (
           text || '\u00A0'
         )}
