@@ -1,25 +1,11 @@
-import React, { useState, useEffect, use } from 'react'
-import {
-  useKeyboardHandler,
-  KeyActionMap,
-} from '../../hooks/useKeyboardHandler'
-import ConfettiBurst from './ConfettiBurst'
-import LevelTimer from '../common/LevelTimer'
-import Scoreboard from '../common/Scoreboard'
-import ModeIndicator from '../common/ModeIndicator'
-import WarningSplash from '../common/WarningSplash'
-import { VIM_MODES, VimMode } from '../../utils/constants'
-import {
-  findLineEnd,
-  findLineEndColumn,
-  findLineStart,
-  moveToNextWordBoundary,
-  moveToPrevWordBoundary,
-  moveToWordEnd,
-} from '../../utils/textUtils'
 import { RefreshCw } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { VIM_MODES, VimMode } from '../../utils/constants'
 import { KeysAllowed } from '../common/KeysAllowed'
-import { useVimMotions } from '../../hooks/useVimMotions'
+import LevelTimer from '../common/LevelTimer'
+import ModeIndicator from '../common/ModeIndicator'
+import Scoreboard from '../common/Scoreboard'
+import ConfettiBurst from './ConfettiBurst'
 import { Cell7 } from './Level7/Cell'
 
 interface LineInsertLevel7Props {
@@ -34,7 +20,7 @@ interface TextLine {
   completed: boolean
 }
 
-const LineInsertLevel7: React.FC<LineInsertLevel7Props> = ({ isMuted }) => {
+const LineInsertLevel7: React.FC<LineInsertLevel7Props> = () => {
   const initialCells: TextLine[] = [
     {
       id: '1',
