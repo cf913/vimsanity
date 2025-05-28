@@ -32,7 +32,7 @@ export const isWordBoundary = (text: string[], index: number): boolean => {
   // 2. A punctuation after a non-punctuation
   // 4. A non-space and non-punctuation after a punctuation
   return (
-    (isPrevSpace && !isCurrentPunctuation) ||
+    (isPrevSpace && !isCurrentPunctuation && !isCurrentSpace) ||
     (isCurrentPunctuation && !isPrevPunctuation) ||
     (!isCurrentPunctuation && isPrevPunctuation && !isCurrentSpace)
   )
