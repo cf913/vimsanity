@@ -1,6 +1,6 @@
 import { RefreshCw } from 'lucide-react'
 import { useState } from 'react'
-import { VimMode, VIM_MODES } from '../../../utils/constants'
+import { VIM_MODES, VimMode } from '../../../utils/constants'
 import ModeIndicator from '../../common/ModeIndicator'
 import Scoreboard from '../../common/Scoreboard'
 import { TextEditor, TextEditorProps } from './TextEditor'
@@ -10,7 +10,6 @@ export default function Recap8() {
   const [score, setScore] = useState(0)
   const [mode, setMode] = useState<VimMode>(VIM_MODES.NORMAL)
   const [lastKeyPressed, setLastKeyPressed] = useState<string | null>(null)
-
   const isInsertMode = mode === VIM_MODES.INSERT
 
   const MAX_SCORE = 1

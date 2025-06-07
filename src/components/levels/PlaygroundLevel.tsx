@@ -15,7 +15,7 @@ import {
 } from '../../utils/textUtils'
 import WarningSplash from '../common/WarningSplash'
 import { VIM_MODES, VimMode } from '../../utils/constants'
-import { useVimMotions } from '../../hooks/useVimMotions'
+import { useVimMotionsV2 } from '../../hooks/useVimMotionsV2'
 
 interface PlaygroundLevelProps {
   isMuted: boolean
@@ -37,7 +37,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
   const editorRef = useRef<HTMLDivElement>(null)
   const cursorRef = useRef<HTMLSpanElement>(null)
 
-  const { keyActionMap } = useVimMotions({
+  const { keyActionMap } = useVimMotionsV2({
     setCursorIndex: setCursorPosition,
     cursorIndex: cursorPosition,
     setVirtualColumn,

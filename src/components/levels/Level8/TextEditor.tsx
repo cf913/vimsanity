@@ -1,6 +1,6 @@
 import { Fragment, useState } from 'react'
 import { VIM_MODES, VimMode } from '../../../utils/constants'
-import { useVimMotions } from '../../../hooks/useVimMotions'
+import { useVimMotionsV2 } from '../../../hooks/useVimMotionsV2'
 import {
   KeyActionMap,
   useKeyboardHandler,
@@ -38,7 +38,7 @@ export function TextEditor({
     },
   ]
 
-  const { keyActionMap } = useVimMotions({
+  const { keyActionMap } = useVimMotionsV2({
     setCursorIndex,
     cursorIndex,
     setVirtualColumn,
@@ -53,7 +53,7 @@ export function TextEditor({
   const keys: string[] = activeKeys
 
   const keyActionsDefault: KeyActionMap = Object.fromEntries(
-    keys.map((key) => [key, keyActionMap[key]]),
+    keys.map((key) => [key, keyActionMap[key]])
   )
 
   const keyActions: KeyActionMap = {
