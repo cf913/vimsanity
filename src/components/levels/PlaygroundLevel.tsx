@@ -1,21 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
-import {
-  KeyActionMap,
-  KeyHandler,
-  useKeyboardHandler,
-} from '../../hooks/useKeyboardHandler'
-import {
-  findLineEnd,
-  findLineEndColumn,
-  findLineStart,
-  isLineEmpty,
-  moveToNextWordBoundary,
-  moveToPrevWordBoundary,
-  moveToWordEnd,
-} from '../../utils/textUtils'
-import WarningSplash from '../common/WarningSplash'
-import { VIM_MODES, VimMode } from '../../utils/constants'
 import { useVimMotionsV2 } from '../../hooks/useVimMotionsV2'
+import { VimMode } from '../../utils/constants'
+import WarningSplash from '../common/WarningSplash'
+import { TextEditor } from './Level8/TextEditor'
 
 interface PlaygroundLevelProps {
   isMuted: boolean
@@ -28,6 +15,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
   const [cursorPosition, setCursorPosition] = useState<number>(0)
   const [mode, setMode] = useState<VimMode>('normal')
   const [lines, setLines] = useState<string[]>(editableText.split('\n'))
+  const [lastKeyPressed, setLastKeyPressed] = useState<string | null>(null)
   // Store the "virtual" column for j/k navigation
   const [virtualColumn, setVirtualColumn] = useState<number>(0)
   // Track the pending command for multi-key sequences
@@ -70,238 +58,15 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
     }
   }, [cursorPosition])
 
-  const updateLines = (text: string) => {
-    setEditableText(text)
-    setLines(text.split('\n'))
-  }
-
-  // const generateKeyActions: () => KeyActionMap = () => {
-  //   const KEYS: string[] = ['h', 'l', 'j', 'k']
-  //   const template = (key: string) => {
-  //     setPendingCommand(null)
-  //     keyActionMap[key]()
-  //   }
-  //
-  //   return KEYS.reduce((acc, next) => {
-  //     return { ...acc, [next]: template(next) }
-  //   }, {})
-  // }
-
-  // Define normal mode key actions
-  const normalModeActions: KeyActionMap = {
-    h: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      keyActionMap.h()
-    },
-    l: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      keyActionMap.l()
-    },
-    j: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      keyActionMap.j()
-    },
-    k: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      keyActionMap.k()
-    },
-    w: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      keyActionMap.w()
-    },
-    e: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      keyActionMap.e()
-    },
-    b: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      keyActionMap.b()
-    },
-    '0': () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      keyActionMap['0']()
-    },
-    $: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      keyActionMap.$()
-    },
-    i: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      keyActionMap.i()
-    },
-    I: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      keyActionMap.I()
-    },
-    a: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      keyActionMap.a()
-    },
-    A: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      keyActionMap.A()
-    },
-    o: () => {
-      setPendingCommand(null)
-      keyActionMap.o(editableText, updateLines)
-    },
-    O: () => {
-      setPendingCommand(null)
-      keyActionMap.O(editableText, updateLines)
-    },
-    x: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      keyActionMap.x(updateLines)
-    },
-    d: () => {
-      // If 'd' is already pending, execute the 'dd' command
-      if (pendingCommand === 'd') {
-        // Get current line start position
-        const currentLineStart = findLineStart(editableText, cursorPosition)
-
-        // The findLineEnd function returns the position of the last character in the line
-        // (not including the newline). We need to find the actual end of the line including the newline.
-        const lineEndPos = findLineEnd(editableText, cursorPosition)
-        // Check if there is a newline character after the line end position
-        const hasNewline =
-          lineEndPos + 1 < editableText.length &&
-          editableText[lineEndPos + 1] === '\n'
-        // Real end position including the newline if it exists
-        const realLineEnd = hasNewline ? lineEndPos + 1 : lineEndPos
-
-        // Check if this is the last line
-        const isLastLine = realLineEnd + 1 >= editableText.length
-
-        // Handle the deletion based on line position
-        let newText
-        let newCursorPosition
-
-        if (lines.length === 1) {
-          // If there's only one line, clear it but keep an empty line
-          newText = ''
-          newCursorPosition = 0
-        } else if (isLastLine) {
-          // If it's the last line, remove the line including the newline before it
-          // Find the previous newline character
-          const previousNewlinePos = editableText.lastIndexOf(
-            '\n',
-            currentLineStart - 1,
-          )
-
-          if (previousNewlinePos === -1) {
-            // Edge case: First line is also last line but not the only line
-            newText = ''
-            newCursorPosition = 0
-          } else {
-            // Normal last line case - delete up to the previous newline
-            newText = editableText.substring(0, previousNewlinePos)
-            newCursorPosition = previousNewlinePos
-          }
-        } else {
-          // Standard case: delete the entire line including its newline character
-          newText =
-            editableText.substring(0, currentLineStart) +
-            editableText.substring(realLineEnd + 1)
-          // Position cursor at the beginning of the next line (which is now at currentLineStart)
-          newCursorPosition = currentLineStart
-        }
-
-        // Update text and cursor position
-        updateLines(newText)
-        setCursorPosition(newCursorPosition)
-        // Reset virtual column since we're at the start of a line
-        setVirtualColumn(0)
-
-        // Clear the pending command
-        setPendingCommand(null)
-      } else {
-        // Set 'd' as the pending command
-        setPendingCommand('d')
-      }
-    },
-    Escape: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      // setMode("normal");
+  const editorProps = {
+    initialText: editableText,
+    mode,
+    setMode,
+    setLastKeyPressed,
+    editor: {
+      showLineNumbers: true,
     },
   }
-
-  // Define insert mode key actions
-  const insertModeActions: KeyActionMap = {
-    Escape: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      // if cursor is at the end of the line move one character to the left
-      const lineStart = findLineStart(editableText, cursorPosition)
-      const nextCursorPosition = Math.max(lineStart, cursorPosition - 1)
-      setCursorPosition(nextCursorPosition)
-      setVirtualColumn(nextCursorPosition - lineStart)
-      setMode('normal')
-    },
-    Backspace: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      if (cursorPosition > 0) {
-        const newText =
-          editableText.substring(0, cursorPosition - 1) +
-          editableText.substring(cursorPosition)
-        updateLines(newText)
-        setCursorPosition(cursorPosition - 1)
-      }
-    },
-    Enter: () => {
-      // Clear any pending commands
-      setPendingCommand(null)
-      const newText =
-        editableText.substring(0, cursorPosition) +
-        '\n' +
-        editableText.substring(cursorPosition)
-      updateLines(newText)
-      setCursorPosition(cursorPosition + 1)
-    },
-  }
-
-  // Special handler for character input in insert mode
-  const handleCharInput = (key: string) => {
-    // Clear any pending commands in insert mode
-    if (mode === 'normal' && pendingCommand && key !== pendingCommand) {
-      setPendingCommand(null)
-    }
-
-    if (
-      mode === VIM_MODES.INSERT &&
-      key.length === 1 &&
-      !Object.keys(insertModeActions).includes(key)
-    ) {
-      const newText =
-        editableText.substring(0, cursorPosition) +
-        key +
-        editableText.substring(cursorPosition)
-      updateLines(newText)
-      setCursorPosition(cursorPosition + 1)
-    }
-  }
-
-  // Use our custom keyboard handler
-  const { lastKeyPressed } = useKeyboardHandler({
-    keyActionMap: mode === 'normal' ? normalModeActions : insertModeActions,
-    dependencies: [cursorPosition, editableText, mode],
-    onAnyKey: handleCharInput,
-  })
 
   return (
     <div className="w-full">
@@ -312,97 +77,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
       </div>
 
       <div className="relative w-full max-w-2xl bg-zinc-800 p-6 rounded-lg">
-        <div className="flex relative">
-          {/* Line number column - fixed position */}
-          <div className="pr-3 text-right text-zinc-500 select-none border-r border-zinc-700 mr-3 min-w-[2.5rem] sticky left-0 z-10 bg-zinc-800">
-            {lines.map((_, lineIdx) => (
-              <div
-                key={lineIdx}
-                className="min-h-[1.5em] text-lg leading-relaxed font-mono"
-              >
-                {lineIdx + 1}
-              </div>
-            ))}
-          </div>
-
-          {/* Text content - scrollable */}
-          <div
-            ref={editorRef}
-            className="flex-1 overflow-x-auto text-lg leading-relaxed font-mono"
-          >
-            {lines.map((line, lineIdx) => {
-              // Calculate line start position in the entire text
-              const lineStartPosition =
-                editableText.split('\n').slice(0, lineIdx).join('\n').length +
-                (lineIdx > 0 ? 1 : 0)
-              // Calculate if cursor is on this line
-              const isCursorOnThisLine =
-                cursorPosition >= lineStartPosition &&
-                (lineIdx === lines.length - 1 ||
-                  cursorPosition < lineStartPosition + line.length + 1)
-
-              return (
-                <div key={lineIdx} className="min-h-[1.5em] whitespace-pre">
-                  {line.split('').map((char, charIdx) => {
-                    const absoluteIdx = lineStartPosition + charIdx
-                    const isCursorPosition = absoluteIdx === cursorPosition
-                    const isCursorOnLastChar =
-                      absoluteIdx + 1 === cursorPosition
-
-                    const isInsertMode = mode === 'insert'
-
-                    const isCursorOnLastCharInInsertMode =
-                      isInsertMode &&
-                      isCursorOnLastChar &&
-                      charIdx === line.length - 1
-
-                    return (
-                      <>
-                        <span
-                          key={charIdx}
-                          ref={isCursorPosition ? cursorRef : null}
-                          className={`${
-                            isCursorPosition
-                              ? mode === 'normal'
-                                ? 'bg-emerald-500 text-white rounded'
-                                : 'bg-amber-500 text-white rounded'
-                              : ''
-                          }`}
-                        >
-                          {char === ' ' ? '\u00A0' : char}
-                        </span>
-                        {isCursorOnLastCharInInsertMode && (
-                          <span className="bg-amber-500 text-white rounded">
-                            {'\u00A0'}
-                          </span>
-                        )}
-                      </>
-                    )
-                  })}
-                  {/* empty line */}
-                  {/* Display cursor on empty line */}
-                  {line.length === 0 &&
-                    (isCursorOnThisLine ? (
-                      <span
-                        ref={cursorRef}
-                        className={
-                          mode === 'normal'
-                            ? 'bg-emerald-500 text-white rounded'
-                            : 'bg-amber-500 text-white rounded'
-                        }
-                      >
-                        {'\u00A0'}
-                      </span>
-                    ) : (
-                      <span ref={cursorRef} className="">
-                        {'\u00A0'}
-                      </span>
-                    ))}
-                </div>
-              )
-            })}
-          </div>
-        </div>
+        <TextEditor {...editorProps} />
 
         {/* Position display */}
         <div className="mt-4 flex justify-between items-center">

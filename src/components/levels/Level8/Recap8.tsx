@@ -19,7 +19,18 @@ export default function Recap8() {
     alert('reset level')
   }
 
-  const ACTIVE_KEYS = ['i', 'a', 'u', 'h', 'j', 'k', 'l', 'ctrl+r', 'Escape']
+  const ACTIVE_KEYS = [
+    'i',
+    'a',
+    'u',
+    'h',
+    'j',
+    'k',
+    'l',
+    'ctrl+r',
+    'Escape',
+    'o',
+  ]
 
   const textEditorProps: TextEditorProps = {
     initialText: `const insertModeActions: KeyActionMap = {
@@ -31,6 +42,9 @@ export default function Recap8() {
     setMode,
     setLastKeyPressed,
     activeKeys: ACTIVE_KEYS,
+    editor: {
+      showLineNumbers: false,
+    },
   }
 
   return (

@@ -5,15 +5,16 @@ import {
   KeyActionMap,
   useKeyboardHandler,
 } from '../../../hooks/useKeyboardHandler'
-import { TextArea } from '../../common/TextArea'
+import { EditorProps, TextArea } from '../../common/TextArea'
 
 export interface TextEditorProps {
   initialText: string
   mode: VimMode
   setMode: (mode: VimMode) => void
   setLastKeyPressed: (key: string | null) => void
-  activeKeys: string[]
+  activeKeys?: string[]
   onCompleted?: ({ newText }: Record<string, any>) => void
+  editor: EditorProps
 }
 
 export function TextEditor({
@@ -21,8 +22,9 @@ export function TextEditor({
   mode,
   setMode,
   setLastKeyPressed,
-  activeKeys = ['h', 'l', 'j', 'k'],
+  activeKeys,
   onCompleted,
+  editor,
 }: TextEditorProps) {
   const [cursorIndex, setCursorIndex] = useState(0)
   const [virtualColumn, setVirtualColumn] = useState(0)
@@ -50,11 +52,11 @@ export function TextEditor({
   })
 
   // generate keyActions from an array of keys
-  const keys: string[] = activeKeys
+  const keys: string[] | undefined = activeKeys
 
-  const keyActionsDefault: KeyActionMap = Object.fromEntries(
-    keys.map((key) => [key, keyActionMap[key]])
-  )
+  const keyActionsDefault: KeyActionMap = keys
+    ? Object.fromEntries(keys.map((key) => [key, keyActionMap[key]]))
+    : keyActionMap
 
   const keyActions: KeyActionMap = {
     ...keyActionsDefault,
@@ -91,6 +93,7 @@ export function TextEditor({
     text,
     cursorIndex,
     mode,
+    editor,
   }
 
   return <TextArea {...textAreaProps} />
