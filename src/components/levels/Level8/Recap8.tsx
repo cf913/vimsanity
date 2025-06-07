@@ -43,7 +43,8 @@ export default function Recap8() {
     setLastKeyPressed,
     activeKeys: ACTIVE_KEYS,
     editor: {
-      showLineNumbers: false,
+      showLineNumbers: true,
+      fontSize: 20,
     },
   }
 

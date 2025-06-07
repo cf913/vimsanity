@@ -112,7 +112,22 @@ export const editingMotions: VimMotion[] = [
     },
     condition: (context: MotionContext) => context.mode === VIM_MODES.INSERT,
   },
-
+  {
+    key: 'Tab',
+    description: 'Insert tab character',
+    category: 'editing',
+    execute: (context: MotionContext) => {
+      const SPACES_PER_TAB = 2
+      if (context.mode !== VIM_MODES.INSERT) return
+      context.setText(
+        context.text.substring(0, context.cursorIndex) +
+          ' '.repeat(SPACES_PER_TAB) +
+          context.text.substring(context.cursorIndex),
+      )
+      context.setCursorIndex(context.cursorIndex + SPACES_PER_TAB)
+    },
+    condition: (context: MotionContext) => context.mode === VIM_MODES.INSERT,
+  },
   {
     key: 'char',
     description: 'Insert character at cursor',

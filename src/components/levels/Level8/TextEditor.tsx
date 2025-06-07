@@ -71,6 +71,7 @@ export function TextEditor({
     },
     Backspace: keyActionMap['Backspace'],
     Enter: keyActionMap['Enter'],
+    Tab: keyActionMap['Tab'],
   }
 
   // Handle character input in insert mode
