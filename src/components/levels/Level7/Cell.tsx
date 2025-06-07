@@ -49,6 +49,9 @@ export function Cell7({
         setText(newText)
       }
     },
+    editor: {
+      fontSize: 20,
+    },
   }
 
   return (
@@ -60,7 +63,7 @@ export function Cell7({
           : 'bg-zinc-800'
       } ${cell.completed ? 'border-2 border-emerald-500' : ''}`}
     >
-      <div className="text-2xl font-mono mb-2 min-h-[2rem]">
+      <div className="text-xl font-mono mb-2 min-h-[2rem]">
         {isActive ? <TextEditor {...textEditorProps} /> : text || '\u00A0'}
       </div>
       <div className="text-sm text-zinc-400 mt-2 border-t border-zinc-700 pt-2">

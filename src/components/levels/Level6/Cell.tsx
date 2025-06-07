@@ -164,6 +164,9 @@ export function Cell({
         setText(newText)
       }
     },
+    editor: {
+      fontSize: 24,
+    },
   }
 
   return (
