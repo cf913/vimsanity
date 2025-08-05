@@ -3,6 +3,7 @@ import { useVimMotionsV2 } from '../../hooks/useVimMotionsV2'
 import { VimMode } from '../../utils/constants'
 import WarningSplash from '../common/WarningSplash'
 import { TextEditor } from './Level8/TextEditor'
+import { DebugHistory } from './Level9/DebugHistory'
 
 interface PlaygroundLevelProps {
   isMuted: boolean
@@ -75,7 +76,10 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = () => {
 
       <div className="relative w-full max-w-2xl bg-zinc-800 p-6 rounded-lg">
         <TextEditor {...editorProps} />
+      </div>
 
+      {/* Debug History Component */}
+      <div className="mt-8">
         {/* Position display */}
         <div className="mt-4 flex justify-between items-center">
           <div className="text-sm text-zinc-400">

@@ -8,6 +8,7 @@ import SearchLevel5 from './levels/SearchLevel5'
 import BasicInsertLevel6 from './levels/BasicInsertLevel6'
 import LineInsertLevel7 from './levels/LineInsertLevel7'
 import Recap8 from './levels/Level8/Recap8'
+import UndoRedoLevel9 from './levels/Level9/UndoRedoLevel9'
 
 interface GameAreaProps {
   level: number
@@ -72,6 +73,8 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
         return <LineInsertLevel7 isMuted={isMuted} />
       case 8:
         return <Recap8 />
+      case 9:
+        return <UndoRedoLevel9 />
       default:
         return <GridMovementLevel isMuted={isMuted} />
     }

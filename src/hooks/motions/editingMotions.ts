@@ -15,6 +15,38 @@ const getCurrentColumn = (context: MotionContext) => {
 
 export const editingMotions: VimMotion[] = [
   {
+    key: 'u',
+    description: 'Undo last change',
+    category: 'editing',
+    execute: (context: MotionContext) => {
+      if (!context.history) return
+      
+      const previousState = context.history.undo()
+      if (previousState) {
+        context.setText(previousState.text)
+        context.setCursorIndex(previousState.cursorIndex)
+      }
+    },
+    condition: (context: MotionContext) => context.mode === VIM_MODES.NORMAL && context.history?.canUndo,
+  },
+
+  {
+    key: 'ctrl+r',
+    description: 'Redo last undone change',
+    category: 'editing',
+    execute: (context: MotionContext) => {
+      if (!context.history) return
+      
+      const redoState = context.history.redo()
+      if (redoState) {
+        context.setText(redoState.text)
+        context.setCursorIndex(redoState.cursorIndex)
+      }
+    },
+    condition: (context: MotionContext) => context.mode === VIM_MODES.NORMAL && context.history?.canRedo,
+  },
+
+  {
     key: 'x',
     description: 'Delete character under cursor',
     category: 'editing',
@@ -22,6 +54,14 @@ export const editingMotions: VimMotion[] = [
       if (isLineEmpty(context.text, context.cursorIndex)) {
         context.setVirtualColumn(0)
         return
+      }
+
+      // Save state to history before making changes
+      if (context.history) {
+        context.history.pushToHistory({
+          text: context.text,
+          cursorIndex: context.cursorIndex,
+        })
       }
 
       const newText =
@@ -46,6 +86,14 @@ export const editingMotions: VimMotion[] = [
     execute: (context: MotionContext) => {
       if (context.mode === VIM_MODES.INSERT) return
 
+      // Save state to history before making changes
+      if (context.history) {
+        context.history.pushToHistory({
+          text: context.text,
+          cursorIndex: context.cursorIndex,
+        })
+      }
+
       context.setMode(VIM_MODES.INSERT)
       const lineEnd = findLineEnd(context.text, context.cursorIndex)
       const newContent =
@@ -66,6 +114,14 @@ export const editingMotions: VimMotion[] = [
     category: 'editing',
     execute: (context: MotionContext) => {
       if (context.mode === VIM_MODES.INSERT) return
+
+      // Save state to history before making changes
+      if (context.history) {
+        context.history.pushToHistory({
+          text: context.text,
+          cursorIndex: context.cursorIndex,
+        })
+      }
 
       context.setMode(VIM_MODES.INSERT)
       const lineStart = findLineStart(context.text, context.cursorIndex)

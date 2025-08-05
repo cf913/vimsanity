@@ -1,4 +1,5 @@
 import { VimMode } from '../../utils/constants'
+import { UseHistoryReturn } from '../useHistory'
 
 export interface MotionContext {
   setCursorIndex: (position: number) => void
@@ -9,6 +10,7 @@ export interface MotionContext {
   mode: VimMode
   text: string
   setText: (text: string) => void
+  history?: UseHistoryReturn
 }
 
 export interface VimMotion {

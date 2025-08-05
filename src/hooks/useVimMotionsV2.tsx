@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { VimMode } from '../utils/constants'
 import { MotionContext, VimMotion } from './motions/types'
+import { UseHistoryReturn } from './useHistory'
 import {
   createMotionRegistry,
   executeMotion,
@@ -18,6 +19,7 @@ interface UseVimMotionsV2Props {
   setText: (text: string) => void
   customMotions?: VimMotion[] // Allow custom motions to be added
   enabledMotions?: string[] // Allow filtering of enabled motions
+  history?: UseHistoryReturn // Optional history for undo/redo
 }
 
 export const useVimMotionsV2 = ({
@@ -31,6 +33,7 @@ export const useVimMotionsV2 = ({
   setText,
   customMotions = [],
   enabledMotions,
+  history,
 }: UseVimMotionsV2Props) => {
   // Create motion context
   const context: MotionContext = useMemo(() => ({
@@ -42,7 +45,8 @@ export const useVimMotionsV2 = ({
     mode,
     text,
     setText,
-  }), [setCursorIndex, cursorIndex, setVirtualColumn, virtualColumn, setMode, mode, text, setText])
+    history,
+  }), [setCursorIndex, cursorIndex, setVirtualColumn, virtualColumn, setMode, mode, text, setText, history])
 
   // Create motion registry with custom motions
   const motionRegistry = useMemo(() => {
