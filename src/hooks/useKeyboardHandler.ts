@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react'
 
 // Define a type for key handlers
-export type KeyHandler = (key: string) => void
+export type KeyHandler = () => void
 
 // Define a type for the key action map
 export interface KeyActionMap {
@@ -13,6 +13,7 @@ interface UseKeyboardHandlerProps {
   dependencies?: unknown[]
   onAnyKey?: (key: string) => void
   onCtrlKeys?: (e: KeyboardEvent) => void
+  onSetLastKeyPressed?: (key: string | null) => void
   disabled?: boolean
 }
 
@@ -21,6 +22,7 @@ export const useKeyboardHandler = ({
   dependencies = [],
   onAnyKey,
   onCtrlKeys,
+  onSetLastKeyPressed,
   disabled = false,
 }: UseKeyboardHandlerProps) => {
   const [lastKeyPressed, setLastKeyPressed] = useState<string | null>(null)
@@ -43,10 +45,16 @@ export const useKeyboardHandler = ({
 
       // Set the last key pressed for animation
       setLastKeyPressed(e.key)
+      if (onSetLastKeyPressed) {
+        onSetLastKeyPressed(e.key)
+      }
 
       // Reset the animation after a short delay
       setTimeout(() => {
         setLastKeyPressed(null)
+        if (onSetLastKeyPressed) {
+          onSetLastKeyPressed(null)
+        }
       }, 150)
 
       // Call the onAnyKey handler if provided
@@ -58,10 +66,24 @@ export const useKeyboardHandler = ({
         onCtrlKeys(e)
       }
 
-      // Check if there's a handler for this key
-      const handler = keyActionMap[e.key]
+      // Build the key string based on modifiers
+      let keyString = ''
+      if (e.ctrlKey && e.key !== 'Control') keyString += 'ctrl+'
+      if (e.shiftKey && e.key !== 'Shift') keyString += 'shift+'
+      if (e.altKey && e.key !== 'Alt') keyString += 'alt+'
+      if (e.metaKey && e.key !== 'Meta') keyString += 'meta+'
+      keyString += e.key.toLowerCase()
+
+      // Check if there's a handler for the full key combination first
+      let handler = keyActionMap[keyString]
+      
+      // Fall back to just the key if no combination handler exists
+      if (!handler) {
+        handler = keyActionMap[e.key]
+      }
+      
       if (handler) {
-        handler(e.key)
+        handler()
       }
     },
     [keyActionMap, onAnyKey, disabled],

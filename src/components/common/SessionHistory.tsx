@@ -92,8 +92,8 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ levelId }) => {
             }}
           />
           <Tooltip
-            formatter={(value: any) => formatSeconds(Number(value))}
-            labelFormatter={(idx: any) => `Session ${idx}`}
+            formatter={(value: number) => formatSeconds(Number(value))}
+            labelFormatter={(idx: number) => `Session ${idx}`}
             contentStyle={{
               background: '#18181b',
               border: 'none',

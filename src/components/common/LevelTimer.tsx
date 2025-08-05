@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useTimer } from '../../hooks/useTimer'
 import { Clock } from 'lucide-react'
-import SessionHistory from './SessionHistory'
 
 interface LevelTimerProps {
   levelId: string | number
@@ -78,7 +77,9 @@ const LevelTimer: React.FC<LevelTimerProps> = ({
       if (prev) {
         try {
           arr = JSON.parse(prev)
-        } catch {}
+        } catch {
+          // Ignore parsing errors
+        }
       }
       arr.push({
         duration: parseDuration(sessionFormattedTime),

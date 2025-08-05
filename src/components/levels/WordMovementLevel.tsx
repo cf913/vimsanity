@@ -12,7 +12,7 @@ import {
 import ExplosionEffect from './ExplosionEffect'
 import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
-import { RefreshCw, Shuffle, Trophy, Zap } from 'lucide-react'
+import { RefreshCw, Shuffle, Zap } from 'lucide-react'
 import Scoreboard from '../common/Scoreboard'
 import { KeysAllowed } from '../common/KeysAllowed'
 import { KBD } from '../common/KBD'
@@ -188,7 +188,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
 
       // Generate new target - must be a square that hasn't been revealed yet
       let newTarget
-      let availableSquares = squares
+      const availableSquares = squares
         .filter(
           (square, idx) =>
             !square.isSpace && idx !== cursor && !revealedLetters.has(idx),

@@ -15,7 +15,7 @@ interface LevelProps {
   isMuted: boolean
 }
 
-const LineOperations3: React.FC<LevelProps> = ({ isMuted }) => {
+const LineOperations3: React.FC<LevelProps> = () => {
   // Array of 5 different lines of text
   const sampleTexts = [
     'Norem ipsum dolor sC',

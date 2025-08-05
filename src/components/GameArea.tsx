@@ -7,6 +7,8 @@ import FindChars4 from './levels/FindChars4'
 import SearchLevel5 from './levels/SearchLevel5'
 import BasicInsertLevel6 from './levels/BasicInsertLevel6'
 import LineInsertLevel7 from './levels/LineInsertLevel7'
+import Recap8 from './levels/Level8/Recap8'
+import UndoRedoLevel9 from './levels/Level9/UndoRedoLevel9'
 
 interface GameAreaProps {
   level: number
@@ -14,11 +16,12 @@ interface GameAreaProps {
 }
 
 // Changelog version and message
-const GAME_VERSION = '0.0.15'
+const GAME_VERSION = '0.0.16'
 
 const CHANGELOG_MESSAGE = `
 <b>What's New in ${GAME_VERSION}</b><br/><br/>
-- Many bug fixes, nothing exciting this week<br/><br/>
+- Added level 9: Undo and Redo<br/><br/>
+- Back from holidays, more updates coming soon!
 Thanks for playing!
 `
 
@@ -69,6 +72,10 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
         return <BasicInsertLevel6 isMuted={isMuted} />
       case 7:
         return <LineInsertLevel7 isMuted={isMuted} />
+      case 8:
+        return <Recap8 />
+      case 9:
+        return <UndoRedoLevel9 />
       default:
         return <GridMovementLevel isMuted={isMuted} />
     }

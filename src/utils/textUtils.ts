@@ -19,20 +19,25 @@ export const isWordBoundary = (text: string[], index: number): boolean => {
   const current = text[index]
   const prev = text[index - 1]
 
+  console.log({ prev, current })
+
   // Word boundary conditions
   const isPrevSpace = /\s/.test(prev)
   const isPrevPunctuation =
-    /[.,;:!?()[\]{}'"<>\/\\|+=\-*&^%$#@!~`]/.test(prev) && prev !== '_'
+    /[.,;:!?()[\]{}'"<>/\\|+=\-*&^%$#@!~`]/.test(prev) && prev !== '_'
   const isCurrentPunctuation =
-    /[.,;:!?()[\]{}'"<>\/\\|+=\-*&^%$#@!~`]/.test(current) && current !== '_'
+    /[.,;:!?()[\]{}'"<>/\\|+=\-*&^%$#@!~`]/.test(current) && current !== '_'
   const isCurrentSpace = /\s/.test(current)
+  const isCurrentEscapeChar = current === '\n'
+  const isPrevEscapeChar = prev === '\n'
 
   // Start of a word is:
   // 1. After a space
   // 2. A punctuation after a non-punctuation
   // 4. A non-space and non-punctuation after a punctuation
   return (
-    (isPrevSpace && !isCurrentPunctuation) ||
+    (isPrevEscapeChar && isCurrentEscapeChar) ||
+    (isPrevSpace && !isCurrentPunctuation && !isCurrentSpace) ||
     (isCurrentPunctuation && !isPrevPunctuation) ||
     (!isCurrentPunctuation && isPrevPunctuation && !isCurrentSpace)
   )
@@ -50,9 +55,9 @@ export const isWordEnd = (text: string[], index: number): boolean => {
   const isNextSpace = /\s/.test(next)
   const isNextEndOfLine = index >= text.length - 1
   const isCurrentPunctuation =
-    /[.,;:!?()[\]{}'"<>\/\\|+=\-*&^%$#@!~`]/.test(current) && current !== '_'
+    /[.,;:!?()[\]{}'"<>/\\|+=\-*&^%$#@!~`]/.test(current) && current !== '_'
   const isNextPunctuation =
-    /[.,;:!?()[\]{}'"<>\/\\|+=\-*&^%$#@!~`]/.test(next) && next !== '_'
+    /[.,;:!?()[\]{}'"<>/\\|+=\-*&^%$#@!~`]/.test(next) && next !== '_'
   const isCurrentSpace = /\s/.test(current)
 
   // End of a word is:
@@ -61,7 +66,7 @@ export const isWordEnd = (text: string[], index: number): boolean => {
   // 3. A non-punctuation and non-space before a punctuation
   return (
     isNextEndOfLine ||
-    (isNextSpace && !isCurrentPunctuation) ||
+    (isNextSpace && !isCurrentPunctuation && !isCurrentSpace) ||
     (!isNextPunctuation && isCurrentPunctuation) ||
     (isNextPunctuation && !isCurrentPunctuation && !isCurrentSpace)
   )
@@ -117,12 +122,30 @@ export const findLineStart = (text: string, currentPos: number): number => {
   return lineStart === 0 && text.charAt(0) === '\n' ? 1 : lineStart
 }
 
+export const findLineStartNonBlank = (
+  text: string,
+  currentPos: number,
+): number => {
+  // go to the first non-blank character in the line
+  // if the current position is already at the first non-blank character, return the current position
+  let lineStart = findLineStart(text, currentPos)
+  while (lineStart < text.length && text[lineStart] === ' ') {
+    lineStart++
+  }
+  return lineStart
+}
+
 /**
  * Find the end of the current line
  */
 export const findLineEnd = (text: string, currentPos: number): number => {
   const endOfLine = text.indexOf('\n', currentPos)
   return endOfLine === -1 ? text.length - 1 : endOfLine - 1
+}
+
+export const isEndOfLine = (text: string, currentPos: number): boolean => {
+  const lineEnd = findLineEnd(text, currentPos)
+  return currentPos === lineEnd
 }
 
 export const findPrevLineEnd = (text: string, currentPos: number): number => {

@@ -1,1 +1,0 @@
-const VIM_KEYS = {}
