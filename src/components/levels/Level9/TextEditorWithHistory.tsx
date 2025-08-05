@@ -14,7 +14,7 @@ export interface TextEditorWithHistoryProps {
   setMode: (mode: VimMode) => void
   setLastKeyPressed: (key: string | null) => void
   activeKeys?: string[]
-  onCompleted?: ({ newText }: { newText: string }) => void
+  onCompleted?: ({ newText, undoCount, redoCount }: { newText: string; undoCount: number; redoCount: number }) => void
   editor: EditorProps
 }
 
@@ -30,6 +30,8 @@ export function TextEditorWithHistory({
   const [cursorIndex, setCursorIndex] = useState(0)
   const [virtualColumn, setVirtualColumn] = useState(0)
   const [text, setText] = useState<string>(initialText)
+  const [undoCount, setUndoCount] = useState(0)
+  const [redoCount, setRedoCount] = useState(0)
 
   const isInsertMode = mode === VIM_MODES.INSERT
 
@@ -65,26 +67,44 @@ export function TextEditorWithHistory({
 
   const keyActions: KeyActionMap = {
     ...keyActionsDefault,
+    u: () => {
+      if (keyActionMap['u']) {
+        keyActionMap['u']()
+        setUndoCount(prev => prev + 1)
+      }
+    },
+    'ctrl+r': () => {
+      if (keyActionMap['ctrl+r']) {
+        keyActionMap['ctrl+r']()
+        setRedoCount(prev => prev + 1)
+      }
+    },
+    Escape: () => {
+      keyActionMap['Escape']()
+      if (onCompleted) {
+        onCompleted({ newText: text, undoCount, redoCount })
+      }
+    },
   }
 
   const insertModeActions: KeyActionMap = {
     Escape: () => {
       keyActionMap['Escape']()
-      
+
       // Save current state to history when exiting insert mode (following Vim behavior)
       let newCursorIndex = cursorIndex
       if (cursorIndex > 0) {
         newCursorIndex = cursorIndex - 1
       }
-      
+
       // Save current state to history
       history.pushToHistory({
         text: text,
         cursorIndex: newCursorIndex,
       })
-      
+
       if (onCompleted) {
-        onCompleted({ newText: text })
+        onCompleted({ newText: text, undoCount, redoCount })
       }
     },
     Backspace: keyActionMap['Backspace'],
