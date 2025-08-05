@@ -7,6 +7,7 @@ import { TextEditorWithHistory } from './TextEditorWithHistory'
 import { KeysAllowed } from '../../common/KeysAllowed'
 import LevelTimer from '../../common/LevelTimer'
 import ConfettiBurst from '../ConfettiBurst'
+import { KBD } from '../../common/KBD'
 
 interface Challenge {
   id: string
@@ -28,10 +29,10 @@ const challenges: Challenge[] = [
     initialText: 'Hello World',
     expectedText: 'Hello World',
     instructions: [
-      '1. Delete the "W" with x',
-      '2. Press u to undo the deletion',
-      '3. The text should be restored',
-      '4. Hit ESCAPE to submit',
+      'Delete the "W" with x',
+      'Press u to undo the deletion',
+      'The text should be restored',
+      'Hit ESCAPE to submit',
     ],
     completedMessage: 'Great! You undid the change successfully!',
     requiredUndos: 1,
@@ -40,13 +41,13 @@ const challenges: Challenge[] = [
     id: 'multiple-undo',
     title: 'Multiple Undos',
     description: 'Undo multiple changes in sequence',
-    initialText: 'Vim Editor',
-    expectedText: 'Vim Editor',
+    initialText: 'Vim Editor\nMotions are fun',
+    expectedText: 'Vim Editor\nMotions are fun',
     instructions: [
-      '1. Delete "E" with x, then delete "d" with x',
-      '2. Press u twice to undo both deletions',
-      '3. All changes should be undone',
-      '4. Hit ESCAPE to submit',
+      'Delete "E" with x, then delete "d" with x',
+      'Press u twice to undo both deletions',
+      'All changes should be undone',
+      'Hit ESCAPE to submit',
     ],
     completedMessage: 'Excellent! You mastered multiple undos!',
     requiredUndos: 2,
@@ -58,11 +59,11 @@ const challenges: Challenge[] = [
     initialText: 'Practice Text',
     expectedText: 'Practice',
     instructions: [
-      '1. Delete " Text" (space and Text)',
-      '2. Press u to undo',
-      '3. Press Ctrl+r to redo the deletion',
-      '4. Final text should be "Practice"',
-      '5. Hit ESCAPE to submit',
+      'Delete " Text" (space and Text)',
+      'Press u to undo',
+      'Press Ctrl+r to redo the deletion',
+      'Final text should be "Practice"',
+      'Hit ESCAPE to submit',
     ],
     completedMessage: 'Perfect! You learned undo and redo!',
     requiredUndos: 1,
@@ -75,11 +76,11 @@ const challenges: Challenge[] = [
     initialText: 'Hello',
     expectedText: 'Hello',
     instructions: [
-      '1. Press i to enter insert mode',
-      '2. Type " World" and press Escape',
-      '3. Press u to undo the insertion',
-      '4. Text should return to "Hello"',
-      '5. Hit ESCAPE to submit',
+      'Press i to enter insert mode',
+      'Type " World" and press Escape',
+      'Press u to undo the insertion',
+      'Text should return to "Hello"',
+      'Hit ESCAPE to submit',
     ],
     completedMessage: 'Amazing! Insert mode changes can be undone too!',
     requiredUndos: 1,
@@ -91,11 +92,12 @@ const challenges: Challenge[] = [
     initialText: 'Code',
     expectedText: 'Coding',
     instructions: [
-      '1. Press A to append, type "ing", press Escape',
-      '2. Delete the "g" with x',
-      '3. Press u to undo the deletion',
-      '4. Final result should be "Coding"',
-      '5. Hit ESCAPE to submit',
+      'Press A to append, type "ing", press Escape',
+      'Delete the "g" with x',
+      'Press u to undo the deletion',
+      'Final result should be "Coding"',
+      'Yup, delete that "e"',
+      'Hit ESCAPE to submit',
     ],
     completedMessage: 'Mastery achieved! You understand the undo/redo system!',
     requiredUndos: 1,
@@ -117,24 +119,30 @@ export default function UndoRedoLevel9() {
   const isInsertMode = mode === VIM_MODES.INSERT
   const isLevelCompleted = score === MAX_SCORE
 
-  const handleChallengeCompleted = ({ 
-    newText, 
-    undoCount, 
-    redoCount 
-  }: { 
-    newText: string; 
-    undoCount: number; 
-    redoCount: number 
+  const handleChallengeCompleted = ({
+    newText,
+    undoCount,
+    redoCount,
+  }: {
+    newText: string
+    undoCount: number
+    redoCount: number
   }) => {
     // Update current counts for display
     setCurrentUndoCount(undoCount)
     setCurrentRedoCount(redoCount)
-    
+
     const textMatches = newText.trim() === challenge.expectedText.trim()
     const undoRequirementMet = undoCount >= challenge.requiredUndos
-    const redoRequirementMet = !challenge.requiredRedos || redoCount >= challenge.requiredRedos
-    
-    if (textMatches && undoRequirementMet && redoRequirementMet && !challengeCompleted) {
+    const redoRequirementMet =
+      !challenge.requiredRedos || redoCount >= challenge.requiredRedos
+
+    if (
+      textMatches &&
+      undoRequirementMet &&
+      redoRequirementMet &&
+      !challengeCompleted
+    ) {
       setChallengeCompleted(true)
       setScore(score + 1)
       setShowConfetti(true)
@@ -179,7 +187,8 @@ export default function UndoRedoLevel9() {
             Level 9: Undo & Redo
           </h1>
           <p className="text-zinc-400 text-lg">
-            Master the power of history navigation with 'u' and 'Ctrl+r'
+            Master the power of history navigation with <KBD>u</KBD> and
+            <KBD>ctrl</KBD>+<KBD>r</KBD>
           </p>
         </div>
 
@@ -211,21 +220,35 @@ export default function UndoRedoLevel9() {
 
           {/* Progress indicator */}
           <div className="bg-zinc-900 rounded-lg p-4 mb-4">
-            <h3 className="text-lg font-semibold mb-2 text-blue-400">Progress:</h3>
+            <h3 className="text-lg font-semibold mb-2 text-blue-400">
+              Progress:
+            </h3>
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">
-                <span className={`w-4 h-4 rounded-full ${currentUndoCount >= challenge.requiredUndos ? 'bg-green-500' : 'bg-zinc-600'}`}></span>
-                <span>Undos: {currentUndoCount}/{challenge.requiredUndos}</span>
+                <span
+                  className={`w-4 h-4 rounded-full ${currentUndoCount >= challenge.requiredUndos ? 'bg-green-500' : 'bg-zinc-600'}`}
+                ></span>
+                <span>
+                  Undos: {currentUndoCount}/{challenge.requiredUndos}
+                </span>
               </div>
               {challenge.requiredRedos && (
                 <div className="flex items-center gap-2">
-                  <span className={`w-4 h-4 rounded-full ${currentRedoCount >= challenge.requiredRedos ? 'bg-green-500' : 'bg-zinc-600'}`}></span>
-                  <span>Redos: {currentRedoCount}/{challenge.requiredRedos}</span>
+                  <span
+                    className={`w-4 h-4 rounded-full ${currentRedoCount >= challenge.requiredRedos ? 'bg-green-500' : 'bg-zinc-600'}`}
+                  ></span>
+                  <span>
+                    Redos: {currentRedoCount}/{challenge.requiredRedos}
+                  </span>
                 </div>
               )}
               <div className="flex items-center gap-2">
-                <span className={`w-4 h-4 rounded-full ${challengeCompleted ? 'bg-green-500' : 'bg-zinc-600'}`}></span>
-                <span>Text matches expected: {challengeCompleted ? 'Yes' : 'No'}</span>
+                <span
+                  className={`w-4 h-4 rounded-full ${challengeCompleted ? 'bg-green-500' : 'bg-zinc-600'}`}
+                ></span>
+                <span>
+                  Text matches expected: {challengeCompleted ? 'Yes' : 'No'}
+                </span>
               </div>
             </div>
           </div>
@@ -242,7 +265,7 @@ export default function UndoRedoLevel9() {
         {/* Editor */}
         <div className="bg-zinc-800 rounded-lg p-6 mb-6">
           <div className="flex justify-between items-center mb-4">
-            <ModeIndicator mode={mode} />
+            <ModeIndicator isInsertMode={isInsertMode} />
             <div className="flex gap-2">
               <button
                 onClick={resetChallenge}
