@@ -177,23 +177,20 @@ export default function UndoRedoLevel9() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-zinc-900 text-white p-8">
+    <div className="flex flex-col items-center gap-4">
       {showConfetti && <ConfettiBurst />}
 
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-4xl flex flex-col gap-4">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Level 9: Undo & Redo
-          </h1>
-          <p className="text-zinc-400 text-lg">
+        <div className="text-center">
+          <p className="text-zinc-400 px-2">
             Master the power of history navigation with <KBD>u</KBD> and
             <KBD>ctrl</KBD>+<KBD>r</KBD>
           </p>
         </div>
 
         {/* Progress */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-center items-center mb-2 gap-4">
           <Scoreboard score={score} maxScore={MAX_SCORE} />
           <div className="text-sm text-zinc-400">
             Challenge {currentChallenge + 1} of {challenges.length}
