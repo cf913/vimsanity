@@ -45,10 +45,12 @@ export function DebugHistory() {
     ...keyActionMap,
     'u': () => {
       addLog('Undo key pressed - before undo')
+      addLog(`Before undo - Cursor: ${cursorIndex}, Text: "${text}"`)
       addLog(`Before undo - History: ${history.history.length}, Redo: ${history.redoHistory.length}`)
       
       if (keyActionMap['u']) {
         const result = keyActionMap['u']()
+        addLog(`After undo - Cursor: ${cursorIndex}, Text: "${text}"`)
         addLog(`After undo - History: ${history.history.length}, Redo: ${history.redoHistory.length}`)
         return result
       } else {
@@ -57,10 +59,12 @@ export function DebugHistory() {
     },
     'ctrl+r': () => {
       addLog('Ctrl+R key pressed - before redo')
+      addLog(`Before redo - Cursor: ${cursorIndex}, Text: "${text}"`)
       addLog(`Before redo - History: ${history.history.length}, Redo: ${history.redoHistory.length}`)
       
       if (keyActionMap['ctrl+r']) {
         const result = keyActionMap['ctrl+r']()
+        addLog(`After redo - Cursor: ${cursorIndex}, Text: "${text}"`)
         addLog(`After redo - History: ${history.history.length}, Redo: ${history.redoHistory.length}`)
         return result
       } else {
@@ -89,7 +93,7 @@ export function DebugHistory() {
     if (result) {
       setText(result.text)
       setCursorIndex(result.cursorIndex)
-      addLog(`Manual undo successful: "${result.text}"`)
+      addLog(`Manual undo successful: "${result.text}" cursor: ${result.cursorIndex}`)
     } else {
       addLog('Manual undo failed - no history')
     }
@@ -101,7 +105,7 @@ export function DebugHistory() {
     if (result) {
       setText(result.text)
       setCursorIndex(result.cursorIndex)
-      addLog(`Manual redo successful: "${result.text}"`)
+      addLog(`Manual redo successful: "${result.text}" cursor: ${result.cursorIndex}`)
     } else {
       addLog('Manual redo failed - no redo history')
     }

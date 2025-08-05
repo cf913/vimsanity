@@ -24,7 +24,15 @@ export const editingMotions: VimMotion[] = [
       const previousState = context.history.undo()
       if (previousState) {
         context.setText(previousState.text)
-        context.setCursorIndex(previousState.cursorIndex)
+        
+        // Ensure cursor position is valid for the restored text
+        const maxCursor = Math.max(0, previousState.text.length - 1)
+        const validCursor = Math.min(Math.max(0, previousState.cursorIndex), maxCursor)
+        context.setCursorIndex(validCursor)
+        
+        // Update virtual column to match the cursor position
+        const lineStart = findLineStart(previousState.text, validCursor)
+        context.setVirtualColumn(validCursor - lineStart)
       }
     },
     condition: (context: MotionContext) => context.mode === VIM_MODES.NORMAL && context.history?.canUndo,
@@ -40,7 +48,15 @@ export const editingMotions: VimMotion[] = [
       const redoState = context.history.redo()
       if (redoState) {
         context.setText(redoState.text)
-        context.setCursorIndex(redoState.cursorIndex)
+        
+        // Ensure cursor position is valid for the restored text
+        const maxCursor = Math.max(0, redoState.text.length - 1)
+        const validCursor = Math.min(Math.max(0, redoState.cursorIndex), maxCursor)
+        context.setCursorIndex(validCursor)
+        
+        // Update virtual column to match the cursor position
+        const lineStart = findLineStart(redoState.text, validCursor)
+        context.setVirtualColumn(validCursor - lineStart)
       }
     },
     condition: (context: MotionContext) => context.mode === VIM_MODES.NORMAL && context.history?.canRedo,
