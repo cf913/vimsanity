@@ -24,9 +24,9 @@ export const isWordBoundary = (text: string[], index: number): boolean => {
   // Word boundary conditions
   const isPrevSpace = /\s/.test(prev)
   const isPrevPunctuation =
-    /[.,;:!?()[\]{}'"<>\/\\|+=\-*&^%$#@!~`]/.test(prev) && prev !== '_'
+    /[.,;:!?()[\]{}'"<>/\\|+=\-*&^%$#@!~`]/.test(prev) && prev !== '_'
   const isCurrentPunctuation =
-    /[.,;:!?()[\]{}'"<>\/\\|+=\-*&^%$#@!~`]/.test(current) && current !== '_'
+    /[.,;:!?()[\]{}'"<>/\\|+=\-*&^%$#@!~`]/.test(current) && current !== '_'
   const isCurrentSpace = /\s/.test(current)
   const isCurrentEscapeChar = current === '\n'
   const isPrevEscapeChar = prev === '\n'
@@ -55,9 +55,9 @@ export const isWordEnd = (text: string[], index: number): boolean => {
   const isNextSpace = /\s/.test(next)
   const isNextEndOfLine = index >= text.length - 1
   const isCurrentPunctuation =
-    /[.,;:!?()[\]{}'"<>\/\\|+=\-*&^%$#@!~`]/.test(current) && current !== '_'
+    /[.,;:!?()[\]{}'"<>/\\|+=\-*&^%$#@!~`]/.test(current) && current !== '_'
   const isNextPunctuation =
-    /[.,;:!?()[\]{}'"<>\/\\|+=\-*&^%$#@!~`]/.test(next) && next !== '_'
+    /[.,;:!?()[\]{}'"<>/\\|+=\-*&^%$#@!~`]/.test(next) && next !== '_'
   const isCurrentSpace = /\s/.test(current)
 
   // End of a word is:

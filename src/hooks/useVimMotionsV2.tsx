@@ -33,7 +33,7 @@ export const useVimMotionsV2 = ({
   enabledMotions,
 }: UseVimMotionsV2Props) => {
   // Create motion context
-  const context: MotionContext = {
+  const context: MotionContext = useMemo(() => ({
     setCursorIndex,
     cursorIndex,
     setVirtualColumn,
@@ -42,7 +42,7 @@ export const useVimMotionsV2 = ({
     mode,
     text,
     setText,
-  }
+  }), [setCursorIndex, cursorIndex, setVirtualColumn, virtualColumn, setMode, mode, text, setText])
 
   // Create motion registry with custom motions
   const motionRegistry = useMemo(() => {
@@ -71,10 +71,10 @@ export const useVimMotionsV2 = ({
 
   // Create key action map compatible with existing keyboard handler
   const keyActionMap = useMemo(() => {
-    const actionMap: Record<string, (args?: any) => void> = {}
+    const actionMap: Record<string, (args?: unknown) => void> = {}
 
     Object.keys(activeRegistry).forEach((key) => {
-      actionMap[key] = (args?: any) => {
+      actionMap[key] = (args?: unknown) => {
         executeMotion(key, context, activeRegistry, args)
       }
     })
@@ -92,7 +92,7 @@ export const useVimMotionsV2 = ({
     availableKeys,
     motionRegistry: activeRegistry,
     context,
-    executeMotion: (key: string, args?: any) =>
+    executeMotion: (key: string, args?: unknown) =>
       executeMotion(key, context, activeRegistry, args),
   }
 }

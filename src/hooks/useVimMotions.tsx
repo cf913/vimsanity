@@ -4,7 +4,6 @@ import {
   findLineEndColumn,
   findLineStart,
   findLineStartNonBlank,
-  findNextLineStart,
   findPrevLineEnd,
   isEndOfLine,
   isLineEmpty,
@@ -35,7 +34,6 @@ export const useVimMotions = ({
   setText,
 }: UseVimMotionsProps) => {
   const isInsertMode = mode === VIM_MODES.INSERT
-  const isNormalMode = mode === VIM_MODES.NORMAL
 
   const editableText = text.split('')
 
@@ -62,7 +60,7 @@ export const useVimMotions = ({
     }
   }
 
-  const keyActionMap: Record<string, (args?: any) => void> = {
+  const keyActionMap: Record<string, (args?: unknown) => void> = {
     h: () => {
       // Move left
       const lineStart = findLineStart(text, cursorIndex)

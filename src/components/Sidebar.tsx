@@ -1,8 +1,6 @@
 import React from 'react'
 import {
   BookOpen,
-  Volume2,
-  VolumeX,
   X,
   ChevronRight,
   Construction,
@@ -93,8 +91,6 @@ const levels = {
 const Sidebar: React.FC<SidebarProps> = ({
   currentLevel,
   setCurrentLevel,
-  isMuted,
-  setIsMuted,
   onClose,
   onReturnToLanding,
 }) => {
@@ -125,13 +121,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     },
   }
 
-  const buttonVariants = {
-    initial: { scale: 1 },
-    hover: {
-      transition: { duration: 0.2 },
-    },
-    tap: { scale: 1 },
-  }
 
   const levelButtonVariants = {
     initial: (locked: boolean) => ({

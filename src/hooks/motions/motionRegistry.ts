@@ -28,7 +28,7 @@ export const executeMotion = (
   key: string,
   context: MotionContext,
   registry: MotionRegistry = defaultMotionRegistry,
-  args?: any
+  args?: unknown
 ): boolean => {
   const motion = registry[key]
 

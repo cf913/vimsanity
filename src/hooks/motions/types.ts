@@ -15,7 +15,7 @@ export interface VimMotion {
   key: string
   description: string
   category: 'movement' | 'editing' | 'mode' | 'text-object'
-  execute: (context: MotionContext, args?: any) => void
+  execute: (context: MotionContext, args?: unknown) => void
   condition?: (context: MotionContext) => boolean
 }
 

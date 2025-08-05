@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { VIM_MODES, VimMode } from '../../../utils/constants'
 import { TextEditor, TextEditorProps } from '../Level8/TextEditor'
 
@@ -30,28 +30,23 @@ export function Cell({
 }: CellProps) {
   const [text, setText] = useState<string>(cell.content)
 
-  const initialHistory = [
+  const initialHistory = useMemo(() => [
     {
       text: cell.content,
       cursorIndex: 0,
     },
-  ]
+  ], [cell.content])
 
   // triggers a cell reset
   useEffect(() => {
     setText(cell.content)
     setHistory(initialHistory)
     setMode(VIM_MODES.NORMAL)
-  }, [resetCount])
+  }, [resetCount, cell.content, initialHistory, setMode])
 
   // History state for undo functionality
-  const [history, setHistory] =
+  const [, setHistory] =
     useState<{ text: string; cursorIndex: number }[]>(initialHistory)
-
-  // Redo history state for Ctrl+r functionality
-  const [redoHistory, setRedoHistory] = useState<
-    { text: string; cursorIndex: number }[]
-  >([])
 
   // // Define key actions
   // const keyActions: KeyActionMap = {
@@ -157,7 +152,7 @@ export function Cell({
     setMode,
     setLastKeyPressed,
     activeKeys: ['h', 'l', 'j', 'k', 'i', 'a'],
-    onCompleted: ({ newText }: Record<string, any>) => {
+    onCompleted: ({ newText }: { newText: string }) => {
       // Check if the current cell is completed
       if (newText === cell.expected && !cell.completed) {
         setCompletedCell()

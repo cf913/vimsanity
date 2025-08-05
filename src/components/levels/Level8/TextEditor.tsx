@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { useState } from 'react'
 import { VIM_MODES, VimMode } from '../../../utils/constants'
 import { useVimMotionsV2 } from '../../../hooks/useVimMotionsV2'
 import {
@@ -13,7 +13,7 @@ export interface TextEditorProps {
   setMode: (mode: VimMode) => void
   setLastKeyPressed: (key: string | null) => void
   activeKeys?: string[]
-  onCompleted?: ({ newText }: Record<string, any>) => void
+  onCompleted?: ({ newText }: { newText: string }) => void
   editor: EditorProps
 }
 
@@ -33,12 +33,6 @@ export function TextEditor({
   const isInsertMode = mode === VIM_MODES.INSERT
 
   // TODO: make this a hook: useHistory()
-  const initialHistory = [
-    {
-      text: initialText,
-      cursorIndex: 0,
-    },
-  ]
 
   const { keyActionMap } = useVimMotionsV2({
     setCursorIndex,
@@ -80,7 +74,7 @@ export function TextEditor({
   }
 
   // Register keyboard handler
-  const { lastKeyPressed } = useKeyboardHandler({
+  useKeyboardHandler({
     keyActionMap: mode === VIM_MODES.INSERT ? insertModeActions : keyActions,
     dependencies: [isInsertMode],
     onAnyKey: handleCharInput,

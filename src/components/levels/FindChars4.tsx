@@ -7,8 +7,7 @@ import { processTextForVim } from '../../utils/textUtils'
 import ExplosionEffect from './ExplosionEffect'
 import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
-import { RefreshCw, Zap, AlertTriangle, X } from 'lucide-react'
-import WarningSplash from '../common/WarningSplash'
+import { RefreshCw } from 'lucide-react'
 import Scoreboard from '../common/Scoreboard'
 import { KeysAllowed } from '../common/KeysAllowed'
 
@@ -16,7 +15,7 @@ interface LevelProps {
   isMuted: boolean
 }
 
-const FindChars4: React.FC<LevelProps> = ({ isMuted }) => {
+const FindChars4: React.FC<LevelProps> = () => {
   // Array of 5 different lines of text
   const sampleTexts = [
     'Vim file navigations',

@@ -34,7 +34,7 @@ export function Cell7({
   useEffect(() => {
     setText(cell.content)
     setMode(VIM_MODES.NORMAL)
-  }, [resetCount])
+  }, [resetCount, cell.content, setMode])
 
   const textEditorProps: TextEditorProps = {
     initialText: cell.content,
@@ -42,7 +42,7 @@ export function Cell7({
     setMode,
     setLastKeyPressed,
     activeKeys: ['h', 'l', 'j', 'k', 'i', 'a', 'I', 'A', 'o', 'O'],
-    onCompleted: ({ newText }: Record<string, any>) => {
+    onCompleted: ({ newText }: { newText: string }) => {
       // Check if the current cell is completed
       if (newText === cell.expected && !cell.completed) {
         setCompletedCell()

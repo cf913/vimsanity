@@ -7,9 +7,8 @@ import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
 import { KeysAllowed } from '../common/KeysAllowed'
 import Scoreboard from '../common/Scoreboard'
-import { Zap, RefreshCw } from 'lucide-react'
+import { RefreshCw } from 'lucide-react'
 import SessionHistory from '../common/SessionHistory'
-import { isDragActive } from 'framer-motion'
 import { KBD } from '../common/KBD'
 
 interface GridMovementLevelProps {
@@ -46,12 +45,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
     y: 5,
   })
   const [score, setScore] = useState(0)
-  const [scoreAnimation, setScoreAnimation] = useState(false)
   const [levelCompleted, setLevelCompleted] = useState(false)
-  const [lastPosition, setLastPosition] = useState<{ x: number; y: number }>({
-    x: 0,
-    y: 0,
-  })
   const [showConfetti, setShowConfetti] = useState(false)
   const [trail, setTrail] = useState<
     Array<{ x: number; y: number; age: number }>

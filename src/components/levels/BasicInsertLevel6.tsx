@@ -12,7 +12,7 @@ interface BasicInsertLevel6Props {
   isMuted: boolean
 }
 
-const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = ({ isMuted }) => {
+const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = () => {
   const initialCells: Cell[] = [
     { id: '1', content: '', expected: 'Hello', completed: false },
     { id: '2', content: 'H', expected: 'Hi', completed: false },

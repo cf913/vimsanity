@@ -8,24 +8,21 @@ interface PlaygroundLevelProps {
   isMuted: boolean
 }
 
-const PlaygroundLevel: React.FC<PlaygroundLevelProps> = ({ isMuted }) => {
+const PlaygroundLevel: React.FC<PlaygroundLevelProps> = () => {
   const [editableText, setEditableText] = useState<string>(
     'This is a Vim playground. Practice your motions here!\n\nNew levels are being added every week!\n\nYou can use h, j, k, l for movement.\nTry w, e, b for word navigation.\nUse i to enter insert mode, Escape to exit.\nPress x to delete characters.',
   )
   const [cursorPosition, setCursorPosition] = useState<number>(0)
   const [mode, setMode] = useState<VimMode>('normal')
-  const [lines, setLines] = useState<string[]>(editableText.split('\n'))
   const [lastKeyPressed, setLastKeyPressed] = useState<string | null>(null)
   // Store the "virtual" column for j/k navigation
   const [virtualColumn, setVirtualColumn] = useState<number>(0)
-  // Track the pending command for multi-key sequences
-  const [pendingCommand, setPendingCommand] = useState<string | null>(null)
 
   // Refs for auto-scrolling
   const editorRef = useRef<HTMLDivElement>(null)
   const cursorRef = useRef<HTMLSpanElement>(null)
 
-  const { keyActionMap } = useVimMotionsV2({
+  useVimMotionsV2({
     setCursorIndex: setCursorPosition,
     cursorIndex: cursorPosition,
     setVirtualColumn,

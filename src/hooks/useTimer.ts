@@ -1,4 +1,3 @@
-import { isDragActive } from 'framer-motion'
 import { useState, useEffect, useRef, useCallback } from 'react'
 
 // Define a type for the timer data stored in localStorage
@@ -106,7 +105,7 @@ export const useTimer = (
         // Update session elapsed time if timer is running
         if (sessionStartRef.current) {
           setSessionElapsedTime(
-            (prev) =>
+            () =>
               (Date.now() - (sessionStartRef.current || Date.now())) / 1000,
           )
         }

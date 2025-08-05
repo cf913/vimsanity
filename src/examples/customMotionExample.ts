@@ -6,7 +6,7 @@ export const customUndoMotion: VimMotion = {
   key: 'ctrl+r',
   description: 'Undo last action',
   category: 'editing',
-  execute: (context) => {
+  execute: () => {
     // Implementation would depend on your undo system
     // This is just a placeholder
     console.log('Undo action executed')
@@ -37,7 +37,7 @@ export const repeatMotion: VimMotion = {
   key: '.',
   description: 'Repeat last action',
   category: 'editing',
-  execute: (context) => {
+  execute: () => {
     // Would need to implement motion history tracking
     console.log('Repeat last action')
   },

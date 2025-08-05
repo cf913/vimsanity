@@ -7,7 +7,7 @@ import { TextEditor, TextEditorProps } from './TextEditor'
 import { KeysAllowed } from '../../common/KeysAllowed'
 
 export default function Recap8() {
-  const [score, setScore] = useState(0)
+  const [score] = useState(0)
   const [mode, setMode] = useState<VimMode>(VIM_MODES.NORMAL)
   const [lastKeyPressed, setLastKeyPressed] = useState<string | null>(null)
   const isInsertMode = mode === VIM_MODES.INSERT
