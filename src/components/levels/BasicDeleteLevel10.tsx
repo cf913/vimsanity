@@ -85,6 +85,19 @@ export default function BasicDeleteLevel10() {
     }
   }, [score, MAX_SCORE, levelCompleted])
 
+  // Handle ESC key for level completion reset
+  useEffect(() => {
+    if (levelCompleted) {
+      const handleEscKey = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          handleRestart()
+        }
+      }
+      window.addEventListener('keydown', handleEscKey)
+      return () => window.removeEventListener('keydown', handleEscKey)
+    }
+  }, [levelCompleted])
+
   const handleRestart = () => {
     const newGrid = initialGrid.map(row => [...row])
     setGrid(newGrid)
@@ -436,12 +449,9 @@ export default function BasicDeleteLevel10() {
             <div className="text-2xl font-bold text-green-400 mb-4">
               Score: {score}/{MAX_SCORE}
             </div>
-            <button
-              onClick={handleRestart}
-              className="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-lg transition-colors font-semibold"
-            >
-              Play Again
-            </button>
+            <p className="text-zinc-400 text-sm">
+              Press <KBD>Esc</KBD> to play again
+            </p>
           </div>
         </div>
       )}

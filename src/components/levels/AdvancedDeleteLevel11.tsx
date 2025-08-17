@@ -58,6 +58,19 @@ export default function AdvancedDeleteLevel11() {
     }
   }, [score, MAX_SCORE, levelCompleted])
 
+  // Handle ESC key for level completion reset
+  useEffect(() => {
+    if (levelCompleted) {
+      const handleEscKey = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          handleRestart()
+        }
+      }
+      window.addEventListener('keydown', handleEscKey)
+      return () => window.removeEventListener('keydown', handleEscKey)
+    }
+  }, [levelCompleted])
+
   const handleRestart = () => {
     setGrid(initialGrid.map(row => [...row]))
     setPosition({ row: 0, col: 0 })
@@ -324,12 +337,9 @@ export default function AdvancedDeleteLevel11() {
             <div className="text-2xl font-bold text-green-400 mb-4">
               Score: {score}/{MAX_SCORE}
             </div>
-            <button
-              onClick={handleRestart}
-              className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors font-semibold"
-            >
-              Play Again
-            </button>
+            <p className="text-zinc-400 text-sm">
+              Press <KBD>Esc</KBD> to play again
+            </p>
           </div>
         </div>
       )}
