@@ -315,18 +315,23 @@ export default function BasicDeleteLevel10() {
               const isDeletedCell = isDeleted(rowIdx, colIdx)
               const isRecentlyDeletedCell = isRecentlyDeleted(rowIdx, colIdx)
 
+              // Cursor colors based on mode (matching ModeIndicator)
+              const cursorBg = mode === VIM_MODES.INSERT ? 'bg-orange-400' : 'bg-emerald-400'
+              const cursorRing = mode === VIM_MODES.INSERT ? 'ring-orange-300' : 'ring-emerald-300'
+              const cursorDot = mode === VIM_MODES.INSERT ? 'bg-orange-400' : 'bg-emerald-400'
+
               return (
                 <div
                   key={`${rowIdx}-${colIdx}`}
                   className={`
                     relative w-10 h-10 flex items-center justify-center text-lg font-mono rounded transition-all duration-200
                     ${isCursor 
-                      ? 'bg-yellow-400 text-black scale-110 shadow-lg ring-2 ring-yellow-300' 
+                      ? `${cursorBg} text-black scale-110 shadow-lg ring-2 ${cursorRing}` 
                       : 'bg-zinc-700'
                     }
-                    ${targetInfo && !isDeletedCell
+                    ${targetInfo && !isDeletedCell && !isCursor
                       ? `${targetInfo.color} font-bold ring-1 ${targetInfo.ring}` 
-                      : 'text-zinc-300'
+                      : !isCursor ? 'text-zinc-300' : 'text-black'
                     }
                     ${isDeletedCell 
                       ? 'bg-green-600 text-green-200' 
@@ -340,7 +345,7 @@ export default function BasicDeleteLevel10() {
                 >
                   {char}
                   {isCursor && (
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse" />
+                    <div className={`absolute -top-1 -right-1 w-3 h-3 ${cursorDot} rounded-full animate-pulse`} />
                   )}
                 </div>
               )
