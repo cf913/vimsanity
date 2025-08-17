@@ -430,6 +430,56 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             </div>
           </>
         )
+      case 9:
+        return (
+          <>
+            <h3 className="text-lg font-semibold mb-2">Undo and Redo</h3>
+            <p className="text-sm mb-3">
+              Navigate through your editing history to undo mistakes and redo changes:
+            </p>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">u</kbd> - Undo last change
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Reverses the most recent edit operation
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Can be used multiple times to undo several changes
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">Ctrl+r</kbd> - Redo change
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Restores a change that was previously undone
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Only works after using undo (u)
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 space-y-2">
+              <div className="text-xs text-zinc-400">
+                <p className="font-medium text-zinc-300 mb-1">How Vim History Works:</p>
+                <ul className="space-y-1 pl-2">
+                  <li>• Each edit creates a new point in history</li>
+                  <li>• Insert mode sessions count as one edit</li>
+                  <li>• Individual deletions (x) are separate edits</li>
+                  <li>• You can undo/redo through multiple changes</li>
+                </ul>
+              </div>
+              <div className="text-xs text-zinc-400">
+                <p className="italic">
+                  Tip: Think of undo/redo as time travel through your editing session.
+                  You can safely experiment knowing you can always go back!
+                </p>
+              </div>
+            </div>
+          </>
+        )
       default:
         return (
           <p className="text-sm">Select a level to see its documentation.</p>
