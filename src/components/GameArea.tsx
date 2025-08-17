@@ -18,12 +18,11 @@ interface GameAreaProps {
 }
 
 // Changelog version and message
-const GAME_VERSION = '0.0.16'
+const GAME_VERSION = '0.0.17'
 
 const CHANGELOG_MESSAGE = `
 <b>What's New in ${GAME_VERSION}</b><br/><br/>
-- Added level 9: Undo and Redo<br/><br/>
-- Back from holidays, more updates coming soon!
+- Added level 10: basic single key delete commands<br/><br/>
 Thanks for playing!
 `
 
