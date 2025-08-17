@@ -247,13 +247,24 @@ export default function BasicDeleteLevel10() {
     setRecentlyDeleted({ row: position.row, col: position.col })
     
     // Check if this was the correct target
-    const target = deleteTargets.find(
-      t => t.row === position.row && t.col === position.col && t.type === command
-    )
+    let target
+    let targetKey
     
-    const targetKey = `${position.row}-${position.col}`
+    if (command === 'S') {
+      // S command works from anywhere on the correct line
+      target = deleteTargets.find(
+        t => t.row === position.row && t.type === command
+      )
+      targetKey = target ? `${target.row}-${target.col}` : null
+    } else {
+      // Other commands need exact position
+      target = deleteTargets.find(
+        t => t.row === position.row && t.col === position.col && t.type === command
+      )
+      targetKey = `${position.row}-${position.col}`
+    }
     
-    if (target && !deletedTargets.has(targetKey)) {
+    if (target && targetKey && !deletedTargets.has(targetKey)) {
       // Correct! Mark as completed
       setDeletedTargets(prev => new Set([...prev, targetKey]))
       setScore(prev => prev + 1)
@@ -262,7 +273,11 @@ export default function BasicDeleteLevel10() {
       // Wrong position or wrong command - show undo message
       const correctTarget = deleteTargets.find(t => t.type === command)
       if (correctTarget) {
-        setWrongMoveMessage(`Wrong position for ${command}! Press u to undo and try from the ${getTargetDescription(command)} target.`)
+        if (command === 'S') {
+          setWrongMoveMessage(`Wrong line for ${command}! Press u to undo and try from the ${getTargetDescription(command)} target line.`)
+        } else {
+          setWrongMoveMessage(`Wrong position for ${command}! Press u to undo and try from the ${getTargetDescription(command)} target.`)
+        }
       } else {
         setWrongMoveMessage(`Command ${command} executed. Press u to undo if this wasn't intended.`)
       }
