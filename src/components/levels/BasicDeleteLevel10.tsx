@@ -37,6 +37,8 @@ export default function BasicDeleteLevel10() {
   const [levelCompleted, setLevelCompleted] = useState(false)
   const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
   const [recentlyDeleted, setRecentlyDeleted] = useState<{ row: number; col: number } | null>(null)
+  const [wrongMoveMessage, setWrongMoveMessage] = useState<string>('')
+  const [gridHistory, setGridHistory] = useState<string[][][]>([initialGrid.map(row => [...row])])
 
   const MAX_SCORE = deleteTargets.length
 
@@ -50,6 +52,16 @@ export default function BasicDeleteLevel10() {
     }
   }, [recentlyDeleted])
 
+  // Reset wrong move message
+  useEffect(() => {
+    if (wrongMoveMessage) {
+      const timer = setTimeout(() => {
+        setWrongMoveMessage('')
+      }, 4000)
+      return () => clearTimeout(timer)
+    }
+  }, [wrongMoveMessage])
+
   // Check if level is completed
   useEffect(() => {
     if (score === MAX_SCORE && !levelCompleted) {
@@ -60,7 +72,8 @@ export default function BasicDeleteLevel10() {
   }, [score, MAX_SCORE, levelCompleted])
 
   const handleRestart = () => {
-    setGrid(initialGrid.map(row => [...row]))
+    const newGrid = initialGrid.map(row => [...row])
+    setGrid(newGrid)
     setPosition({ row: 0, col: 0 })
     setScore(0)
     setDeletedTargets(new Set())
@@ -68,44 +81,78 @@ export default function BasicDeleteLevel10() {
     setShowConfetti(false)
     setLastKeyPressed('')
     setRecentlyDeleted(null)
+    setWrongMoveMessage('')
+    setGridHistory([newGrid])
+  }
+
+  const undoLastAction = () => {
+    if (gridHistory.length > 1) {
+      const newHistory = gridHistory.slice(0, -1)
+      const previousGrid = newHistory[newHistory.length - 1]
+      setGrid(previousGrid.map(row => [...row]))
+      setGridHistory(newHistory)
+      setWrongMoveMessage('')
+      setRecentlyDeleted(null)
+    }
   }
 
   const executeDeleteCommand = (command: string) => {
-    const currentChar = grid[position.row][position.col]
-    const targetKey = `${position.row}-${position.col}`
+    // Always execute the command regardless of position
+    const newGrid = grid.map(row => [...row])
     
-    // Check if this is a valid delete target
+    // Save current grid state to history
+    setGridHistory(prev => [...prev, newGrid])
+    
+    // Apply the command based on type
+    if (command === 'x' || command === 'S') {
+      // Delete single character
+      newGrid[position.row][position.col] = '·'
+    } else if (command === 'D') {
+      // Delete from current position to end of line
+      for (let col = position.col; col < newGrid[position.row].length; col++) {
+        newGrid[position.row][col] = '·'
+      }
+    } else if (command === 'C') {
+      // Change entire line
+      for (let col = 0; col < newGrid[position.row].length; col++) {
+        newGrid[position.row][col] = '·'
+      }
+    }
+    
+    // Update the grid
+    setGrid(newGrid)
+    setRecentlyDeleted({ row: position.row, col: position.col })
+    
+    // Check if this was the correct target
     const target = deleteTargets.find(
       t => t.row === position.row && t.col === position.col && t.type === command
     )
     
+    const targetKey = `${position.row}-${position.col}`
+    
     if (target && !deletedTargets.has(targetKey)) {
-      // Mark as deleted
+      // Correct! Mark as completed
       setDeletedTargets(prev => new Set([...prev, targetKey]))
       setScore(prev => prev + 1)
-      setRecentlyDeleted({ row: position.row, col: position.col })
-      
-      // Update grid based on command type
-      setGrid(prev => {
-        const newGrid = prev.map(row => [...row])
-        
-        if (command === 'x' || command === 'S') {
-          // Delete single character
-          newGrid[position.row][position.col] = '·'
-        } else if (command === 'D') {
-          // Delete from current position to end of line
-          for (let col = position.col; col < newGrid[position.row].length; col++) {
-            newGrid[position.row][col] = '·'
-          }
-        } else if (command === 'C') {
-          // Change entire line
-          for (let col = 0; col < newGrid[position.row].length; col++) {
-            newGrid[position.row][col] = '·'
-          }
-        }
-        
-        return newGrid
-      })
+      setWrongMoveMessage('')
+    } else {
+      // Wrong position or wrong command - show undo message
+      const correctTarget = deleteTargets.find(t => t.type === command)
+      if (correctTarget) {
+        setWrongMoveMessage(`Wrong position for ${command}! Press u to undo and try from the ${getTargetDescription(command)} target.`)
+      } else {
+        setWrongMoveMessage(`Command ${command} executed. Press u to undo if this wasn't intended.`)
+      }
+    }
+  }
+
+  const getTargetDescription = (command: string) => {
+    switch (command) {
+      case 'x': return 'red x'
+      case 'D': return 'orange D'
+      case 'C': return 'blue C'
+      case 'S': return 'purple S'
+      default: return 'correct'
     }
   }
 
@@ -154,6 +201,10 @@ export default function BasicDeleteLevel10() {
       executeDeleteCommand('S')
       setLastKeyPressed('S')
     },
+    u: () => {
+      undoLastAction()
+      setLastKeyPressed('u')
+    },
   }
 
   useKeyboardHandler({
@@ -196,6 +247,13 @@ export default function BasicDeleteLevel10() {
         <p className="text-zinc-400 px-2">
           Use <KBD>x</KBD>, <KBD>D</KBD>, <KBD>C</KBD>, and <KBD>S</KBD> to delete different targets
         </p>
+        {wrongMoveMessage && (
+          <div className="mt-3 p-3 bg-yellow-900/50 border border-yellow-600 rounded-lg max-w-md">
+            <p className="text-yellow-200 text-sm font-medium">
+              ⚠️ {wrongMoveMessage}
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="flex justify-center items-center gap-4 mb-4">
@@ -211,7 +269,7 @@ export default function BasicDeleteLevel10() {
 
       {/* Instructions */}
       <div className="bg-zinc-800 rounded-lg p-4 max-w-2xl">
-        <div className="grid grid-cols-4 gap-4 text-sm">
+        <div className="grid grid-cols-4 gap-4 text-sm mb-3">
           <div className="text-center">
             <div className="text-red-400 font-bold">x</div>
             <div className="text-zinc-400">Delete character</div>
@@ -228,6 +286,9 @@ export default function BasicDeleteLevel10() {
             <div className="text-purple-400 font-bold">S</div>
             <div className="text-zinc-400">Substitute char</div>
           </div>
+        </div>
+        <div className="text-xs text-zinc-500 text-center border-t border-zinc-700 pt-2">
+          💡 Commands work from any position. Use <KBD>u</KBD> to undo mistakes.
         </div>
       </div>
 
@@ -277,7 +338,7 @@ export default function BasicDeleteLevel10() {
 
       {/* Controls */}
       <div className="flex justify-between items-center w-full max-w-md">
-        <KeysAllowed keys={['h', 'j', 'k', 'l', 'x', 'D', 'C', 'S']} />
+        <KeysAllowed keys={['h', 'j', 'k', 'l', 'x', 'D', 'C', 'S', 'u']} />
       </div>
 
       {/* Level completion */}
