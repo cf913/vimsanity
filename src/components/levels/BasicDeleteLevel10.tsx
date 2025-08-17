@@ -13,23 +13,99 @@ import { VIM_MODES, VimMode } from '../../utils/constants'
 import ModeIndicator from '../common/ModeIndicator'
 
 export default function BasicDeleteLevel10() {
-  // Simple grid with different delete targets
-  const initialGrid = [
-    ['V', 'i', 'm', 'x', 'D', 'e', 'l', 'e', 't', 'e'],
-    ['L', 'e', 'a', 'r', 'n', ' ', 'D', '→', '→', '→'],  // D target - delete to end from 'D'
-    ['P', 'r', 'a', 'c', 'x', 'i', 'c', 'e', ' ', 'F'],
-    ['C', '→', '→', '→', '→', '→', '→', 'L', 'i', 'n'],  // C target - change entire line
-    ['S', 'i', 'm', 'p', 'l', 'e', ' ', 'S', 'u', 'n'],  // S target - substitute character
+  // Multiple grid variations with different target positions for muscle memory
+  const gridVariations = [
+    {
+      grid: [
+        ['V', 'i', 'm', 'x', 'D', 'e', 'l', 'e', 't', 'e'],
+        ['L', 'e', 'a', 'r', 'n', ' ', 'D', '→', '→', '→'],  // D target - delete to end from 'D'
+        ['P', 'r', 'a', 'c', 'x', 'i', 'c', 'e', ' ', 'F'],
+        ['C', '→', '→', '→', '→', '→', '→', 'L', 'i', 'n'],  // C target - change entire line
+        ['S', 'i', 'm', 'p', 'l', 'e', ' ', 'S', 'u', 'n'],  // S target - substitute character
+      ],
+      targets: [
+        { row: 0, col: 3, type: 'x' },
+        { row: 1, col: 6, type: 'D' },
+        { row: 2, col: 4, type: 'x' },
+        { row: 3, col: 0, type: 'C' },
+        { row: 4, col: 7, type: 'S' },
+      ]
+    },
+    {
+      grid: [
+        ['E', 'd', 'i', 't', ' ', 'C', 'o', 'd', 'e', 'x'],
+        ['T', 'y', 'p', 'e', 'x', 'F', 'a', 's', 't', ' '],
+        ['Q', 'u', 'D', '→', '→', '→', '→', '→', '→', '→'],  // D target - delete to end from col 2
+        ['S', 'a', 'v', 'e', ' ', 'F', 'i', 'l', 'e', 's'],  // S target at start
+        ['C', '→', '→', '→', '→', '→', '→', '→', '→', '→'],  // C target - change entire line
+      ],
+      targets: [
+        { row: 0, col: 9, type: 'x' },
+        { row: 1, col: 4, type: 'x' },
+        { row: 2, col: 2, type: 'D' },
+        { row: 3, col: 0, type: 'S' },
+        { row: 4, col: 0, type: 'C' },
+      ]
+    },
+    {
+      grid: [
+        ['H', 'a', 'c', 'k', ' ', 'T', 'e', 'x', 't', ' '],
+        ['M', 'o', 'v', 'e', ' ', 'x', 'F', 'a', 's', 't'],
+        ['F', 'a', 's', 't', ' ', 'E', 'd', 'i', 't', 'x'],
+        ['C', '→', '→', '→', '→', '→', '→', '→', '→', '→'],  // C target - change entire line
+        ['B', 'u', 'i', 'l', 'd', ' ', 'D', '→', '→', '→'],  // D target - delete to end
+      ],
+      targets: [
+        { row: 1, col: 5, type: 'x' },
+        { row: 2, col: 9, type: 'x' },
+        { row: 3, col: 0, type: 'C' },
+        { row: 4, col: 6, type: 'D' },
+        { row: 0, col: 0, type: 'S' }, // S target at start of first line
+      ]
+    },
+    {
+      grid: [
+        ['K', 'e', 'y', ' ', 'M', 'a', 'p', 's', 'x', 'R'],
+        ['S', '→', '→', '→', '→', '→', '→', '→', '→', '→'],  // S target - substitute character at start
+        ['A', 'u', 't', 'o', ' ', 'S', 'a', 'v', 'e', 'x'],
+        ['G', 'i', 't', ' ', 'D', '→', '→', '→', '→', '→'],  // D target - delete to end
+        ['C', '→', '→', '→', '→', '→', '→', '→', '→', '→'],  // C target - change entire line
+      ],
+      targets: [
+        { row: 0, col: 8, type: 'x' },
+        { row: 1, col: 0, type: 'S' },
+        { row: 2, col: 9, type: 'x' },
+        { row: 3, col: 4, type: 'D' },
+        { row: 4, col: 0, type: 'C' },
+      ]
+    },
+    {
+      grid: [
+        ['P', 'l', 'u', 'g', 'x', 'I', 'n', 's', ' ', 'M'],
+        ['D', 'o', 'c', 's', ' ', 'H', 'e', 'l', 'p', 'x'],
+        ['R', 'e', 'a', 'd', ' ', 'M', 'o', 'r', 'e', ' '],
+        ['T', 'e', 's', 'D', '→', '→', '→', '→', '→', '→'],  // D target - delete to end
+        ['C', '→', '→', '→', '→', '→', '→', '→', '→', '→'],  // C target - change entire line
+      ],
+      targets: [
+        { row: 0, col: 4, type: 'x' },
+        { row: 1, col: 9, type: 'x' },
+        { row: 2, col: 0, type: 'S' }, // S target at start
+        { row: 3, col: 3, type: 'D' },
+        { row: 4, col: 0, type: 'C' },
+      ]
+    }
   ]
 
-  // Different types of delete targets
-  const deleteTargets = [
-    { row: 0, col: 3, type: 'x' }, // Delete single character with x
-    { row: 1, col: 6, type: 'D' }, // Delete to end of line with D  
-    { row: 2, col: 4, type: 'x' }, // Delete single character with x
-    { row: 3, col: 0, type: 'C' }, // Change entire line with C
-    { row: 4, col: 7, type: 'S' }, // Substitute character with S
-  ]
+  // Select a random grid variation
+  const getRandomGridVariation = () => {
+    const randomIndex = Math.floor(Math.random() * gridVariations.length)
+    return gridVariations[randomIndex]
+  }
+
+  const [currentVariation, setCurrentVariation] = useState(() => getRandomGridVariation())
+  const [initialGrid, setInitialGrid] = useState(() => currentVariation.grid.map(row => [...row]))
+  const [deleteTargets, setDeleteTargets] = useState(currentVariation.targets)
 
   const [grid, setGrid] = useState(initialGrid)
   const [position, setPosition] = useState({ row: 0, col: 0 })
@@ -99,11 +175,18 @@ export default function BasicDeleteLevel10() {
   }, [levelCompleted])
 
   const handleRestart = () => {
-    const newGrid = initialGrid.map(row => [...row])
+    // Get a new random variation with different target positions
+    const newVariation = getRandomGridVariation()
+    const newGrid = newVariation.grid.map(row => [...row])
+    
+    // Update both grid and targets for the new variation
+    setCurrentVariation(newVariation)
+    setInitialGrid(newGrid)
+    setDeleteTargets(newVariation.targets)
     setGrid(newGrid)
+    setDeletedTargets(new Set())
     setPosition({ row: 0, col: 0 })
     setScore(0)
-    setDeletedTargets(new Set())
     setLevelCompleted(false)
     setShowConfetti(false)
     setLastKeyPressed('')
