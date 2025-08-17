@@ -81,7 +81,7 @@ const levels = {
   //     locked: false,
   //   },
   // ],
-  advanced: [
+  history: [
     {
       id: 9,
       title: 'Undo & Redo (u, Ctrl+r)',
@@ -89,6 +89,22 @@ const levels = {
       wip: false,
       locked: false,
     },
+  ],
+  delete: [
+    {
+      id: 10,
+      title: 'Basic Delete (x, D, C, S)',
+      description: 'Master single-key delete and change commands',
+      wip: false,
+      locked: false,
+    },
+    // {
+    //   id: 11,
+    //   title: 'Text Objects (di", caw, ci()',
+    //   description: 'Master advanced delete and change operations',
+    //   wip: false,
+    //   locked: false,
+    // },
   ],
 }
 
@@ -241,35 +257,19 @@ const Sidebar: React.FC<SidebarProps> = ({
       </motion.div>
 
       <motion.div className="space-y-3" variants={itemVariants}>
-        <motion.div className="mb-4 px-1" variants={itemVariants}>
-          <h2 className="text-sm uppercase tracking-wider text-zinc-400 font-semibold mb-2">
-            Move
-          </h2>
-          <div className="h-1 w-16 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full" />
-        </motion.div>
-
-        {levels.navigate.map(renderLevel)}
-        <motion.div className="px-1 my-4" variants={itemVariants}>
-          <h2 className="text-sm uppercase tracking-wider text-zinc-400 font-semibold mb-2">
-            Insert
-          </h2>
-          <div className="h-1 w-16 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full" />
-        </motion.div>
-        {levels.insert.map(renderLevel)}
-        {/*<motion.div className="px-1 my-4" variants={itemVariants}>
-          <h2 className="text-sm uppercase tracking-wider text-zinc-400 font-semibold mb-2">
-            Recap
-          </h2>
-          <div className="h-1 w-16 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full" />
-        </motion.div>
-        {levels.recap.map(renderLevel)}*/}
-        <motion.div className="px-1 my-4" variants={itemVariants}>
-          <h2 className="text-sm uppercase tracking-wider text-zinc-400 font-semibold mb-2">
-            Advanced
-          </h2>
-          <div className="h-1 w-16 bg-gradient-to-r from-purple-500 to-pink-400 rounded-full" />
-        </motion.div>
-        {levels.advanced.map(renderLevel)}
+        {Object.entries(levels).map(([k, v]) => {
+          return (
+            <>
+              <motion.div className="mb-4 px-1" variants={itemVariants}>
+                <h2 className="text-sm uppercase tracking-wider text-zinc-400 font-semibold mb-2">
+                  {k}
+                </h2>
+                <div className="h-1 w-16 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full" />
+              </motion.div>
+              {v.map(renderLevel)}
+            </>
+          )
+        })}
       </motion.div>
 
       <motion.div
