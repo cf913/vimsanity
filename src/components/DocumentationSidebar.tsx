@@ -485,7 +485,7 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
           <>
             <h3 className="text-lg font-semibold mb-2">Basic Delete Operations</h3>
             <p className="text-sm mb-3">
-              Learn essential Vim deletion commands for efficient text editing:
+              Master the essential single-key delete commands in Vim:
             </p>
             <div className="space-y-3">
               <div>
@@ -501,17 +501,6 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">dd</kbd> - Delete line
-                </p>
-                <p className="text-xs text-zinc-400 ml-1">
-                  Delete the entire current line
-                </p>
-                <p className="text-xs text-zinc-400 ml-1">
-                  One of the most commonly used Vim commands
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium">
                   <kbd className="px-2 py-1 bg-zinc-700 rounded">D</kbd> - Delete to end of line
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
@@ -523,21 +512,42 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">dw</kbd> - Delete word
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">C</kbd> - Change line
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Delete from cursor to start of next word
+                  Delete entire line and enter insert mode
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Combines delete operator with word motion
+                  Combines deletion with immediate editing
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">S</kbd> - Substitute character
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete character and enter insert mode
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Like x followed by i, but in one command
                 </p>
               </div>
             </div>
-            <div className="mt-4 text-xs text-zinc-400">
-              <p className="italic">
-                Tip: Deleted text is stored in Vim's clipboard and can be pasted with 'p'.
-                Think of delete operations as "cut" operations!
-              </p>
+            <div className="mt-4 space-y-2">
+              <div className="text-xs text-zinc-400">
+                <p className="font-medium text-zinc-300 mb-1">Command Types:</p>
+                <ul className="space-y-1 pl-2">
+                  <li>• <strong>Delete:</strong> x, D (remove text)</li>
+                  <li>• <strong>Change:</strong> C, S (delete + insert mode)</li>
+                  <li>• <strong>Single key:</strong> Fast and efficient</li>
+                </ul>
+              </div>
+              <div className="text-xs text-zinc-400">
+                <p className="italic">
+                  Tip: These single-key commands are the foundation of Vim editing.
+                  Master them for lightning-fast text manipulation!
+                </p>
+              </div>
             </div>
           </>
         )

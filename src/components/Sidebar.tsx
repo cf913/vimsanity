@@ -93,8 +93,8 @@ const levels = {
   delete: [
     {
       id: 10,
-      title: 'Basic Delete (x, dd, D, dw)',
-      description: 'Learn essential deletion commands',
+      title: 'Basic Delete (x, D, C, S)',
+      description: 'Master single-key delete and change commands',
       wip: false,
       locked: false,
     },

@@ -11,22 +11,22 @@ import { RefreshCw } from 'lucide-react'
 import { KBD } from '../common/KBD'
 
 export default function BasicDeleteLevel10() {
-  // Simple grid with some characters marked for deletion
+  // Simple grid with different delete targets
   const initialGrid = [
     ['V', 'i', 'm', 'x', 'D', 'e', 'l', 'e', 't', 'e'],
-    ['L', 'e', 'a', 'r', 'n', 'x', 'd', 'd', 'N', 'o'],
-    ['P', 'r', 'a', 'c', 't', 'i', 'c', 'e', 'x', 'D'],
-    ['D', 'e', 'l', 'e', 't', 'e', 'x', 'L', 'i', 'n'],
-    ['S', 'i', 'm', 'p', 'l', 'e', 'x', 'F', 'u', 'n'],
+    ['L', 'e', 'a', 'r', 'n', ' ', 'D', '→', '→', '→'],  // D target - delete to end from 'D'
+    ['P', 'r', 'a', 'c', 'x', 'i', 'c', 'e', ' ', 'F'],
+    ['C', '→', '→', '→', '→', '→', '→', 'L', 'i', 'n'],  // C target - change entire line
+    ['S', 'i', 'm', 'p', 'l', 'e', ' ', 'S', 'u', 'n'],  // S target - substitute character
   ]
 
-  // Targets to delete (marked with 'x' in the grid)
+  // Different types of delete targets
   const deleteTargets = [
-    { row: 0, col: 3, type: 'x' }, // Delete single character
-    { row: 1, col: 5, type: 'x' }, // Delete single character  
-    { row: 2, col: 8, type: 'x' }, // Delete single character
-    { row: 3, col: 6, type: 'x' }, // Delete single character
-    { row: 4, col: 6, type: 'x' }, // Delete single character
+    { row: 0, col: 3, type: 'x' }, // Delete single character with x
+    { row: 1, col: 6, type: 'D' }, // Delete to end of line with D  
+    { row: 2, col: 4, type: 'x' }, // Delete single character with x
+    { row: 3, col: 0, type: 'C' }, // Change entire line with C
+    { row: 4, col: 7, type: 'S' }, // Substitute character with S
   ]
 
   const [grid, setGrid] = useState(initialGrid)
@@ -70,6 +70,45 @@ export default function BasicDeleteLevel10() {
     setRecentlyDeleted(null)
   }
 
+  const executeDeleteCommand = (command: string) => {
+    const currentChar = grid[position.row][position.col]
+    const targetKey = `${position.row}-${position.col}`
+    
+    // Check if this is a valid delete target
+    const target = deleteTargets.find(
+      t => t.row === position.row && t.col === position.col && t.type === command
+    )
+    
+    if (target && !deletedTargets.has(targetKey)) {
+      // Mark as deleted
+      setDeletedTargets(prev => new Set([...prev, targetKey]))
+      setScore(prev => prev + 1)
+      setRecentlyDeleted({ row: position.row, col: position.col })
+      
+      // Update grid based on command type
+      setGrid(prev => {
+        const newGrid = prev.map(row => [...row])
+        
+        if (command === 'x' || command === 'S') {
+          // Delete single character
+          newGrid[position.row][position.col] = '·'
+        } else if (command === 'D') {
+          // Delete from current position to end of line
+          for (let col = position.col; col < newGrid[position.row].length; col++) {
+            newGrid[position.row][col] = '·'
+          }
+        } else if (command === 'C') {
+          // Change entire line
+          for (let col = 0; col < newGrid[position.row].length; col++) {
+            newGrid[position.row][col] = '·'
+          }
+        }
+        
+        return newGrid
+      })
+    }
+  }
+
   const keyActionMap: KeyActionMap = {
     h: () => {
       setPosition(prev => ({
@@ -100,28 +139,20 @@ export default function BasicDeleteLevel10() {
       setLastKeyPressed('l')
     },
     x: () => {
-      const currentChar = grid[position.row][position.col]
-      const targetKey = `${position.row}-${position.col}`
-      
-      // Check if this is a valid delete target
-      const isTarget = deleteTargets.some(
-        target => target.row === position.row && target.col === position.col
-      )
-      
-      if (isTarget && currentChar === 'x' && !deletedTargets.has(targetKey)) {
-        // Mark as deleted
-        setDeletedTargets(prev => new Set([...prev, targetKey]))
-        setScore(prev => prev + 1)
-        setRecentlyDeleted({ row: position.row, col: position.col })
-        
-        // Update grid to show deletion
-        setGrid(prev => {
-          const newGrid = prev.map(row => [...row])
-          newGrid[position.row][position.col] = '·' // Show as deleted
-          return newGrid
-        })
-      }
+      executeDeleteCommand('x')
       setLastKeyPressed('x')
+    },
+    D: () => {
+      executeDeleteCommand('D')
+      setLastKeyPressed('D')
+    },
+    C: () => {
+      executeDeleteCommand('C')
+      setLastKeyPressed('C')
+    },
+    S: () => {
+      executeDeleteCommand('S')
+      setLastKeyPressed('S')
     },
   }
 
@@ -130,8 +161,22 @@ export default function BasicDeleteLevel10() {
     dependencies: [position, grid, deletedTargets],
   })
 
-  const isTarget = (row: number, col: number) => {
-    return deleteTargets.some(target => target.row === row && target.col === col)
+  const getTargetInfo = (row: number, col: number) => {
+    const target = deleteTargets.find(t => t.row === row && t.col === col)
+    if (!target) return null
+    
+    switch (target.type) {
+      case 'x':
+        return { type: 'x', color: 'text-red-400', ring: 'ring-red-400/50' }
+      case 'D':
+        return { type: 'D', color: 'text-orange-400', ring: 'ring-orange-400/50' }
+      case 'C':
+        return { type: 'C', color: 'text-blue-400', ring: 'ring-blue-400/50' }
+      case 'S':
+        return { type: 'S', color: 'text-purple-400', ring: 'ring-purple-400/50' }
+      default:
+        return null
+    }
   }
 
   const isDeleted = (row: number, col: number) => {
@@ -149,7 +194,7 @@ export default function BasicDeleteLevel10() {
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-2 text-red-400">Basic Delete Operations</h2>
         <p className="text-zinc-400 px-2">
-          Navigate with <KBD>h j k l</KBD> and delete the <span className="text-red-400 font-bold">x</span> characters with <KBD>x</KBD>
+          Use <KBD>x</KBD>, <KBD>D</KBD>, <KBD>C</KBD>, and <KBD>S</KBD> to delete different targets
         </p>
       </div>
 
@@ -164,13 +209,35 @@ export default function BasicDeleteLevel10() {
         </button>
       </div>
 
+      {/* Instructions */}
+      <div className="bg-zinc-800 rounded-lg p-4 max-w-2xl">
+        <div className="grid grid-cols-4 gap-4 text-sm">
+          <div className="text-center">
+            <div className="text-red-400 font-bold">x</div>
+            <div className="text-zinc-400">Delete character</div>
+          </div>
+          <div className="text-center">
+            <div className="text-orange-400 font-bold">D</div>
+            <div className="text-zinc-400">Delete to end</div>
+          </div>
+          <div className="text-center">
+            <div className="text-blue-400 font-bold">C</div>
+            <div className="text-zinc-400">Change line</div>
+          </div>
+          <div className="text-center">
+            <div className="text-purple-400 font-bold">S</div>
+            <div className="text-zinc-400">Substitute char</div>
+          </div>
+        </div>
+      </div>
+
       {/* Grid */}
       <div className="grid gap-1 p-6 bg-zinc-800 rounded-lg border-2 border-zinc-600">
         {grid.map((row, rowIdx) => (
           <div key={rowIdx} className="flex gap-1">
             {row.map((char, colIdx) => {
               const isCursor = position.row === rowIdx && position.col === colIdx
-              const isTargetCell = isTarget(rowIdx, colIdx)
+              const targetInfo = getTargetInfo(rowIdx, colIdx)
               const isDeletedCell = isDeleted(rowIdx, colIdx)
               const isRecentlyDeletedCell = isRecentlyDeleted(rowIdx, colIdx)
 
@@ -183,8 +250,8 @@ export default function BasicDeleteLevel10() {
                       ? 'bg-yellow-400 text-black scale-110 shadow-lg ring-2 ring-yellow-300' 
                       : 'bg-zinc-700'
                     }
-                    ${isTargetCell && !isDeletedCell
-                      ? 'text-red-400 font-bold ring-1 ring-red-400/50' 
+                    ${targetInfo && !isDeletedCell
+                      ? `${targetInfo.color} font-bold ring-1 ${targetInfo.ring}` 
                       : 'text-zinc-300'
                     }
                     ${isDeletedCell 
@@ -210,7 +277,7 @@ export default function BasicDeleteLevel10() {
 
       {/* Controls */}
       <div className="flex justify-between items-center w-full max-w-md">
-        <KeysAllowed keys={['h', 'j', 'k', 'l', 'x']} />
+        <KeysAllowed keys={['h', 'j', 'k', 'l', 'x', 'D', 'C', 'S']} />
       </div>
 
       {/* Level completion */}
@@ -219,8 +286,8 @@ export default function BasicDeleteLevel10() {
           <div className="bg-zinc-800 rounded-lg p-8 text-center max-w-md">
             <h2 className="text-3xl font-bold mb-4 text-red-400">🎉 Level Complete!</h2>
             <p className="text-zinc-300 mb-6">
-              Great job! You've learned to delete characters with <KBD>x</KBD>.
-              This is the foundation of Vim's delete operations!
+              Excellent! You've mastered basic delete operations: <KBD>x</KBD>, <KBD>D</KBD>, <KBD>C</KBD>, and <KBD>S</KBD>.
+              These are essential Vim commands for efficient editing!
             </p>
             <div className="text-2xl font-bold text-green-400 mb-4">
               Score: {score}/{MAX_SCORE}
