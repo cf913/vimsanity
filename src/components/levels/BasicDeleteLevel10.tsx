@@ -42,6 +42,7 @@ export default function BasicDeleteLevel10() {
   const [wrongMoveMessage, setWrongMoveMessage] = useState<string>('')
   const [gridHistory, setGridHistory] = useState<string[][][]>([initialGrid.map(row => [...row])])
   const [mode, setMode] = useState<VimMode>(VIM_MODES.NORMAL)
+  const [insertModeWarning, setInsertModeWarning] = useState<string>('')
 
   const MAX_SCORE = deleteTargets.length
 
@@ -65,6 +66,16 @@ export default function BasicDeleteLevel10() {
     }
   }, [wrongMoveMessage])
 
+  // Reset insert mode warning
+  useEffect(() => {
+    if (insertModeWarning) {
+      const timer = setTimeout(() => {
+        setInsertModeWarning('')
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [insertModeWarning])
+
   // Check if level is completed
   useEffect(() => {
     if (score === MAX_SCORE && !levelCompleted) {
@@ -87,6 +98,7 @@ export default function BasicDeleteLevel10() {
     setWrongMoveMessage('')
     setGridHistory([newGrid])
     setMode(VIM_MODES.NORMAL)
+    setInsertModeWarning('')
   }
 
   const undoLastAction = () => {
@@ -171,8 +183,29 @@ export default function BasicDeleteLevel10() {
     }
   }
 
+  const handleDisabledInInsertMode = (command: string) => {
+    const commandDescriptions: { [key: string]: string } = {
+      'h': 'move left',
+      'j': 'move down', 
+      'k': 'move up',
+      'l': 'move right',
+      'x': 'delete character',
+      'D': 'delete to end',
+      'C': 'change to end',
+      'S': 'substitute line',
+      'u': 'undo'
+    }
+    
+    const desc = commandDescriptions[command] || 'use that command'
+    setInsertModeWarning(`Can't ${desc} in insert mode! Press Esc to return to normal mode.`)
+  }
+
   const keyActionMap: KeyActionMap = {
     h: () => {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('h')
+        return
+      }
       setPosition(prev => ({
         ...prev,
         col: Math.max(0, prev.col - 1)
@@ -180,6 +213,10 @@ export default function BasicDeleteLevel10() {
       setLastKeyPressed('h')
     },
     j: () => {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('j')
+        return
+      }
       setPosition(prev => ({
         ...prev,
         row: Math.min(grid.length - 1, prev.row + 1)
@@ -187,6 +224,10 @@ export default function BasicDeleteLevel10() {
       setLastKeyPressed('j')
     },
     k: () => {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('k')
+        return
+      }
       setPosition(prev => ({
         ...prev,
         row: Math.max(0, prev.row - 1)
@@ -194,6 +235,10 @@ export default function BasicDeleteLevel10() {
       setLastKeyPressed('k')
     },
     l: () => {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('l')
+        return
+      }
       setPosition(prev => ({
         ...prev,
         col: Math.min(grid[0].length - 1, prev.col + 1)
@@ -201,22 +246,42 @@ export default function BasicDeleteLevel10() {
       setLastKeyPressed('l')
     },
     x: () => {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('x')
+        return
+      }
       executeDeleteCommand('x')
       setLastKeyPressed('x')
     },
     D: () => {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('D')
+        return
+      }
       executeDeleteCommand('D')
       setLastKeyPressed('D')
     },
     C: () => {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('C')
+        return
+      }
       executeDeleteCommand('C')
       setLastKeyPressed('C')
     },
     S: () => {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('S')
+        return
+      }
       executeDeleteCommand('S')
       setLastKeyPressed('S')
     },
     u: () => {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('u')
+        return
+      }
       undoLastAction()
       setLastKeyPressed('u')
     },
@@ -394,6 +459,15 @@ export default function BasicDeleteLevel10() {
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 p-3 bg-yellow-900/90 border border-yellow-600 rounded-lg max-w-md backdrop-blur-sm">
           <p className="text-yellow-200 text-sm font-medium">
             ⚠️ {wrongMoveMessage}
+          </p>
+        </div>
+      )}
+
+      {/* Insert Mode Warning */}
+      {insertModeWarning && (
+        <div className="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 p-3 bg-orange-900/90 border border-orange-600 rounded-lg max-w-md backdrop-blur-sm">
+          <p className="text-orange-200 text-sm font-medium">
+            🚫 {insertModeWarning}
           </p>
         </div>
       )}
