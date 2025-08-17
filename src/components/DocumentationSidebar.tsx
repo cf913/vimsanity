@@ -480,6 +480,139 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             </div>
           </>
         )
+      case 10:
+        return (
+          <>
+            <h3 className="text-lg font-semibold mb-2">Basic Delete Operations</h3>
+            <p className="text-sm mb-3">
+              Learn essential Vim deletion commands for efficient text editing:
+            </p>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">x</kbd> - Delete character
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete the character under the cursor
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Most basic deletion command
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">dd</kbd> - Delete line
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete the entire current line
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  One of the most commonly used Vim commands
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">D</kbd> - Delete to end of line
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete from cursor position to end of line
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Equivalent to d$ but faster to type
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">dw</kbd> - Delete word
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete from cursor to start of next word
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Combines delete operator with word motion
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 text-xs text-zinc-400">
+              <p className="italic">
+                Tip: Deleted text is stored in Vim's clipboard and can be pasted with 'p'.
+                Think of delete operations as "cut" operations!
+              </p>
+            </div>
+          </>
+        )
+      case 11:
+        return (
+          <>
+            <h3 className="text-lg font-semibold mb-2">Advanced Delete & Change</h3>
+            <p className="text-sm mb-3">
+              Master text objects and advanced editing operations:
+            </p>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">di"</kbd> - Delete inside quotes
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete text between double quotes
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Works with any quote type: ", ', `
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">da"</kbd> - Delete around quotes
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete text and the surrounding quotes
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  "Around" includes the delimiters themselves
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">caw</kbd> - Change a word
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete word and enter insert mode
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Combines deletion with immediate editing
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">ci(</kbd> - Change inside parentheses
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete content inside () and enter insert mode
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Works with (), [], {}, &lt;&gt;
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 space-y-2">
+              <div className="text-xs text-zinc-400">
+                <p className="font-medium text-zinc-300 mb-1">Text Objects:</p>
+                <ul className="space-y-1 pl-2">
+                  <li>• <strong>i</strong> = "inside" (excludes delimiters)</li>
+                  <li>• <strong>a</strong> = "around" (includes delimiters)</li>
+                  <li>• Works with: (), [], {}, "", '', ``, &lt;&gt;</li>
+                  <li>• <strong>w</strong> = word, <strong>s</strong> = sentence, <strong>p</strong> = paragraph</li>
+                </ul>
+              </div>
+              <div className="text-xs text-zinc-400">
+                <p className="italic">
+                  Tip: Text objects are Vim's superpower! They let you operate on 
+                  logical units of text rather than just characters.
+                </p>
+              </div>
+            </div>
+          </>
+        )
       default:
         return (
           <p className="text-sm">Select a level to see its documentation.</p>
