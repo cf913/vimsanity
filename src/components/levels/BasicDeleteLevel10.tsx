@@ -9,6 +9,8 @@ import { KeysAllowed } from '../common/KeysAllowed'
 import Scoreboard from '../common/Scoreboard'
 import { RefreshCw } from 'lucide-react'
 import { KBD } from '../common/KBD'
+import { VIM_MODES, VimMode } from '../../utils/constants'
+import ModeIndicator from '../common/ModeIndicator'
 
 export default function BasicDeleteLevel10() {
   // Simple grid with different delete targets
@@ -39,6 +41,7 @@ export default function BasicDeleteLevel10() {
   const [recentlyDeleted, setRecentlyDeleted] = useState<{ row: number; col: number } | null>(null)
   const [wrongMoveMessage, setWrongMoveMessage] = useState<string>('')
   const [gridHistory, setGridHistory] = useState<string[][][]>([initialGrid.map(row => [...row])])
+  const [mode, setMode] = useState<VimMode>(VIM_MODES.NORMAL)
 
   const MAX_SCORE = deleteTargets.length
 
@@ -83,6 +86,7 @@ export default function BasicDeleteLevel10() {
     setRecentlyDeleted(null)
     setWrongMoveMessage('')
     setGridHistory([newGrid])
+    setMode(VIM_MODES.NORMAL)
   }
 
   const undoLastAction = () => {
@@ -104,19 +108,30 @@ export default function BasicDeleteLevel10() {
     setGridHistory(prev => [...prev, newGrid])
     
     // Apply the command based on type
-    if (command === 'x' || command === 'S') {
-      // Delete single character
+    if (command === 'x') {
+      // Delete single character (stay in normal mode)
       newGrid[position.row][position.col] = '·'
+      setMode(VIM_MODES.NORMAL)
     } else if (command === 'D') {
-      // Delete from current position to end of line
+      // Delete from current position to end of line (stay in normal mode)
       for (let col = position.col; col < newGrid[position.row].length; col++) {
         newGrid[position.row][col] = '·'
       }
+      setMode(VIM_MODES.NORMAL)
     } else if (command === 'C') {
-      // Change entire line
+      // Change from current position to end of line (enter insert mode)
+      for (let col = position.col; col < newGrid[position.row].length; col++) {
+        newGrid[position.row][col] = '·'
+      }
+      setMode(VIM_MODES.INSERT)
+    } else if (command === 'S') {
+      // Substitute line - delete entire line and enter insert mode at start
       for (let col = 0; col < newGrid[position.row].length; col++) {
         newGrid[position.row][col] = '·'
       }
+      setMode(VIM_MODES.INSERT)
+      // Move cursor to start of line for S command
+      setPosition(prev => ({ ...prev, col: 0 }))
     }
     
     // Update the grid
@@ -205,6 +220,10 @@ export default function BasicDeleteLevel10() {
       undoLastAction()
       setLastKeyPressed('u')
     },
+    Escape: () => {
+      setMode(VIM_MODES.NORMAL)
+      setLastKeyPressed('Escape')
+    },
   }
 
   useKeyboardHandler({
@@ -247,17 +266,11 @@ export default function BasicDeleteLevel10() {
         <p className="text-zinc-400 px-2">
           Use <KBD>x</KBD>, <KBD>D</KBD>, <KBD>C</KBD>, and <KBD>S</KBD> to delete different targets
         </p>
-        {wrongMoveMessage && (
-          <div className="mt-3 p-3 bg-yellow-900/50 border border-yellow-600 rounded-lg max-w-md">
-            <p className="text-yellow-200 text-sm font-medium">
-              ⚠️ {wrongMoveMessage}
-            </p>
-          </div>
-        )}
       </div>
 
       <div className="flex justify-center items-center gap-4 mb-4">
         <Scoreboard score={score} maxScore={MAX_SCORE} />
+        <ModeIndicator isInsertMode={mode === VIM_MODES.INSERT} />
         <button
           onClick={handleRestart}
           className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
@@ -280,15 +293,15 @@ export default function BasicDeleteLevel10() {
           </div>
           <div className="text-center">
             <div className="text-blue-400 font-bold">C</div>
-            <div className="text-zinc-400">Change line</div>
+            <div className="text-zinc-400">Change to end</div>
           </div>
           <div className="text-center">
             <div className="text-purple-400 font-bold">S</div>
-            <div className="text-zinc-400">Substitute char</div>
+            <div className="text-zinc-400">Substitute line</div>
           </div>
         </div>
         <div className="text-xs text-zinc-500 text-center border-t border-zinc-700 pt-2">
-          💡 Commands work from any position. Use <KBD>u</KBD> to undo mistakes.
+          💡 Commands work from any position. <KBD>C</KBD> and <KBD>S</KBD> enter insert mode. Use <KBD>u</KBD> to undo, <KBD>Esc</KBD> to exit insert mode.
         </div>
       </div>
 
@@ -338,7 +351,7 @@ export default function BasicDeleteLevel10() {
 
       {/* Controls */}
       <div className="flex justify-between items-center w-full max-w-md">
-        <KeysAllowed keys={['h', 'j', 'k', 'l', 'x', 'D', 'C', 'S', 'u']} />
+        <KeysAllowed keys={['h', 'j', 'k', 'l', 'x', 'D', 'C', 'S', 'u', 'Esc']} />
       </div>
 
       {/* Level completion */}
@@ -370,6 +383,15 @@ export default function BasicDeleteLevel10() {
           isCompleted={levelCompleted}
         />
       </div>
+
+      {/* Floating Warning Message */}
+      {wrongMoveMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 p-3 bg-yellow-900/90 border border-yellow-600 rounded-lg max-w-md backdrop-blur-sm">
+          <p className="text-yellow-200 text-sm font-medium">
+            ⚠️ {wrongMoveMessage}
+          </p>
+        </div>
+      )}
     </div>
   )
 }
