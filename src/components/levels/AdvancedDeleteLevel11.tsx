@@ -35,6 +35,7 @@ export default function AdvancedDeleteLevel11() {
   const [levelCompleted, setLevelCompleted] = useState(false)
   const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
   const [recentlyDeleted, setRecentlyDeleted] = useState<string | null>(null)
+  const [pendingCommand, setPendingCommand] = useState<string>('')
 
   const MAX_SCORE = deleteTargets.length
 
@@ -66,6 +67,7 @@ export default function AdvancedDeleteLevel11() {
     setShowConfetti(false)
     setLastKeyPressed('')
     setRecentlyDeleted(null)
+    setPendingCommand('')
   }
 
   const deleteWord = () => {
@@ -120,56 +122,84 @@ export default function AdvancedDeleteLevel11() {
     }
   }
 
-  const keyActionMap: KeyActionMap = {
-    h: () => {
+  // Handle command sequences
+  const handleCommand = (key: string) => {
+    if (pendingCommand === 'd') {
+      // Handle second character of dd or dw
+      if (key === 'd') {
+        deleteLine()
+        setLastKeyPressed('dd')
+        setPendingCommand('')
+        return
+      } else if (key === 'w') {
+        deleteWord()
+        setLastKeyPressed('dw')
+        setPendingCommand('')
+        return
+      } else {
+        // Invalid second character, reset
+        setPendingCommand('')
+      }
+    }
+
+    // Handle single character commands
+    if (key === 'd') {
+      setPendingCommand('d')
+      setLastKeyPressed('d')
+      return
+    }
+
+    if (key === 'D') {
+      deleteToEnd()
+      setLastKeyPressed('D')
+      return
+    }
+
+    // Movement commands
+    if (key === 'h') {
       setPosition(prev => ({
         ...prev,
         col: Math.max(0, prev.col - 1)
       }))
       setLastKeyPressed('h')
-    },
-    j: () => {
+      setPendingCommand('')
+    } else if (key === 'j') {
       setPosition(prev => ({
         ...prev,
         row: Math.min(grid.length - 1, prev.row + 1)
       }))
       setLastKeyPressed('j')
-    },
-    k: () => {
+      setPendingCommand('')
+    } else if (key === 'k') {
       setPosition(prev => ({
         ...prev,
         row: Math.max(0, prev.row - 1)
       }))
       setLastKeyPressed('k')
-    },
-    l: () => {
+      setPendingCommand('')
+    } else if (key === 'l') {
       setPosition(prev => ({
         ...prev,
         col: Math.min(grid[0].length - 1, prev.col + 1)
       }))
       setLastKeyPressed('l')
-    },
-    d: () => {
-      // Setup for dd or dw - wait for next key
-      setLastKeyPressed('d')
-    },
-    dd: () => {
-      deleteLine()
-      setLastKeyPressed('dd')
-    },
-    dw: () => {
-      deleteWord()
-      setLastKeyPressed('dw')
-    },
-    D: () => {
-      deleteToEnd()
-      setLastKeyPressed('D')
-    },
+      setPendingCommand('')
+    }
+  }
+
+  const keyActionMap: KeyActionMap = {
+    h: () => handleCommand('h'),
+    j: () => handleCommand('j'),
+    k: () => handleCommand('k'),
+    l: () => handleCommand('l'),
+    d: () => handleCommand('d'),
+    w: () => handleCommand('w'),
+    D: () => handleCommand('D'),
   }
 
   useKeyboardHandler({
     keyActionMap,
-    dependencies: [position, grid, completedTargets],
+    dependencies: [position, grid, completedTargets, pendingCommand],
   })
 
   const getTargetInfo = (row: number, col: number) => {
@@ -198,6 +228,11 @@ export default function AdvancedDeleteLevel11() {
         <p className="text-zinc-400 px-2">
           Use <KBD>dw</KBD> to delete words, <KBD>dd</KBD> to delete lines, and <KBD>D</KBD> to delete to end
         </p>
+        {pendingCommand && (
+          <div className="mt-2 text-yellow-400 text-sm">
+            Command pending: <KBD>{pendingCommand}</KBD> (press next key)
+          </div>
+        )}
       </div>
 
       <div className="flex justify-center items-center gap-4 mb-4">
