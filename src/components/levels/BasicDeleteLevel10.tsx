@@ -11,6 +11,7 @@ import { RefreshCw } from 'lucide-react'
 import { KBD } from '../common/KBD'
 import { VIM_MODES, VimMode } from '../../utils/constants'
 import ModeIndicator from '../common/ModeIndicator'
+import { motion } from 'framer-motion'
 
 export default function BasicDeleteLevel10() {
   // Multiple grid variations with different target positions for muscle memory
@@ -564,20 +565,32 @@ export default function BasicDeleteLevel10() {
 
       {/* Floating Warning Message */}
       {wrongMoveMessage && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 p-3 bg-yellow-900/90 border border-yellow-600 rounded-lg max-w-md backdrop-blur-sm">
+        <motion.div 
+          className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 p-3 bg-yellow-900/90 border border-yellow-600 rounded-lg max-w-md backdrop-blur-sm"
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 100, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        >
           <p className="text-yellow-200 text-sm font-medium">
             ⚠️ {wrongMoveMessage}
           </p>
-        </div>
+        </motion.div>
       )}
 
       {/* Insert Mode Warning */}
       {insertModeWarning && (
-        <div className="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 p-3 bg-orange-900/90 border border-orange-600 rounded-lg max-w-md backdrop-blur-sm">
+        <motion.div 
+          className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 p-3 bg-orange-900/90 border border-orange-600 rounded-lg max-w-md backdrop-blur-sm"
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 100, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        >
           <p className="text-orange-200 text-sm font-medium">
             🚫 {insertModeWarning}
           </p>
-        </div>
+        </motion.div>
       )}
     </div>
   )
