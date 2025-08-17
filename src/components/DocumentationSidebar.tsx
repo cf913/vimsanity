@@ -232,7 +232,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
                   - Find character backward
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Move to the previous occurrence of {'{char}'} on the current line
+                  Move to the previous occurrence of {'{char}'} on the current
+                  line
                 </p>
               </div>
               <div>
@@ -251,8 +252,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
                   - Till character backward
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Move to just after the previous occurrence of {'{char}'} on the
-                  current line
+                  Move to just after the previous occurrence of {'{char}'} on
+                  the current line
                 </p>
               </div>
               <div>
@@ -272,9 +273,10 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             </div>
             <div className="mt-4 text-xs text-zinc-400">
               <p className="italic">
-                Tip: After pressing 'f', 'F', 't', or 'T', you need to type the character
-                you want to find. The cursor will move to (or just before/after) the
-                next or previous occurrence of that character depending on the command used.
+                Tip: After pressing 'f', 'F', 't', or 'T', you need to type the
+                character you want to find. The cursor will move to (or just
+                before/after) the next or previous occurrence of that character
+                depending on the command used.
               </p>
             </div>
           </>
@@ -289,7 +291,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">/</kbd> - Search forward
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">/</kbd> -
+                  Search forward
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Search for a pattern going forward from your current position
@@ -300,7 +303,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">?</kbd> - Search backward
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">?</kbd> -
+                  Search backward
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Search for a pattern going backward from your current position
@@ -311,7 +315,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">n</kbd> - Next match
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">n</kbd> - Next
+                  match
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Jump to the next occurrence of your search pattern
@@ -322,7 +327,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">N</kbd> - Previous match
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">N</kbd> -
+                  Previous match
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Jump to the previous occurrence of your search pattern
@@ -334,8 +340,9 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             </div>
             <div className="mt-4 text-xs text-zinc-400">
               <p className="italic">
-                Tip: Search is one of Vim's most powerful navigation tools. You can 
-                use it to quickly jump to specific words, variables, or patterns in your text.
+                Tip: Search is one of Vim's most powerful navigation tools. You
+                can use it to quickly jump to specific words, variables, or
+                patterns in your text.
               </p>
             </div>
           </>
@@ -345,12 +352,14 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
           <>
             <h3 className="text-lg font-semibold mb-2">Basic Insert Mode</h3>
             <p className="text-sm mb-3">
-              Insert mode allows you to add and edit text in Vim. These commands enter insert mode:
+              Insert mode allows you to add and edit text in Vim. These commands
+              enter insert mode:
             </p>
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">i</kbd> - Insert before cursor
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">i</kbd> -
+                  Insert before cursor
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Begin inserting text at the current cursor position
@@ -358,7 +367,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">a</kbd> - Append after cursor
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">a</kbd> -
+                  Append after cursor
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Begin inserting text after the current cursor position
@@ -366,7 +376,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">Escape</kbd> - Exit insert mode
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">Escape</kbd> -
+                  Exit insert mode
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Return to normal mode after making text changes
@@ -375,8 +386,9 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             </div>
             <div className="mt-4 text-xs text-zinc-400">
               <p className="italic">
-                Tip: Always remember to press Escape to return to normal mode after making changes.
-                This is one of the most common mistakes for new Vim users!
+                Tip: Always remember to press Escape to return to normal mode
+                after making changes. This is one of the most common mistakes
+                for new Vim users!
               </p>
             </div>
           </>
@@ -386,12 +398,14 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
           <>
             <h3 className="text-lg font-semibold mb-2">Line Insert Commands</h3>
             <p className="text-sm mb-3">
-              These commands let you insert text at specific line positions or create new lines:
+              These commands let you insert text at specific line positions or
+              create new lines:
             </p>
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">I</kbd> - Insert at line beginning
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">I</kbd> -
+                  Insert at line beginning
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Move to the start of the line and enter insert mode
@@ -399,7 +413,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">A</kbd> - Append at line end
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">A</kbd> -
+                  Append at line end
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Move to the end of the line and enter insert mode
@@ -407,7 +422,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">o</kbd> - Open line below
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">o</kbd> - Open
+                  line below
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Create a new line below the current line and enter insert mode
@@ -415,7 +431,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">O</kbd> - Open line above
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">O</kbd> - Open
+                  line above
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Create a new line above the current line and enter insert mode
@@ -424,8 +441,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             </div>
             <div className="mt-4 text-xs text-zinc-400">
               <p className="italic">
-                Tip: These commands combine movement and insert mode in one keystroke,
-                making them very efficient for common editing tasks.
+                Tip: These commands combine movement and insert mode in one
+                keystroke, making them very efficient for common editing tasks.
               </p>
             </div>
           </>
@@ -435,12 +452,14 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
           <>
             <h3 className="text-lg font-semibold mb-2">Undo and Redo</h3>
             <p className="text-sm mb-3">
-              Navigate through your editing history to undo mistakes and redo changes:
+              Navigate through your editing history to undo mistakes and redo
+              changes:
             </p>
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">u</kbd> - Undo last change
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">u</kbd> - Undo
+                  last change
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Reverses the most recent edit operation
@@ -451,7 +470,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">Ctrl+r</kbd> - Redo change
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">Ctrl+r</kbd> -
+                  Redo change
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Restores a change that was previously undone
@@ -463,7 +483,9 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             </div>
             <div className="mt-4 space-y-2">
               <div className="text-xs text-zinc-400">
-                <p className="font-medium text-zinc-300 mb-1">How Vim History Works:</p>
+                <p className="font-medium text-zinc-300 mb-1">
+                  How Vim History Works:
+                </p>
                 <ul className="space-y-1 pl-2">
                   <li>• Each edit creates a new point in history</li>
                   <li>• Insert mode sessions count as one edit</li>
@@ -473,8 +495,9 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div className="text-xs text-zinc-400">
                 <p className="italic">
-                  Tip: Think of undo/redo as time travel through your editing session.
-                  You can safely experiment knowing you can always go back!
+                  Tip: Think of undo/redo as time travel through your editing
+                  session. You can safely experiment knowing you can always go
+                  back!
                 </p>
               </div>
             </div>
@@ -483,14 +506,17 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
       case 10:
         return (
           <>
-            <h3 className="text-lg font-semibold mb-2">Basic Delete Operations</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Basic Delete Operations
+            </h3>
             <p className="text-sm mb-3">
               Master the essential single-key delete commands in Vim:
             </p>
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">x</kbd> - Delete character
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">x</kbd> -
+                  Delete character
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Delete the character under the cursor
@@ -501,7 +527,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">D</kbd> - Delete to end of line
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">D</kbd> -
+                  Delete to end of line
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Delete from cursor position to end of line
@@ -512,10 +539,12 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">C</kbd> - Change line
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">C</kbd> -
+                  Change to end of line
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Delete entire line and enter insert mode
+                  Delete from cursor position to end of line and enter INSERT
+                  mode
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Combines deletion with immediate editing
@@ -523,10 +552,35 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">S</kbd> - Substitute character
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">S</kbd> -
+                  Substitute line
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Delete character and enter insert mode
+                  Delete entire line and enter insert mode
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Like x followed by i, but in one command
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 space-y-2 border-t border-zinc-700 pt-4 ">
+              <p className="text-sm mb-3">Command variants:</p>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">X</kbd> -
+                  Delete character
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete the character before the cursor
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">s</kbd> -
+                  Substitute char
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete char under cursor and enter insert mode
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Like x followed by i, but in one command
@@ -537,15 +591,21 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               <div className="text-xs text-zinc-400">
                 <p className="font-medium text-zinc-300 mb-1">Command Types:</p>
                 <ul className="space-y-1 pl-2">
-                  <li>• <strong>Delete:</strong> x, D (remove text)</li>
-                  <li>• <strong>Change:</strong> C, S (delete + insert mode)</li>
-                  <li>• <strong>Single key:</strong> Fast and efficient</li>
+                  <li>
+                    • <strong>Delete:</strong> x, D (remove text)
+                  </li>
+                  <li>
+                    • <strong>Change:</strong> C, S (delete + insert mode)
+                  </li>
+                  <li>
+                    • <strong>Single key:</strong> Fast and efficient
+                  </li>
                 </ul>
               </div>
               <div className="text-xs text-zinc-400">
                 <p className="italic">
-                  Tip: These single-key commands are the foundation of Vim editing.
-                  Master them for lightning-fast text manipulation!
+                  Tip: These single-key commands are the foundation of Vim
+                  editing. Master them for lightning-fast text manipulation!
                 </p>
               </div>
             </div>
@@ -554,14 +614,17 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
       case 11:
         return (
           <>
-            <h3 className="text-lg font-semibold mb-2">Advanced Delete & Change</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Advanced Delete & Change
+            </h3>
             <p className="text-sm mb-3">
               Master text objects and advanced editing operations:
             </p>
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">di"</kbd> - Delete inside quotes
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">di"</kbd> -
+                  Delete inside quotes
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Delete text between double quotes
@@ -572,7 +635,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">da"</kbd> - Delete around quotes
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">da"</kbd> -
+                  Delete around quotes
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Delete text and the surrounding quotes
@@ -583,7 +647,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">caw</kbd> - Change a word
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">caw</kbd> -
+                  Change a word
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Delete word and enter insert mode
@@ -594,7 +659,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">ci(</kbd> - Change inside parentheses
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">ci(</kbd> -
+                  Change inside parentheses
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
                   Delete content inside () and enter insert mode
@@ -608,16 +674,23 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               <div className="text-xs text-zinc-400">
                 <p className="font-medium text-zinc-300 mb-1">Text Objects:</p>
                 <ul className="space-y-1 pl-2">
-                  <li>• <strong>i</strong> = "inside" (excludes delimiters)</li>
-                  <li>• <strong>a</strong> = "around" (includes delimiters)</li>
+                  <li>
+                    • <strong>i</strong> = "inside" (excludes delimiters)
+                  </li>
+                  <li>
+                    • <strong>a</strong> = "around" (includes delimiters)
+                  </li>
                   <li>• Works with: (), [], {}, "", '', ``, &lt;&gt;</li>
-                  <li>• <strong>w</strong> = word, <strong>s</strong> = sentence, <strong>p</strong> = paragraph</li>
+                  <li>
+                    • <strong>w</strong> = word, <strong>s</strong> = sentence,{' '}
+                    <strong>p</strong> = paragraph
+                  </li>
                 </ul>
               </div>
               <div className="text-xs text-zinc-400">
                 <p className="italic">
-                  Tip: Text objects are Vim's superpower! They let you operate on 
-                  logical units of text rather than just characters.
+                  Tip: Text objects are Vim's superpower! They let you operate
+                  on logical units of text rather than just characters.
                 </p>
               </div>
             </div>

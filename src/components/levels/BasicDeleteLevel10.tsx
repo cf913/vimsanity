@@ -70,14 +70,14 @@ export default function BasicDeleteLevel10() {
         ['S', '→', '→', '→', '→', '→', '→', '→', '→', '→'], // S target - substitute character at start
         ['A', 'u', 't', 'o', ' ', 'S', 'a', 'v', 'e', 'x'],
         ['G', 'i', 't', ' ', 'D', '→', '→', '→', '→', '→'], // D target - delete to end
-        ['C', '→', '→', '→', '→', '→', '→', '→', '→', '→'], // C target - change entire line
+        ['N', 'e', 'o', 'v', 'i', 'm', ' ', 'b', 'u', 'y'], // C target - change entire line
       ],
       targets: [
         { row: 0, col: 8, type: 'x' },
         { row: 1, col: 0, type: 'S' },
         { row: 2, col: 9, type: 'x' },
         { row: 3, col: 4, type: 'D' },
-        { row: 4, col: 0, type: 'C' },
+        { row: 4, col: 6, type: 'C' },
       ],
     },
     {
@@ -85,15 +85,15 @@ export default function BasicDeleteLevel10() {
         ['P', 'l', 'u', 'g', 'x', 'I', 'n', 's', ' ', 'M'],
         ['D', 'o', 'c', 's', ' ', 'H', 'e', 'l', 'p', 'x'],
         ['R', 'e', 'a', 'd', ' ', 'M', 'o', 'r', 'e', ' '],
+        ['A', 'u', 'X', 'C', '→', '→', '→', '→', '→', '→'], // C target - change entire line
         ['T', 'e', 's', 'D', '→', '→', '→', '→', '→', '→'], // D target - delete to end
-        ['C', '→', '→', '→', '→', '→', '→', '→', '→', '→'], // C target - change entire line
       ],
       targets: [
         { row: 0, col: 4, type: 'x' },
         { row: 1, col: 9, type: 'x' },
         { row: 2, col: 0, type: 'S' }, // S target at start
-        { row: 3, col: 3, type: 'D' },
-        { row: 4, col: 0, type: 'C' },
+        { row: 3, col: 3, type: 'C' },
+        { row: 4, col: 3, type: 'D' },
       ],
     },
   ]
@@ -713,41 +713,14 @@ export default function BasicDeleteLevel10() {
 
       <div className="flex justify-center items-center gap-4 mb-4">
         <Scoreboard score={score} maxScore={MAX_SCORE} />
-        <ModeIndicator isInsertMode={mode === VIM_MODES.INSERT} />
         <button
           onClick={handleRestart}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+          className="bg-zinc-800 p-3 rounded-lg hover:bg-zinc-700 transition-colors"
+          aria-label="Reset Level"
         >
-          <RefreshCw size={16} />
-          Reset
+          <RefreshCw size={18} className="text-zinc-400" />
         </button>
-      </div>
-
-      {/* Instructions */}
-      <div className="bg-zinc-800 rounded-lg p-4 max-w-2xl">
-        <div className="grid grid-cols-4 gap-4 text-sm mb-3">
-          <div className="text-center">
-            <div className="text-red-400 font-bold">x</div>
-            <div className="text-zinc-400">Delete character</div>
-          </div>
-          <div className="text-center">
-            <div className="text-orange-400 font-bold">D</div>
-            <div className="text-zinc-400">Delete to end</div>
-          </div>
-          <div className="text-center">
-            <div className="text-blue-400 font-bold">C</div>
-            <div className="text-zinc-400">Change to end</div>
-          </div>
-          <div className="text-center">
-            <div className="text-purple-400 font-bold">S</div>
-            <div className="text-zinc-400">Substitute line</div>
-          </div>
-        </div>
-        <div className="text-xs text-zinc-500 text-center border-t border-zinc-700 pt-2">
-          💡 Commands work from any position. <KBD>C</KBD> and <KBD>S</KBD>{' '}
-          enter insert mode. Use <KBD>u</KBD> to undo, <KBD>Esc</KBD> to exit
-          insert mode.
-        </div>
+        <ModeIndicator isInsertMode={mode === VIM_MODES.INSERT} />
       </div>
 
       {/* Grid */}
@@ -807,6 +780,35 @@ export default function BasicDeleteLevel10() {
             })}
           </div>
         ))}
+      </div>
+
+      {/* Instructions */}
+      <div className="bg-zinc-800 rounded-lg p-4 max-w-2xl">
+        <div className="grid grid-cols-4 gap-4 text-sm mb-3">
+          <div className="text-center">
+            <div className="text-red-400 font-bold">x</div>
+            <div className="text-xs text-zinc-400">Delete character</div>
+          </div>
+          <div className="text-center">
+            <div className="text-orange-400 font-bold">D</div>
+            <div className="text-xs text-zinc-400">Delete to end</div>
+          </div>
+          <div className="text-center">
+            <div className="text-blue-400 font-bold">C</div>
+            <div className="text-xs text-zinc-400">
+              Delete to end and insert
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-purple-400 font-bold">S</div>
+            <div className="text-xs text-zinc-400">Delete line and insert</div>
+          </div>
+        </div>
+        {/* <div className="text-xs text-zinc-500 text-center border-t border-zinc-700 pt-2"> */}
+        {/*   💡 Commands work from any position. <KBD>C</KBD> and <KBD>S</KBD>{' '} */}
+        {/*   enter insert mode. Use <KBD>u</KBD> to undo, <KBD>Esc</KBD> to exit */}
+        {/*   insert mode. */}
+        {/* </div> */}
       </div>
 
       {/* Controls */}
