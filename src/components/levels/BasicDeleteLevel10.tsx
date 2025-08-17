@@ -125,7 +125,10 @@ export default function BasicDeleteLevel10() {
     },
   }
 
-  useKeyboardHandler(keyActionMap, [position, grid, deletedTargets])
+  useKeyboardHandler({
+    keyActionMap,
+    dependencies: [position, grid, deletedTargets],
+  })
 
   const isTarget = (row: number, col: number) => {
     return deleteTargets.some(target => target.row === row && target.col === col)

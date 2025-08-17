@@ -167,7 +167,10 @@ export default function AdvancedDeleteLevel11() {
     },
   }
 
-  useKeyboardHandler(keyActionMap, [position, grid, completedTargets])
+  useKeyboardHandler({
+    keyActionMap,
+    dependencies: [position, grid, completedTargets],
+  })
 
   const getTargetInfo = (row: number, col: number) => {
     if (row === 0 && col >= 7 && col <= 10 && !completedTargets.has('dw')) {
