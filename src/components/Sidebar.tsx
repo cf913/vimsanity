@@ -98,13 +98,13 @@ const levels = {
       wip: false,
       locked: false,
     },
-    // {
-    //   id: 11,
-    //   title: 'Text Objects (di", caw, ci()',
-    //   description: 'Master advanced delete and change operations',
-    //   wip: false,
-    //   locked: false,
-    // },
+    {
+      id: 11,
+      title: 'Text Objects (di", caw, ci()',
+      description: 'Master advanced delete and change operations',
+      wip: false,
+      locked: false,
+    },
   ],
 }
 
