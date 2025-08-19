@@ -46,6 +46,7 @@ export default function AdvancedDeleteLevel11() {
   const [mode, setMode] = useState<VimMode>(VIM_MODES.NORMAL)
   const [insertModeWarning, setInsertModeWarning] = useState<string>('')
   const [pendingCommand, setPendingCommand] = useState<string>('')
+  const [pendingFindCommand, setPendingFindCommand] = useState<string>('')
 
   const MAX_SCORE = deleteTargets.length
 
@@ -78,6 +79,39 @@ export default function AdvancedDeleteLevel11() {
       return () => clearTimeout(timer)
     }
   }, [insertModeWarning])
+
+  // Handle find character input
+  useEffect(() => {
+    if (pendingFindCommand && mode === VIM_MODES.NORMAL) {
+      const handleFindCharacter = (e: KeyboardEvent) => {
+        // Ignore special keys
+        if (e.key.length > 1) return
+
+        const char = e.key
+
+        switch (pendingFindCommand) {
+          case 'f':
+            findCharacterForward(char)
+            break
+          case 'F':
+            findCharacterBackward(char)
+            break
+          case 't':
+            tillCharacterForward(char)
+            break
+          case 'T':
+            tillCharacterBackward(char)
+            break
+        }
+
+        setPendingFindCommand('')
+        setLastKeyPressed(`${pendingFindCommand}${char}`)
+      }
+
+      window.addEventListener('keydown', handleFindCharacter)
+      return () => window.removeEventListener('keydown', handleFindCharacter)
+    }
+  }, [pendingFindCommand, mode, position, grid])
 
   // Check if level is completed
   useEffect(() => {
@@ -114,6 +148,7 @@ export default function AdvancedDeleteLevel11() {
     setMode(VIM_MODES.NORMAL)
     setInsertModeWarning('')
     setPendingCommand('')
+    setPendingFindCommand('')
   }
 
   const deleteWord = () => {
@@ -136,6 +171,14 @@ export default function AdvancedDeleteLevel11() {
       setCompletedTargets((prev) => new Set([...prev, 'dw']))
       setScore((prev) => prev + 1)
       setRecentlyDeleted({ row: 0, col: 7 })
+      setWrongMoveMessage('')
+    } else {
+      // Wrong position or already completed
+      if (!completedTargets.has('dw')) {
+        setWrongMoveMessage(
+          'Wrong position for dw! Navigate to the "Word" text and try again.',
+        )
+      }
     }
   }
 
@@ -152,6 +195,14 @@ export default function AdvancedDeleteLevel11() {
       setCompletedTargets((prev) => new Set([...prev, 'dd']))
       setScore((prev) => prev + 1)
       setRecentlyDeleted({ row: 1, col: 0 })
+      setWrongMoveMessage('')
+    } else {
+      // Wrong line or already completed
+      if (!completedTargets.has('dd')) {
+        setWrongMoveMessage(
+          'Wrong line for dd! Navigate to the line with the 🗑 icon and try again.',
+        )
+      }
     }
   }
 
@@ -168,6 +219,14 @@ export default function AdvancedDeleteLevel11() {
       setCompletedTargets((prev) => new Set([...prev, 'D']))
       setScore((prev) => prev + 1)
       setRecentlyDeleted({ row: 3, col: 6 })
+      setWrongMoveMessage('')
+    } else {
+      // Wrong position or already completed
+      if (!completedTargets.has('D')) {
+        setWrongMoveMessage(
+          'Wrong position for D! Navigate to the 📝 icons on line 4 and try again.',
+        )
+      }
     }
   }
 
@@ -206,6 +265,10 @@ export default function AdvancedDeleteLevel11() {
 
     // Movement commands
     if (key === 'h') {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('h')
+        return
+      }
       setPosition((prev) => ({
         ...prev,
         col: Math.max(0, prev.col - 1),
@@ -213,6 +276,10 @@ export default function AdvancedDeleteLevel11() {
       setLastKeyPressed('h')
       setPendingCommand('')
     } else if (key === 'j') {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('j')
+        return
+      }
       setPosition((prev) => ({
         ...prev,
         row: Math.min(grid.length - 1, prev.row + 1),
@@ -220,6 +287,10 @@ export default function AdvancedDeleteLevel11() {
       setLastKeyPressed('j')
       setPendingCommand('')
     } else if (key === 'k') {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('k')
+        return
+      }
       setPosition((prev) => ({
         ...prev,
         row: Math.max(0, prev.row - 1),
@@ -227,13 +298,222 @@ export default function AdvancedDeleteLevel11() {
       setLastKeyPressed('k')
       setPendingCommand('')
     } else if (key === 'l') {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('l')
+        return
+      }
       setPosition((prev) => ({
         ...prev,
         col: Math.min(grid[0].length - 1, prev.col + 1),
       }))
       setLastKeyPressed('l')
       setPendingCommand('')
+    } else if (key === 'w') {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('w')
+        return
+      }
+      moveToNextWord()
+      setLastKeyPressed('w')
+      setPendingCommand('')
+    } else if (key === 'b') {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('b')
+        return
+      }
+      moveToPrevWord()
+      setLastKeyPressed('b')
+      setPendingCommand('')
+    } else if (key === 'e') {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('e')
+        return
+      }
+      moveToWordEnd()
+      setLastKeyPressed('e')
+      setPendingCommand('')
+    } else if (key === '0') {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('0')
+        return
+      }
+      setPosition((prev) => ({
+        ...prev,
+        col: 0,
+      }))
+      setLastKeyPressed('0')
+      setPendingCommand('')
+    } else if (key === '$') {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('$')
+        return
+      }
+      setPosition((prev) => ({
+        ...prev,
+        col: grid[prev.row].length - 1,
+      }))
+      setLastKeyPressed('$')
+      setPendingCommand('')
+    } else if (key === 'f') {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('f')
+        return
+      }
+      setPendingFindCommand('f')
+      setLastKeyPressed('f')
+      setPendingCommand('')
+    } else if (key === 'F') {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('F')
+        return
+      }
+      setPendingFindCommand('F')
+      setLastKeyPressed('F')
+      setPendingCommand('')
+    } else if (key === 't') {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('t')
+        return
+      }
+      setPendingFindCommand('t')
+      setLastKeyPressed('t')
+      setPendingCommand('')
+    } else if (key === 'T') {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('T')
+        return
+      }
+      setPendingFindCommand('T')
+      setLastKeyPressed('T')
+      setPendingCommand('')
     }
+  }
+
+  const handleDisabledInInsertMode = (command: string) => {
+    const commandDescriptions: { [key: string]: string } = {
+      h: 'move left',
+      j: 'move down',
+      k: 'move up',
+      l: 'move right',
+      w: 'move to next word',
+      b: 'move to previous word',
+      e: 'move to word end',
+      '0': 'move to line start',
+      $: 'move to line end',
+      f: 'find character',
+      t: 'till character',
+      F: 'find character backward',
+      T: 'till character backward',
+      d: 'delete',
+      D: 'delete to end',
+    }
+
+    const desc = commandDescriptions[command] || 'use that command'
+    setInsertModeWarning(
+      `Can't ${desc} in insert mode! Press Esc to return to normal mode.`,
+    )
+  }
+
+  // Find character helpers
+  const findCharacterForward = (char: string) => {
+    const currentRow = grid[position.row]
+    for (let col = position.col + 1; col < currentRow.length; col++) {
+      if (currentRow[col] === char) {
+        setPosition((prev) => ({ ...prev, col }))
+        return
+      }
+    }
+  }
+
+  const findCharacterBackward = (char: string) => {
+    const currentRow = grid[position.row]
+    for (let col = position.col - 1; col >= 0; col--) {
+      if (currentRow[col] === char) {
+        setPosition((prev) => ({ ...prev, col }))
+        return
+      }
+    }
+  }
+
+  const tillCharacterForward = (char: string) => {
+    const currentRow = grid[position.row]
+    for (let col = position.col + 1; col < currentRow.length; col++) {
+      if (currentRow[col] === char) {
+        setPosition((prev) => ({ ...prev, col: col - 1 }))
+        return
+      }
+    }
+  }
+
+  const tillCharacterBackward = (char: string) => {
+    const currentRow = grid[position.row]
+    for (let col = position.col - 1; col >= 0; col--) {
+      if (currentRow[col] === char) {
+        setPosition((prev) => ({ ...prev, col: col + 1 }))
+        return
+      }
+    }
+  }
+
+  // Word movement helpers
+  const moveToNextWord = () => {
+    const currentRow = grid[position.row]
+    let newCol = position.col
+
+    // Skip current word
+    while (newCol < currentRow.length && currentRow[newCol] !== ' ') {
+      newCol++
+    }
+    // Skip spaces
+    while (newCol < currentRow.length && currentRow[newCol] === ' ') {
+      newCol++
+    }
+
+    setPosition((prev) => ({
+      ...prev,
+      col: Math.min(currentRow.length - 1, newCol),
+    }))
+  }
+
+  const moveToPrevWord = () => {
+    const currentRow = grid[position.row]
+    let newCol = position.col
+
+    // Move back one if at start of word
+    if (newCol > 0) newCol--
+
+    // Skip spaces
+    while (newCol > 0 && currentRow[newCol] === ' ') {
+      newCol--
+    }
+    // Skip to start of word
+    while (newCol > 0 && currentRow[newCol - 1] !== ' ') {
+      newCol--
+    }
+
+    setPosition((prev) => ({
+      ...prev,
+      col: Math.max(0, newCol),
+    }))
+  }
+
+  const moveToWordEnd = () => {
+    const currentRow = grid[position.row]
+    let newCol = position.col
+
+    // Skip spaces first
+    while (newCol < currentRow.length && currentRow[newCol] === ' ') {
+      newCol++
+    }
+    // Move to end of word
+    while (newCol < currentRow.length - 1 && currentRow[newCol + 1] !== ' ') {
+      newCol++
+    }
+
+    setPosition((prev) => ({
+      ...prev,
+      col: Math.min(currentRow.length - 1, newCol),
+    }))
   }
 
   const keyActionMap: KeyActionMap = {
@@ -241,8 +521,16 @@ export default function AdvancedDeleteLevel11() {
     j: () => handleCommand('j'),
     k: () => handleCommand('k'),
     l: () => handleCommand('l'),
-    d: () => handleCommand('d'),
     w: () => handleCommand('w'),
+    b: () => handleCommand('b'),
+    e: () => handleCommand('e'),
+    '0': () => handleCommand('0'),
+    $: () => handleCommand('$'),
+    f: () => handleCommand('f'),
+    t: () => handleCommand('t'),
+    F: () => handleCommand('F'),
+    T: () => handleCommand('T'),
+    d: () => handleCommand('d'),
     D: () => handleCommand('D'),
     Escape: () => {
       setMode(VIM_MODES.NORMAL)
@@ -295,6 +583,12 @@ export default function AdvancedDeleteLevel11() {
         {pendingCommand && (
           <div className="mt-2 text-yellow-400 text-sm">
             Command pending: <KBD>{pendingCommand}</KBD> (press next key)
+          </div>
+        )}
+        {pendingFindCommand && (
+          <div className="mt-2 text-yellow-400 text-sm">
+            Command pending: <KBD>{pendingFindCommand}</KBD> (type a character
+            to find)
           </div>
         )}
       </div>
