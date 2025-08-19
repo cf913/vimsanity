@@ -580,17 +580,6 @@ export default function AdvancedDeleteLevel11() {
           Use <KBD>dw</KBD> to delete words, <KBD>dd</KBD> to delete lines, and{' '}
           <KBD>D</KBD> to delete to end
         </p>
-        {pendingCommand && (
-          <div className="mt-2 text-yellow-400 text-sm">
-            Command pending: <KBD>{pendingCommand}</KBD> (press next key)
-          </div>
-        )}
-        {pendingFindCommand && (
-          <div className="mt-2 text-yellow-400 text-sm">
-            Command pending: <KBD>{pendingFindCommand}</KBD> (type a character
-            to find)
-          </div>
-        )}
       </div>
 
       <div className="flex justify-center items-center gap-4 mb-4">
@@ -606,7 +595,8 @@ export default function AdvancedDeleteLevel11() {
       </div>
 
       {/* Grid */}
-      <div className="grid gap-1 p-6 bg-zinc-800 rounded-lg border-2 border-zinc-600">
+      <div className="bg-zinc-800 rounded-lg border-2 border-zinc-600">
+        <div className="grid gap-1 p-6">
         {grid.map((row, rowIdx) => (
           <div key={rowIdx} className="flex gap-1">
             {row.map((char, colIdx) => {
@@ -662,6 +652,24 @@ export default function AdvancedDeleteLevel11() {
             })}
           </div>
         ))}
+        </div>
+        
+        {/* Command Line (vim-style) */}
+        <div className="bg-zinc-900 rounded-b-lg px-4 py-2 border-t border-zinc-600 font-mono text-sm min-h-[2.5rem] flex items-center">
+          {pendingCommand && (
+            <span className="text-yellow-300">
+              :{pendingCommand}<span className="animate-pulse">_</span>
+            </span>
+          )}
+          {pendingFindCommand && (
+            <span className="text-yellow-300">
+              {pendingFindCommand}<span className="animate-pulse">_</span>
+            </span>
+          )}
+          {!pendingCommand && !pendingFindCommand && (
+            <span className="text-zinc-500">-- NORMAL --</span>
+          )}
+        </div>
       </div>
 
       {/* Instructions */}
