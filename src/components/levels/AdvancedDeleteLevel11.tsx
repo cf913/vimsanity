@@ -48,8 +48,18 @@ export default function AdvancedDeleteLevel11() {
   const [insertModeWarning, setInsertModeWarning] = useState<string>('')
   const [pendingCommand, setPendingCommand] = useState<string>('')
   const [pendingFindCommand, setPendingFindCommand] = useState<string>('')
-  const [gridHistory, setGridHistory] = useState<string[][][]>([
-    initialGrid.map((row) => [...row]),
+  const [gridHistory, setGridHistory] = useState<
+    {
+      grid: string[][]
+      completedTargets: Set<string>
+      score: number
+    }[]
+  >([
+    {
+      grid: initialGrid.map((row) => [...row]),
+      completedTargets: new Set(),
+      score: 0,
+    },
   ])
 
   const MAX_SCORE = deleteTargets.length
@@ -167,12 +177,25 @@ export default function AdvancedDeleteLevel11() {
     setInsertModeWarning('')
     setPendingCommand('')
     setPendingFindCommand('')
-    setGridHistory([initialGrid.map((row) => [...row])])
+    setGridHistory([
+      {
+        grid: initialGrid.map((row) => [...row]),
+        completedTargets: new Set(),
+        score: 0,
+      },
+    ])
   }
 
   const deleteWord = () => {
-    // Save current grid state to history
-    setGridHistory((prev) => [...prev, grid.map((row) => [...row])])
+    // Save current state to history
+    setGridHistory((prev) => [
+      ...prev,
+      {
+        grid: grid.map((row) => [...row]),
+        completedTargets: new Set(completedTargets),
+        score: score,
+      },
+    ])
 
     setGrid((prev) => {
       const newGrid = prev.map((row) => [...row])
@@ -232,23 +255,34 @@ export default function AdvancedDeleteLevel11() {
     } else {
       // Check if there are any incomplete dw targets for better messaging
       const incompleteDwTargets = deleteTargets.filter(
-        (t) => t.type === 'dw' && !completedTargets.has(`${t.row}-${t.col}-${t.type}`)
+        (t) =>
+          t.type === 'dw' &&
+          !completedTargets.has(`${t.row}-${t.col}-${t.type}`),
       )
-      
+
       if (incompleteDwTargets.length > 0) {
         setWrongMoveMessage(
           'dw executed, but wrong target! Press u to undo and navigate to a target word for points.',
         )
       } else {
-        setWrongMoveMessage('dw executed, but all dw targets already completed!')
+        setWrongMoveMessage(
+          'dw executed, but all dw targets already completed!',
+        )
       }
       setRecentlyDeleted({ row: position.row, col: position.col })
     }
   }
 
   const deleteLine = () => {
-    // Save current grid state to history
-    setGridHistory((prev) => [...prev, grid.map((row) => [...row])])
+    // Save current state to history
+    setGridHistory((prev) => [
+      ...prev,
+      {
+        grid: grid.map((row) => [...row]),
+        completedTargets: new Set(completedTargets),
+        score: score,
+      },
+    ])
 
     setGrid((prev) => {
       const newGrid = prev.map((row) => [...row])
@@ -282,9 +316,16 @@ export default function AdvancedDeleteLevel11() {
   }
 
   const deleteToEnd = () => {
-    // Save current grid state to history
-    setGridHistory((prev) => [...prev, grid.map((row) => [...row])])
-    
+    // Save current state to history
+    setGridHistory((prev) => [
+      ...prev,
+      {
+        grid: grid.map((row) => [...row]),
+        completedTargets: new Set(completedTargets),
+        score: score,
+      },
+    ])
+
     setGrid((prev) => {
       const newGrid = prev.map((row) => [...row])
       // Delete from current position to end of line
@@ -617,8 +658,12 @@ export default function AdvancedDeleteLevel11() {
   const undoLastAction = () => {
     if (gridHistory.length > 1) {
       const newHistory = gridHistory.slice(0, -1)
-      const previousGrid = newHistory[newHistory.length - 1]
-      setGrid(previousGrid.map((row) => [...row]))
+      const previousState = newHistory[newHistory.length - 1]
+
+      // Restore all state from history
+      setGrid(previousState.grid.map((row) => [...row]))
+      setCompletedTargets(new Set(previousState.completedTargets))
+      setScore(previousState.score)
       setGridHistory(newHistory)
       setWrongMoveMessage('')
       setRecentlyDeleted(null)
@@ -675,7 +720,10 @@ export default function AdvancedDeleteLevel11() {
       return false
     })
 
-    if (target && !completedTargets.has(`${target.row}-${target.col}-${target.type}`)) {
+    if (
+      target &&
+      !completedTargets.has(`${target.row}-${target.col}-${target.type}`)
+    ) {
       const colors = getTargetColors(target.type)
       return { type: target.type, ...colors }
     }
