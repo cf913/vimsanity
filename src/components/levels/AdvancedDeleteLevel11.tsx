@@ -26,6 +26,7 @@ export default function AdvancedDeleteLevel11() {
   const deleteTargets = [
     { row: 0, col: 7, type: 'dw', word: 'Word' }, // Delete word "Word"
     { row: 1, col: 10, type: 'dd' }, // Delete entire line (trash can icon)
+    { row: 2, col: 5, type: 'dw', word: 'this' }, // Delete word "line"
     { row: 3, col: 6, type: 'D' }, // Delete from cursor to end (notebook icons)
   ]
 
@@ -52,6 +53,20 @@ export default function AdvancedDeleteLevel11() {
   ])
 
   const MAX_SCORE = deleteTargets.length
+
+  // Color mapping for different target types
+  const getTargetColors = (type: string) => {
+    switch (type) {
+      case 'dw':
+        return { color: 'text-blue-400', ring: 'ring-blue-400/50' }
+      case 'dd':
+        return { color: 'text-orange-400', ring: 'ring-orange-400/50' }
+      case 'D':
+        return { color: 'text-purple-400', ring: 'ring-purple-400/50' }
+      default:
+        return { color: 'text-gray-400', ring: 'ring-gray-400/50' }
+    }
+  }
 
   // Reset recently deleted animation
   useEffect(() => {
@@ -219,29 +234,37 @@ export default function AdvancedDeleteLevel11() {
   }
 
   const deleteLine = () => {
-    if (position.row === 1 && !completedTargets.has('dd')) {
-      // Save current grid state to history
-      setGridHistory((prev) => [...prev, grid.map((row) => [...row])])
+    // Save current grid state to history
+    setGridHistory((prev) => [...prev, grid.map((row) => [...row])])
 
-      setGrid((prev) => {
-        const newGrid = prev.map((row) => [...row])
-        // Mark entire line as deleted
-        for (let i = 0; i < newGrid[1].length; i++) {
-          newGrid[1][i] = '·'
-        }
-        return newGrid
-      })
+    setGrid((prev) => {
+      const newGrid = prev.map((row) => [...row])
+      // Delete entire current line (vim dd behavior)
+      for (let col = 0; col < newGrid[position.row].length; col++) {
+        newGrid[position.row][col] = '·'
+      }
+      return newGrid
+    })
+
+    // Check if this was the correct target for scoring
+    const target = deleteTargets.find(
+      (t) => t.type === 'dd' && t.row === position.row,
+    )
+
+    if (target && !completedTargets.has('dd')) {
+      // Correct target - award points
       setCompletedTargets((prev) => new Set([...prev, 'dd']))
       setScore((prev) => prev + 1)
-      setRecentlyDeleted({ row: 1, col: 0 })
+      setRecentlyDeleted({ row: position.row, col: 0 })
       setWrongMoveMessage('')
     } else {
-      // Wrong line or already completed
+      // Wrong line but command still executed
       if (!completedTargets.has('dd')) {
         setWrongMoveMessage(
-          'Wrong line for dd! Press u to undo and navigate to the line with the 🗑 icon.',
+          'dd executed, but wrong target! Press u to undo and navigate to line with 🗑 icon for points.',
         )
       }
+      setRecentlyDeleted({ row: position.row, col: 0 })
     }
   }
 
@@ -613,18 +636,24 @@ export default function AdvancedDeleteLevel11() {
   })
 
   const getTargetInfo = (row: number, col: number) => {
-    if (row === 0 && col >= 7 && col <= 10 && !completedTargets.has('dw')) {
-      return { type: 'dw', color: 'text-blue-400', ring: 'ring-blue-400/50' }
-    }
-    if (row === 1 && col === 10 && !completedTargets.has('dd')) {
-      return {
-        type: 'dd',
-        color: 'text-orange-400',
-        ring: 'ring-orange-400/50',
+    // Find target at this position
+    const target = deleteTargets.find((t) => {
+      if (t.type === 'dw') {
+        // For dw targets, highlight the word area
+        return t.row === row && col >= t.col && col <= t.col + 3
+      } else if (t.type === 'dd') {
+        // For dd targets, highlight specific position (like trash icon)
+        return t.row === row && t.col === col
+      } else if (t.type === 'D') {
+        // For D targets, highlight from position to end of line
+        return t.row === row && col >= t.col
       }
-    }
-    if (row === 3 && col >= 6 && !completedTargets.has('D')) {
-      return { type: 'D', color: 'text-purple-400', ring: 'ring-purple-400/50' }
+      return false
+    })
+
+    if (target && !completedTargets.has(`${target.row}-${target.col}-${target.type}`)) {
+      const colors = getTargetColors(target.type)
+      return { type: target.type, ...colors }
     }
     return null
   }
