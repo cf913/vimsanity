@@ -47,6 +47,9 @@ export default function AdvancedDeleteLevel11() {
   const [insertModeWarning, setInsertModeWarning] = useState<string>('')
   const [pendingCommand, setPendingCommand] = useState<string>('')
   const [pendingFindCommand, setPendingFindCommand] = useState<string>('')
+  const [gridHistory, setGridHistory] = useState<string[][][]>([
+    initialGrid.map((row) => [...row]),
+  ])
 
   const MAX_SCORE = deleteTargets.length
 
@@ -149,6 +152,7 @@ export default function AdvancedDeleteLevel11() {
     setInsertModeWarning('')
     setPendingCommand('')
     setPendingFindCommand('')
+    setGridHistory([initialGrid.map((row) => [...row])])
   }
 
   const deleteWord = () => {
@@ -160,6 +164,9 @@ export default function AdvancedDeleteLevel11() {
     )
 
     if (target && !completedTargets.has('dw')) {
+      // Save current grid state to history
+      setGridHistory((prev) => [...prev, grid.map((row) => [...row])])
+      
       setGrid((prev) => {
         const newGrid = prev.map((row) => [...row])
         // Replace "Word" with dots
@@ -176,7 +183,7 @@ export default function AdvancedDeleteLevel11() {
       // Wrong position or already completed
       if (!completedTargets.has('dw')) {
         setWrongMoveMessage(
-          'Wrong position for dw! Navigate to the "Word" text and try again.',
+          'Wrong position for dw! Press u to undo and navigate to the "Word" text.',
         )
       }
     }
@@ -184,6 +191,9 @@ export default function AdvancedDeleteLevel11() {
 
   const deleteLine = () => {
     if (position.row === 1 && !completedTargets.has('dd')) {
+      // Save current grid state to history
+      setGridHistory((prev) => [...prev, grid.map((row) => [...row])])
+      
       setGrid((prev) => {
         const newGrid = prev.map((row) => [...row])
         // Mark entire line as deleted
@@ -200,7 +210,7 @@ export default function AdvancedDeleteLevel11() {
       // Wrong line or already completed
       if (!completedTargets.has('dd')) {
         setWrongMoveMessage(
-          'Wrong line for dd! Navigate to the line with the 🗑 icon and try again.',
+          'Wrong line for dd! Press u to undo and navigate to the line with the 🗑 icon.',
         )
       }
     }
@@ -208,6 +218,9 @@ export default function AdvancedDeleteLevel11() {
 
   const deleteToEnd = () => {
     if (position.row === 3 && position.col >= 6 && !completedTargets.has('D')) {
+      // Save current grid state to history
+      setGridHistory((prev) => [...prev, grid.map((row) => [...row])])
+      
       setGrid((prev) => {
         const newGrid = prev.map((row) => [...row])
         // Delete from position to end of line
@@ -224,7 +237,7 @@ export default function AdvancedDeleteLevel11() {
       // Wrong position or already completed
       if (!completedTargets.has('D')) {
         setWrongMoveMessage(
-          'Wrong position for D! Navigate to the 📝 icons on line 4 and try again.',
+          'Wrong position for D! Press u to undo and navigate to the 📝 icons on line 4.',
         )
       }
     }
@@ -386,6 +399,14 @@ export default function AdvancedDeleteLevel11() {
       setPendingFindCommand('T')
       setLastKeyPressed('T')
       setPendingCommand('')
+    } else if (key === 'u') {
+      if (mode === VIM_MODES.INSERT) {
+        handleDisabledInInsertMode('u')
+        return
+      }
+      undoLastAction()
+      setLastKeyPressed('u')
+      setPendingCommand('')
     }
   }
 
@@ -406,6 +427,7 @@ export default function AdvancedDeleteLevel11() {
       T: 'till character backward',
       d: 'delete',
       D: 'delete to end',
+      u: 'undo',
     }
 
     const desc = commandDescriptions[command] || 'use that command'
@@ -516,6 +538,17 @@ export default function AdvancedDeleteLevel11() {
     }))
   }
 
+  const undoLastAction = () => {
+    if (gridHistory.length > 1) {
+      const newHistory = gridHistory.slice(0, -1)
+      const previousGrid = newHistory[newHistory.length - 1]
+      setGrid(previousGrid.map((row) => [...row]))
+      setGridHistory(newHistory)
+      setWrongMoveMessage('')
+      setRecentlyDeleted(null)
+    }
+  }
+
   const keyActionMap: KeyActionMap = {
     h: () => handleCommand('h'),
     j: () => handleCommand('j'),
@@ -532,6 +565,7 @@ export default function AdvancedDeleteLevel11() {
     T: () => handleCommand('T'),
     d: () => handleCommand('d'),
     D: () => handleCommand('D'),
+    u: () => handleCommand('u'),
     Escape: () => {
       setMode(VIM_MODES.NORMAL)
       setLastKeyPressed('Escape')
@@ -540,7 +574,7 @@ export default function AdvancedDeleteLevel11() {
 
   useKeyboardHandler({
     keyActionMap,
-    dependencies: [position, grid, completedTargets, pendingCommand],
+    dependencies: [position, grid, completedTargets, pendingCommand, gridHistory],
   })
 
   const getTargetInfo = (row: number, col: number) => {
