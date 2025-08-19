@@ -216,18 +216,31 @@ export default function AdvancedDeleteLevel11() {
         Math.abs(t.col - position.col) <= 3,
     )
 
-    if (target && !completedTargets.has('dw')) {
-      // Correct target - award points
-      setCompletedTargets((prev) => new Set([...prev, 'dw']))
-      setScore((prev) => prev + 1)
-      setRecentlyDeleted({ row: position.row, col: position.col })
-      setWrongMoveMessage('')
+    if (target) {
+      const targetKey = `${target.row}-${target.col}-${target.type}`
+      if (!completedTargets.has(targetKey)) {
+        // Correct target - award points
+        setCompletedTargets((prev) => new Set([...prev, targetKey]))
+        setScore((prev) => prev + 1)
+        setRecentlyDeleted({ row: position.row, col: position.col })
+        setWrongMoveMessage('')
+      } else {
+        // Target already completed
+        setRecentlyDeleted({ row: position.row, col: position.col })
+        setWrongMoveMessage('dw executed, but this target already completed!')
+      }
     } else {
-      // Wrong position but command still executed
-      if (!completedTargets.has('dw')) {
+      // Check if there are any incomplete dw targets for better messaging
+      const incompleteDwTargets = deleteTargets.filter(
+        (t) => t.type === 'dw' && !completedTargets.has(`${t.row}-${t.col}-${t.type}`)
+      )
+      
+      if (incompleteDwTargets.length > 0) {
         setWrongMoveMessage(
-          'dw executed, but wrong target! Press u to undo and navigate to the "Word" text for points.',
+          'dw executed, but wrong target! Press u to undo and navigate to a target word for points.',
         )
+      } else {
+        setWrongMoveMessage('dw executed, but all dw targets already completed!')
       }
       setRecentlyDeleted({ row: position.row, col: position.col })
     }
@@ -269,29 +282,40 @@ export default function AdvancedDeleteLevel11() {
   }
 
   const deleteToEnd = () => {
-    if (position.row === 3 && position.col >= 6 && !completedTargets.has('D')) {
-      // Save current grid state to history
-      setGridHistory((prev) => [...prev, grid.map((row) => [...row])])
-
-      setGrid((prev) => {
-        const newGrid = prev.map((row) => [...row])
-        // Delete from position to end of line
-        for (let i = 6; i < newGrid[3].length; i++) {
-          newGrid[3][i] = '·'
-        }
-        return newGrid
-      })
-      setCompletedTargets((prev) => new Set([...prev, 'D']))
-      setScore((prev) => prev + 1)
-      setRecentlyDeleted({ row: 3, col: 6 })
-      setWrongMoveMessage('')
-    } else {
-      // Wrong position or already completed
-      if (!completedTargets.has('D')) {
-        setWrongMoveMessage(
-          'Wrong position for D! Press u to undo and navigate to the 📝 icons on line 4.',
-        )
+    // Save current grid state to history
+    setGridHistory((prev) => [...prev, grid.map((row) => [...row])])
+    
+    setGrid((prev) => {
+      const newGrid = prev.map((row) => [...row])
+      // Delete from current position to end of line
+      for (let col = position.col; col < newGrid[position.row].length; col++) {
+        newGrid[position.row][col] = '·'
       }
+      return newGrid
+    })
+
+    // Check if this was the correct target for scoring
+    const target = deleteTargets.find(
+      (t) => t.type === 'D' && t.row === position.row && position.col >= t.col,
+    )
+
+    if (target) {
+      const targetKey = `${target.row}-${target.col}-${target.type}`
+      if (!completedTargets.has(targetKey)) {
+        // Correct target - award points
+        setCompletedTargets((prev) => new Set([...prev, targetKey]))
+        setScore((prev) => prev + 1)
+        setRecentlyDeleted({ row: position.row, col: position.col })
+        setWrongMoveMessage('')
+      } else {
+        setRecentlyDeleted({ row: position.row, col: position.col })
+      }
+    } else {
+      // Wrong position but command still executed
+      setWrongMoveMessage(
+        'D executed, but wrong target! Press u to undo and navigate to target position for points.',
+      )
+      setRecentlyDeleted({ row: position.row, col: position.col })
     }
   }
 
