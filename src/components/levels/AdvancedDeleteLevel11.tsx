@@ -156,6 +156,44 @@ export default function AdvancedDeleteLevel11() {
   }
 
   const deleteWord = () => {
+    // Save current grid state to history
+    setGridHistory((prev) => [...prev, grid.map((row) => [...row])])
+
+    setGrid((prev) => {
+      const newGrid = prev.map((row) => [...row])
+      const currentRow = newGrid[position.row]
+      let startCol = position.col
+      let endCol = position.col
+
+      // If we're on a space, move to the next word first
+      if (currentRow[startCol] === ' ') {
+        while (endCol < currentRow.length && currentRow[endCol] === ' ') {
+          endCol++
+        }
+        startCol = endCol
+      }
+
+      // Find the end of the current word
+      while (endCol < currentRow.length && currentRow[endCol] !== ' ') {
+        endCol++
+      }
+
+      // Include one trailing space if it exists (vim behavior)
+      if (endCol < currentRow.length && currentRow[endCol] === ' ') {
+        endCol++
+      }
+
+      // Delete from start to end
+      for (let col = startCol; col < endCol; col++) {
+        if (col < currentRow.length) {
+          newGrid[position.row][col] = '·'
+        }
+      }
+
+      return newGrid
+    })
+
+    // Check if this was the correct target for scoring
     const target = deleteTargets.find(
       (t) =>
         t.type === 'dw' &&
@@ -164,28 +202,19 @@ export default function AdvancedDeleteLevel11() {
     )
 
     if (target && !completedTargets.has('dw')) {
-      // Save current grid state to history
-      setGridHistory((prev) => [...prev, grid.map((row) => [...row])])
-      
-      setGrid((prev) => {
-        const newGrid = prev.map((row) => [...row])
-        // Replace "Word" with dots
-        for (let i = 7; i <= 10; i++) {
-          newGrid[0][i] = '·'
-        }
-        return newGrid
-      })
+      // Correct target - award points
       setCompletedTargets((prev) => new Set([...prev, 'dw']))
       setScore((prev) => prev + 1)
-      setRecentlyDeleted({ row: 0, col: 7 })
+      setRecentlyDeleted({ row: position.row, col: position.col })
       setWrongMoveMessage('')
     } else {
-      // Wrong position or already completed
+      // Wrong position but command still executed
       if (!completedTargets.has('dw')) {
         setWrongMoveMessage(
-          'Wrong position for dw! Press u to undo and navigate to the "Word" text.',
+          'dw executed, but wrong target! Press u to undo and navigate to the "Word" text for points.',
         )
       }
+      setRecentlyDeleted({ row: position.row, col: position.col })
     }
   }
 
@@ -193,7 +222,7 @@ export default function AdvancedDeleteLevel11() {
     if (position.row === 1 && !completedTargets.has('dd')) {
       // Save current grid state to history
       setGridHistory((prev) => [...prev, grid.map((row) => [...row])])
-      
+
       setGrid((prev) => {
         const newGrid = prev.map((row) => [...row])
         // Mark entire line as deleted
@@ -220,7 +249,7 @@ export default function AdvancedDeleteLevel11() {
     if (position.row === 3 && position.col >= 6 && !completedTargets.has('D')) {
       // Save current grid state to history
       setGridHistory((prev) => [...prev, grid.map((row) => [...row])])
-      
+
       setGrid((prev) => {
         const newGrid = prev.map((row) => [...row])
         // Delete from position to end of line
@@ -574,7 +603,13 @@ export default function AdvancedDeleteLevel11() {
 
   useKeyboardHandler({
     keyActionMap,
-    dependencies: [position, grid, completedTargets, pendingCommand, gridHistory],
+    dependencies: [
+      position,
+      grid,
+      completedTargets,
+      pendingCommand,
+      gridHistory,
+    ],
   })
 
   const getTargetInfo = (row: number, col: number) => {
@@ -631,29 +666,29 @@ export default function AdvancedDeleteLevel11() {
       {/* Grid */}
       <div className="bg-zinc-800 rounded-lg border-2 border-zinc-600">
         <div className="grid gap-1 p-6">
-        {grid.map((row, rowIdx) => (
-          <div key={rowIdx} className="flex gap-1">
-            {row.map((char, colIdx) => {
-              const isCursor =
-                position.row === rowIdx && position.col === colIdx
-              const targetInfo = getTargetInfo(rowIdx, colIdx)
-              const isDeletedCell = isDeleted(rowIdx, colIdx)
-              const isRecentlyDeletedCell = isRecentlyDeleted(rowIdx, colIdx)
+          {grid.map((row, rowIdx) => (
+            <div key={rowIdx} className="flex gap-1">
+              {row.map((char, colIdx) => {
+                const isCursor =
+                  position.row === rowIdx && position.col === colIdx
+                const targetInfo = getTargetInfo(rowIdx, colIdx)
+                const isDeletedCell = isDeleted(rowIdx, colIdx)
+                const isRecentlyDeletedCell = isRecentlyDeleted(rowIdx, colIdx)
 
-              // Cursor colors based on mode (matching ModeIndicator)
-              const cursorBg =
-                mode === VIM_MODES.INSERT ? 'bg-orange-400' : 'bg-emerald-400'
-              const cursorRing =
-                mode === VIM_MODES.INSERT
-                  ? 'ring-orange-300'
-                  : 'ring-emerald-300'
-              const cursorDot =
-                mode === VIM_MODES.INSERT ? 'bg-orange-400' : 'bg-emerald-400'
+                // Cursor colors based on mode (matching ModeIndicator)
+                const cursorBg =
+                  mode === VIM_MODES.INSERT ? 'bg-orange-400' : 'bg-emerald-400'
+                const cursorRing =
+                  mode === VIM_MODES.INSERT
+                    ? 'ring-orange-300'
+                    : 'ring-emerald-300'
+                const cursorDot =
+                  mode === VIM_MODES.INSERT ? 'bg-orange-400' : 'bg-emerald-400'
 
-              return (
-                <div
-                  key={`${rowIdx}-${colIdx}`}
-                  className={`
+                return (
+                  <div
+                    key={`${rowIdx}-${colIdx}`}
+                    className={`
                     relative w-10 h-10 flex items-center justify-center text-lg font-mono rounded transition-all duration-200
                     ${
                       isCursor
@@ -674,30 +709,32 @@ export default function AdvancedDeleteLevel11() {
                         : ''
                     }
                   `}
-                >
-                  {char}
-                  {isCursor && (
-                    <div
-                      className={`absolute -top-1 -right-1 w-3 h-3 ${cursorDot} rounded-full animate-pulse`}
-                    />
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        ))}
+                  >
+                    {char}
+                    {isCursor && (
+                      <div
+                        className={`absolute -top-1 -right-1 w-3 h-3 ${cursorDot} rounded-full animate-pulse`}
+                      />
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          ))}
         </div>
-        
+
         {/* Command Line (vim-style) */}
         <div className="bg-zinc-900 rounded-b-lg px-4 py-2 border-t border-zinc-600 font-mono text-sm min-h-[2.5rem] flex items-center">
           {pendingCommand && (
             <span className="text-yellow-300">
-              :{pendingCommand}<span className="animate-pulse">_</span>
+              :{pendingCommand}
+              <span className="animate-pulse">_</span>
             </span>
           )}
           {pendingFindCommand && (
             <span className="text-yellow-300">
-              {pendingFindCommand}<span className="animate-pulse">_</span>
+              {pendingFindCommand}
+              <span className="animate-pulse">_</span>
             </span>
           )}
           {!pendingCommand && !pendingFindCommand && (
@@ -785,4 +822,3 @@ export default function AdvancedDeleteLevel11() {
     </div>
   )
 }
-
