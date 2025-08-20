@@ -98,13 +98,22 @@ const levels = {
       wip: false,
       locked: false,
     },
-    // {
-    //   id: 11,
-    //   title: 'Text Objects (di", caw, ci()',
-    //   description: 'Master advanced delete and change operations',
-    //   wip: false,
-    //   locked: false,
-    // },
+    {
+      id: 11,
+      title: 'Advanced Delete (dw, dd, D)',
+      description: 'Master word, line, and partial line deletion',
+      wip: false,
+      locked: false,
+    },
+  ],
+  recap: [
+    {
+      id: 12,
+      title: 'Quick Recap',
+      description: 'Review and practice all vim motions learned so far',
+      wip: false,
+      locked: false,
+    },
   ],
 }
 

@@ -615,82 +615,109 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
         return (
           <>
             <h3 className="text-lg font-semibold mb-2">
-              Advanced Delete & Change
+              Advanced Delete Operations
             </h3>
             <p className="text-sm mb-3">
-              Master text objects and advanced editing operations:
+              Master combined delete commands for efficient text removal:
             </p>
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">di"</kbd> -
-                  Delete inside quotes
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">dw</kbd> -
+                  Delete word
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Delete text between double quotes
+                  Delete from cursor to the end of the current word
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Works with any quote type: ", ', `
+                  Includes trailing space after the word
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">da"</kbd> -
-                  Delete around quotes
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">dd</kbd> -
+                  Delete entire line
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Delete text and the surrounding quotes
+                  Delete the entire current line
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  "Around" includes the delimiters themselves
+                  Most common line deletion command
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">caw</kbd> -
-                  Change a word
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">D</kbd> -
+                  Delete to end of line
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Delete word and enter insert mode
+                  Delete from cursor position to end of line
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Combines deletion with immediate editing
+                  Same as the single-key D command from Level 10
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">ci(</kbd> -
-                  Change inside parentheses
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">dh</kbd> -
+                  Delete character left
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Delete content inside () and enter insert mode
+                  Delete the character to the left of cursor
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Works with (), [], {}, &lt;&gt;
+                  Like pressing backspace
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">dl</kbd> -
+                  Delete character under cursor
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete the character under the cursor
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Same as x command
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">u</kbd> -
+                  Undo
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Undo the last delete operation
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Essential for correcting mistakes
                 </p>
               </div>
             </div>
             <div className="mt-4 space-y-2">
               <div className="text-xs text-zinc-400">
-                <p className="font-medium text-zinc-300 mb-1">Text Objects:</p>
+                <p className="font-medium text-zinc-300 mb-1">Delete Command Pattern:</p>
                 <ul className="space-y-1 pl-2">
                   <li>
-                    • <strong>i</strong> = "inside" (excludes delimiters)
+                    • <strong>d</strong> = delete operator
                   </li>
                   <li>
-                    • <strong>a</strong> = "around" (includes delimiters)
+                    • <strong>w</strong> = word motion (dw = delete word)
                   </li>
-                  <li>• Works with: (), [], {}, "", '', ``, &lt;&gt;</li>
                   <li>
-                    • <strong>w</strong> = word, <strong>s</strong> = sentence,{' '}
-                    <strong>p</strong> = paragraph
+                    • <strong>h, l</strong> = character motions (dh, dl = delete chars)
+                  </li>
+                  <li>
+                    • <strong>dd</strong> = delete operator applied to line
+                  </li>
+                  <li>
+                    • <strong>D</strong> = shortcut for delete to end of line
                   </li>
                 </ul>
               </div>
               <div className="text-xs text-zinc-400">
                 <p className="italic">
-                  Tip: Text objects are Vim's superpower! They let you operate
-                  on logical units of text rather than just characters.
+                  Tip: These commands combine the delete operator (d) with motions to create powerful deletion commands. Master these for efficient text editing!
                 </p>
               </div>
             </div>

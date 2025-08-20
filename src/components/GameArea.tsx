@@ -11,6 +11,7 @@ import Recap8 from './levels/Level8/Recap8'
 import UndoRedoLevel9 from './levels/Level9/UndoRedoLevel9'
 import BasicDeleteLevel10 from './levels/BasicDeleteLevel10'
 import AdvancedDeleteLevel11 from './levels/AdvancedDeleteLevel11'
+import RecapLevel12 from './levels/RecapLevel12'
 
 interface GameAreaProps {
   level: number
@@ -18,11 +19,12 @@ interface GameAreaProps {
 }
 
 // Changelog version and message
-const GAME_VERSION = '0.0.17'
+const GAME_VERSION = '0.0.18'
 
 const CHANGELOG_MESSAGE = `
 <b>What's New in ${GAME_VERSION}</b><br/><br/>
-- Added level 10: basic single key delete commands<br/><br/>
+- Bugfix: fixed level 1 movements not working<br/><br/>
+- Added level 11: multi key delete commands<br/><br/>
 Thanks for playing!
 `
 
@@ -81,6 +83,8 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
         return <BasicDeleteLevel10 />
       case 11:
         return <AdvancedDeleteLevel11 />
+      case 12:
+        return <RecapLevel12 />
       default:
         return <GridMovementLevel isMuted={isMuted} />
     }

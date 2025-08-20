@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react'
-import {
-  useKeyboardHandler,
-  KeyActionMap,
-} from '../../hooks/useKeyboardHandler'
-import ConfettiBurst from './ConfettiBurst'
-import LevelTimer from '../common/LevelTimer'
-import { KeysAllowed } from '../common/KeysAllowed'
-import Scoreboard from '../common/Scoreboard'
-import { RefreshCw } from 'lucide-react'
-import { KBD } from '../common/KBD'
-import { VIM_MODES, VimMode } from '../../utils/constants'
-import ModeIndicator from '../common/ModeIndicator'
 import { motion } from 'framer-motion'
+import { HelpCircleIcon, RefreshCw } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import {
+  KeyActionMap,
+  useKeyboardHandler,
+} from '../../hooks/useKeyboardHandler'
+import { VIM_MODES, VimMode } from '../../utils/constants'
+import { KBD } from '../common/KBD'
+import LevelTimer from '../common/LevelTimer'
+import ModeIndicator from '../common/ModeIndicator'
+import Scoreboard from '../common/Scoreboard'
+import ConfettiBurst from './ConfettiBurst'
 
 export default function BasicDeleteLevel10() {
   // Multiple grid variations with different target positions for muscle memory
@@ -878,4 +877,3 @@ export default function BasicDeleteLevel10() {
     </div>
   )
 }
-
