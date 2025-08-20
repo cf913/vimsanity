@@ -19,6 +19,11 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
   const LEVEL_ID = '1-grid-movement'
   // ...existing state...
   // Add a key listener for Escape to reset
+  const [scoreAnimation, setScoreAnimation] = useState(false)
+  const [lastPosition, setLastPosition] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  })
 
   // Reset all state to initial values
   function handleRestart() {
