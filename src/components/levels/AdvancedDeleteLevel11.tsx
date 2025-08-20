@@ -227,10 +227,13 @@ export default function AdvancedDeleteLevel11() {
         endCol++
       }
 
-      // Delete from start to end
-      for (let col = startCol; col < endCol; col++) {
-        if (col < currentRow.length) {
-          newGrid[position.row][col] = '·'
+      // Realistic deletion: shift text left and fill with spaces
+      const deletedLength = endCol - startCol
+      for (let col = startCol; col < currentRow.length; col++) {
+        if (col + deletedLength < currentRow.length) {
+          newGrid[position.row][col] = currentRow[col + deletedLength]
+        } else {
+          newGrid[position.row][col] = ' '
         }
       }
 
@@ -292,9 +295,13 @@ export default function AdvancedDeleteLevel11() {
 
     setGrid((prev) => {
       const newGrid = prev.map((row) => [...row])
-      // Delete entire current line (vim dd behavior)
-      for (let col = 0; col < newGrid[position.row].length; col++) {
-        newGrid[position.row][col] = '·'
+      // Realistic deletion: shift all lines up and add empty line at bottom
+      for (let row = position.row; row < newGrid.length - 1; row++) {
+        newGrid[row] = [...newGrid[row + 1]]
+      }
+      // Fill last line with spaces
+      for (let col = 0; col < newGrid[newGrid.length - 1].length; col++) {
+        newGrid[newGrid.length - 1][col] = ' '
       }
       return newGrid
     })
@@ -334,9 +341,9 @@ export default function AdvancedDeleteLevel11() {
 
     setGrid((prev) => {
       const newGrid = prev.map((row) => [...row])
-      // Delete from current position to end of line
+      // Realistic deletion: simply replace from cursor to end with spaces
       for (let col = position.col; col < newGrid[position.row].length; col++) {
-        newGrid[position.row][col] = '·'
+        newGrid[position.row][col] = ' '
       }
       return newGrid
     })
@@ -379,9 +386,14 @@ export default function AdvancedDeleteLevel11() {
 
     setGrid((prev) => {
       const newGrid = prev.map((row) => [...row])
-      // Delete character to the left (like backspace)
+      // Realistic deletion: shift text left from current position
       if (position.col > 0) {
-        newGrid[position.row][position.col - 1] = '·'
+        const currentRow = newGrid[position.row]
+        for (let col = position.col - 1; col < currentRow.length - 1; col++) {
+          newGrid[position.row][col] = currentRow[col + 1]
+        }
+        // Fill last position with space
+        newGrid[position.row][currentRow.length - 1] = ' '
       }
       return newGrid
     })
@@ -431,9 +443,14 @@ export default function AdvancedDeleteLevel11() {
 
     setGrid((prev) => {
       const newGrid = prev.map((row) => [...row])
-      // Delete character to the right (like delete key)
-      if (position.col < newGrid[position.row].length) {
-        newGrid[position.row][position.col + 1] = '·'
+      // Realistic deletion: shift text left from position after cursor
+      if (position.col < newGrid[position.row].length - 1) {
+        const currentRow = newGrid[position.row]
+        for (let col = position.col + 1; col < currentRow.length - 1; col++) {
+          newGrid[position.row][col] = currentRow[col + 1]
+        }
+        // Fill last position with space
+        newGrid[position.row][currentRow.length - 1] = ' '
       }
       return newGrid
     })
@@ -851,9 +868,6 @@ export default function AdvancedDeleteLevel11() {
     return null
   }
 
-  const isDeleted = (row: number, col: number) => {
-    return grid[row][col] === '·'
-  }
 
   const isRecentlyDeleted = (row: number, col: number) => {
     return recentlyDeleted?.row === row && recentlyDeleted?.col === col
@@ -893,7 +907,6 @@ export default function AdvancedDeleteLevel11() {
                 const isCursor =
                   position.row === rowIdx && position.col === colIdx
                 const targetInfo = getTargetInfo(rowIdx, colIdx)
-                const isDeletedCell = isDeleted(rowIdx, colIdx)
                 const isRecentlyDeletedCell = isRecentlyDeleted(rowIdx, colIdx)
 
                 // Cursor colors based on mode (matching ModeIndicator)
@@ -917,16 +930,15 @@ export default function AdvancedDeleteLevel11() {
                         : 'bg-zinc-700'
                     }
                     ${
-                      targetInfo && !isDeletedCell && !isCursor
+                      targetInfo && !isCursor
                         ? `${targetInfo.color} font-bold ring-1 ${targetInfo.ring}`
                         : !isCursor
                           ? 'text-zinc-300'
                           : 'text-black'
                     }
-                    ${isDeletedCell ? 'bg-green-600 text-green-200' : ''}
                     ${
                       isRecentlyDeletedCell
-                        ? 'animate-pulse bg-green-500 scale-110'
+                        ? 'animate-pulse bg-blue-500 scale-110'
                         : ''
                     }
                   `}
