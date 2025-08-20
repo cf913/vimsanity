@@ -106,6 +106,15 @@ const levels = {
       locked: false,
     },
   ],
+  recap: [
+    {
+      id: 12,
+      title: 'Quick Recap',
+      description: 'Review and practice all vim motions learned so far',
+      wip: false,
+      locked: false,
+    },
+  ],
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
