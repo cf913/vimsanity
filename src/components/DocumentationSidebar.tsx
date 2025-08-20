@@ -672,13 +672,13 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               <div>
                 <p className="text-sm font-medium">
                   <kbd className="px-2 py-1 bg-zinc-700 rounded">dl</kbd> -
-                  Delete character right
+                  Delete character under cursor
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Delete the character to the right of cursor
+                  Delete the character under the cursor
                 </p>
                 <p className="text-xs text-zinc-400 ml-1">
-                  Like pressing delete key
+                  Same as x command
                 </p>
               </div>
               <div>

@@ -19,17 +19,18 @@ export default function AdvancedDeleteLevel11() {
     ['T', 'h', 'i', 's', ' ', 'l', 'i', 'n', 'e', ' ', '🗑'], // dd target (trash icon marks whole line)
     ['K', 'e', 'e', 'p', ' ', 't', 'h', 'i', 's', ' ', 'T'],
     ['R', 'e', 'm', 'o', 'v', 'e', '📝', '📝', '📝', '📝', 'D'], // D target (notebook icons mark from here to end)
-    ['S', '◀', 'v', 'e', ' ', 'T', 'h', 'i', 's', '▶', 'T'], // dh and dl targets (arrows mark direction)
+    ['S', '◀', 'v', 'e', ' ', 'T', 'h', 'i', 's', ' ', 'T'], // dh target (left arrow)
+    ['D', 'e', 'l', 'e', 't', 'e', ' ', '▶', 'i', 'g', 'h', 't'], // dl target (right arrow)
   ]
 
   // Different types of delete targets
   const deleteTargets = [
     { row: 0, col: 7, type: 'dw', word: 'Word' }, // Delete word "Word"
     { row: 1, col: 10, type: 'dd' }, // Delete entire line (trash can icon)
-    { row: 2, col: 5, type: 'dw', word: 'this' }, // Delete word "line"
+    { row: 2, col: 5, type: 'dw', word: 'this' }, // Delete word "this"
     { row: 3, col: 6, type: 'D' }, // Delete from cursor to end (notebook icons)
     { row: 4, col: 1, type: 'dh' }, // Delete character to the left (left arrow)
-    { row: 4, col: 9, type: 'dl' }, // Delete character to the right (right arrow)
+    { row: 5, col: 7, type: 'dl' }, // Delete character to the right (right arrow)
   ]
 
   const [grid, setGrid] = useState(initialGrid.map((row) => [...row]))
@@ -295,13 +296,9 @@ export default function AdvancedDeleteLevel11() {
 
     setGrid((prev) => {
       const newGrid = prev.map((row) => [...row])
-      // Realistic deletion: shift all lines up and add empty line at bottom
-      for (let row = position.row; row < newGrid.length - 1; row++) {
-        newGrid[row] = [...newGrid[row + 1]]
-      }
-      // Fill last line with spaces
-      for (let col = 0; col < newGrid[newGrid.length - 1].length; col++) {
-        newGrid[newGrid.length - 1][col] = ' '
+      // Clear entire current line (don't shift to preserve target positions)
+      for (let col = 0; col < newGrid[position.row].length; col++) {
+        newGrid[position.row][col] = ' '
       }
       return newGrid
     })
@@ -400,7 +397,8 @@ export default function AdvancedDeleteLevel11() {
 
     // Check if this was the correct target for scoring
     const target = deleteTargets.find(
-      (t) => t.type === 'dh' && t.row === position.row && t.col === position.col,
+      (t) =>
+        t.type === 'dh' && t.row === position.row && t.col === position.col,
     )
 
     if (target) {
@@ -443,10 +441,10 @@ export default function AdvancedDeleteLevel11() {
 
     setGrid((prev) => {
       const newGrid = prev.map((row) => [...row])
-      // Realistic deletion: shift text left from position after cursor
-      if (position.col < newGrid[position.row].length - 1) {
+      // Realistic deletion: delete character under cursor and shift text left
+      if (position.col < newGrid[position.row].length) {
         const currentRow = newGrid[position.row]
-        for (let col = position.col + 1; col < currentRow.length - 1; col++) {
+        for (let col = position.col; col < currentRow.length - 1; col++) {
           newGrid[position.row][col] = currentRow[col + 1]
         }
         // Fill last position with space
@@ -457,7 +455,8 @@ export default function AdvancedDeleteLevel11() {
 
     // Check if this was the correct target for scoring
     const target = deleteTargets.find(
-      (t) => t.type === 'dl' && t.row === position.row && t.col === position.col,
+      (t) =>
+        t.type === 'dl' && t.row === position.row && t.col === position.col,
     )
 
     if (target) {
@@ -466,18 +465,18 @@ export default function AdvancedDeleteLevel11() {
         // Correct target - award points
         setCompletedTargets((prev) => new Set([...prev, targetKey]))
         setScore((prev) => prev + 1)
-        setRecentlyDeleted({ row: position.row, col: position.col + 1 })
+        setRecentlyDeleted({ row: position.row, col: position.col })
         setWrongMoveMessage('')
       } else {
-        setRecentlyDeleted({ row: position.row, col: position.col + 1 })
+        setRecentlyDeleted({ row: position.row, col: position.col })
       }
     } else {
       // Wrong position but command still executed
       setWrongMoveMessage(
         'dl executed, but wrong target! Press u to undo and navigate to target position for points.',
       )
-      if (position.col < grid[position.row].length - 1) {
-        setRecentlyDeleted({ row: position.row, col: position.col + 1 })
+      if (position.col < grid[position.row].length) {
+        setRecentlyDeleted({ row: position.row, col: position.col })
       }
     }
   }
@@ -868,7 +867,6 @@ export default function AdvancedDeleteLevel11() {
     return null
   }
 
-
   const isRecentlyDeleted = (row: number, col: number) => {
     return recentlyDeleted?.row === row && recentlyDeleted?.col === col
   }
@@ -882,7 +880,9 @@ export default function AdvancedDeleteLevel11() {
           Advanced Delete Operations
         </h2>
         <p className="text-zinc-400 px-2">
-          Use <KBD>dw</KBD> to delete words, <KBD>dd</KBD> to delete lines, <KBD>D</KBD> to delete to end, <KBD>dh</KBD> to delete left, and <KBD>dl</KBD> to delete right
+          Use <KBD>dw</KBD> to delete words, <KBD>dd</KBD> to delete lines,{' '}
+          <KBD>D</KBD> to delete to end, <KBD>dh</KBD> to delete left, and{' '}
+          <KBD>dl</KBD> to delete under cursor
         </p>
       </div>
 
@@ -997,8 +997,48 @@ export default function AdvancedDeleteLevel11() {
           </div>
           <div className="text-center">
             <div className="text-green-400 font-bold">dl</div>
-            <div className="text-xs text-zinc-400">Delete character right</div>
+            <div className="text-xs text-zinc-400">
+              Delete char under cursor
+            </div>
           </div>
+        </div>
+        
+        {/* Philosophy Section */}
+        <div className="mt-6 bg-zinc-700/50 rounded-lg p-4 text-sm">
+          <h3 className="text-emerald-400 font-semibold mb-3">Vim's Delete Philosophy: Operators + Motions</h3>
+          <p className="text-zinc-300 mb-3">
+            In Vim, <span className="text-blue-400 font-mono">d</span> is a <strong>delete operator</strong> that combines with <strong>motions</strong> to create powerful commands. 
+            The pattern is: <span className="text-yellow-300 font-mono">operator + motion = action</span>
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+            <div>
+              <p className="text-zinc-400 font-medium mb-2">More delete combinations:</p>
+              <ul className="text-zinc-300 space-y-1 text-xs">
+                <li><span className="text-orange-400 font-mono">dj</span> - Delete current and next line</li>
+                <li><span className="text-orange-400 font-mono">dk</span> - Delete current and previous line</li>
+                <li><span className="text-blue-400 font-mono">db</span> - Delete back to word start</li>
+                <li><span className="text-blue-400 font-mono">de</span> - Delete to word end</li>
+                <li><span className="text-purple-400 font-mono">d$</span> - Delete to line end (same as D)</li>
+              </ul>
+            </div>
+            
+            <div>
+              <p className="text-zinc-400 font-medium mb-2">Change operator (c):</p>
+              <ul className="text-zinc-300 space-y-1 text-xs">
+                <li><span className="text-green-400 font-mono">cw</span> - Change word (delete + insert mode)</li>
+                <li><span className="text-green-400 font-mono">ch</span> - Change character left</li>
+                <li><span className="text-green-400 font-mono">cl</span> - Change character under cursor</li>
+                <li><span className="text-green-400 font-mono">cc</span> - Change entire line</li>
+                <li><span className="text-green-400 font-mono">C</span> - Change to line end</li>
+              </ul>
+            </div>
+          </div>
+          
+          <p className="text-zinc-400 text-xs italic">
+            💡 The key difference: <span className="text-red-400">d</span> deletes and stays in normal mode, 
+            <span className="text-green-400">c</span> deletes and enters insert mode for immediate editing.
+          </p>
         </div>
       </div>
 
