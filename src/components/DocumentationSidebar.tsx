@@ -659,6 +659,30 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">dh</kbd> -
+                  Delete character left
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete the character to the left of cursor
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Like pressing backspace
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">dl</kbd> -
+                  Delete character right
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete the character to the right of cursor
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Like pressing delete key
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
                   <kbd className="px-2 py-1 bg-zinc-700 rounded">u</kbd> -
                   Undo
                 </p>
@@ -679,6 +703,9 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
                   </li>
                   <li>
                     • <strong>w</strong> = word motion (dw = delete word)
+                  </li>
+                  <li>
+                    • <strong>h, l</strong> = character motions (dh, dl = delete chars)
                   </li>
                   <li>
                     • <strong>dd</strong> = delete operator applied to line

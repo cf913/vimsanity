@@ -19,7 +19,7 @@ export default function AdvancedDeleteLevel11() {
     ['T', 'h', 'i', 's', ' ', 'l', 'i', 'n', 'e', ' ', '🗑'], // dd target (trash icon marks whole line)
     ['K', 'e', 'e', 'p', ' ', 't', 'h', 'i', 's', ' ', 'T'],
     ['R', 'e', 'm', 'o', 'v', 'e', '📝', '📝', '📝', '📝', 'D'], // D target (notebook icons mark from here to end)
-    ['S', 'a', 'v', 'e', ' ', 'T', 'h', 'i', 's', ' ', 'T'],
+    ['S', '◀', 'v', 'e', ' ', 'T', 'h', 'i', 's', '▶', 'T'], // dh and dl targets (arrows mark direction)
   ]
 
   // Different types of delete targets
@@ -28,6 +28,8 @@ export default function AdvancedDeleteLevel11() {
     { row: 1, col: 10, type: 'dd' }, // Delete entire line (trash can icon)
     { row: 2, col: 5, type: 'dw', word: 'this' }, // Delete word "line"
     { row: 3, col: 6, type: 'D' }, // Delete from cursor to end (notebook icons)
+    { row: 4, col: 1, type: 'dh' }, // Delete character to the left (left arrow)
+    { row: 4, col: 9, type: 'dl' }, // Delete character to the right (right arrow)
   ]
 
   const [grid, setGrid] = useState(initialGrid.map((row) => [...row]))
@@ -73,6 +75,10 @@ export default function AdvancedDeleteLevel11() {
         return { color: 'text-orange-400', ring: 'ring-orange-400/50' }
       case 'D':
         return { color: 'text-purple-400', ring: 'ring-purple-400/50' }
+      case 'dh':
+        return { color: 'text-red-400', ring: 'ring-red-400/50' }
+      case 'dl':
+        return { color: 'text-green-400', ring: 'ring-green-400/50' }
       default:
         return { color: 'text-gray-400', ring: 'ring-gray-400/50' }
     }
@@ -360,10 +366,109 @@ export default function AdvancedDeleteLevel11() {
     }
   }
 
+  const deleteLeft = () => {
+    // Save current state to history
+    setGridHistory((prev) => [
+      ...prev,
+      {
+        grid: grid.map((row) => [...row]),
+        completedTargets: new Set(completedTargets),
+        score: score,
+      },
+    ])
+
+    setGrid((prev) => {
+      const newGrid = prev.map((row) => [...row])
+      // Delete character to the left (like backspace)
+      if (position.col > 0) {
+        newGrid[position.row][position.col - 1] = '·'
+      }
+      return newGrid
+    })
+
+    // Check if this was the correct target for scoring
+    const target = deleteTargets.find(
+      (t) => t.type === 'dh' && t.row === position.row && t.col === position.col,
+    )
+
+    if (target) {
+      const targetKey = `${target.row}-${target.col}-${target.type}`
+      if (!completedTargets.has(targetKey)) {
+        // Correct target - award points
+        setCompletedTargets((prev) => new Set([...prev, targetKey]))
+        setScore((prev) => prev + 1)
+        setRecentlyDeleted({ row: position.row, col: position.col - 1 })
+        setWrongMoveMessage('')
+      } else {
+        setRecentlyDeleted({ row: position.row, col: position.col - 1 })
+      }
+    } else {
+      // Wrong position but command still executed
+      setWrongMoveMessage(
+        'dh executed, but wrong target! Press u to undo and navigate to target position for points.',
+      )
+      if (position.col > 0) {
+        setRecentlyDeleted({ row: position.row, col: position.col - 1 })
+      }
+    }
+
+    // Move cursor left after deletion if possible
+    if (position.col > 0) {
+      setPosition((prev) => ({ ...prev, col: prev.col - 1 }))
+    }
+  }
+
+  const deleteRight = () => {
+    // Save current state to history
+    setGridHistory((prev) => [
+      ...prev,
+      {
+        grid: grid.map((row) => [...row]),
+        completedTargets: new Set(completedTargets),
+        score: score,
+      },
+    ])
+
+    setGrid((prev) => {
+      const newGrid = prev.map((row) => [...row])
+      // Delete character to the right (like delete key)
+      if (position.col < newGrid[position.row].length) {
+        newGrid[position.row][position.col + 1] = '·'
+      }
+      return newGrid
+    })
+
+    // Check if this was the correct target for scoring
+    const target = deleteTargets.find(
+      (t) => t.type === 'dl' && t.row === position.row && t.col === position.col,
+    )
+
+    if (target) {
+      const targetKey = `${target.row}-${target.col}-${target.type}`
+      if (!completedTargets.has(targetKey)) {
+        // Correct target - award points
+        setCompletedTargets((prev) => new Set([...prev, targetKey]))
+        setScore((prev) => prev + 1)
+        setRecentlyDeleted({ row: position.row, col: position.col + 1 })
+        setWrongMoveMessage('')
+      } else {
+        setRecentlyDeleted({ row: position.row, col: position.col + 1 })
+      }
+    } else {
+      // Wrong position but command still executed
+      setWrongMoveMessage(
+        'dl executed, but wrong target! Press u to undo and navigate to target position for points.',
+      )
+      if (position.col < grid[position.row].length - 1) {
+        setRecentlyDeleted({ row: position.row, col: position.col + 1 })
+      }
+    }
+  }
+
   // Handle command sequences
   const handleCommand = (key: string) => {
     if (pendingCommand === 'd') {
-      // Handle second character of dd or dw
+      // Handle second character of dd, dw, dh, or dl
       if (key === 'd') {
         deleteLine()
         setLastKeyPressed('dd')
@@ -372,6 +477,16 @@ export default function AdvancedDeleteLevel11() {
       } else if (key === 'w') {
         deleteWord()
         setLastKeyPressed('dw')
+        setPendingCommand('')
+        return
+      } else if (key === 'h') {
+        deleteLeft()
+        setLastKeyPressed('dh')
+        setPendingCommand('')
+        return
+      } else if (key === 'l') {
+        deleteRight()
+        setLastKeyPressed('dl')
         setPendingCommand('')
         return
       } else {
@@ -716,6 +831,12 @@ export default function AdvancedDeleteLevel11() {
       } else if (t.type === 'D') {
         // For D targets, highlight from position to end of line
         return t.row === row && col >= t.col
+      } else if (t.type === 'dh') {
+        // For dh targets, highlight the specific position (arrow)
+        return t.row === row && t.col === col
+      } else if (t.type === 'dl') {
+        // For dl targets, highlight the specific position (arrow)
+        return t.row === row && t.col === col
       }
       return false
     })
@@ -747,8 +868,7 @@ export default function AdvancedDeleteLevel11() {
           Advanced Delete Operations
         </h2>
         <p className="text-zinc-400 px-2">
-          Use <KBD>dw</KBD> to delete words, <KBD>dd</KBD> to delete lines, and{' '}
-          <KBD>D</KBD> to delete to end
+          Use <KBD>dw</KBD> to delete words, <KBD>dd</KBD> to delete lines, <KBD>D</KBD> to delete to end, <KBD>dh</KBD> to delete left, and <KBD>dl</KBD> to delete right
         </p>
       </div>
 
@@ -845,8 +965,8 @@ export default function AdvancedDeleteLevel11() {
       </div>
 
       {/* Instructions */}
-      <div className="bg-zinc-800 rounded-lg p-4 max-w-2xl">
-        <div className="grid grid-cols-3 gap-4 text-sm mb-3">
+      <div className="bg-zinc-800 rounded-lg p-4 max-w-4xl">
+        <div className="grid grid-cols-5 gap-4 text-sm mb-3">
           <div className="text-center">
             <div className="text-blue-400 font-bold">dw</div>
             <div className="text-xs text-zinc-400">Delete to end of word</div>
@@ -858,6 +978,14 @@ export default function AdvancedDeleteLevel11() {
           <div className="text-center">
             <div className="text-purple-400 font-bold">D</div>
             <div className="text-xs text-zinc-400">Delete to end of line</div>
+          </div>
+          <div className="text-center">
+            <div className="text-red-400 font-bold">dh</div>
+            <div className="text-xs text-zinc-400">Delete character left</div>
+          </div>
+          <div className="text-center">
+            <div className="text-green-400 font-bold">dl</div>
+            <div className="text-xs text-zinc-400">Delete character right</div>
           </div>
         </div>
       </div>
