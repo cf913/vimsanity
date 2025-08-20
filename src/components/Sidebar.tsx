@@ -100,8 +100,8 @@ const levels = {
     },
     {
       id: 11,
-      title: 'Text Objects (di", caw, ci()',
-      description: 'Master advanced delete and change operations',
+      title: 'Advanced Delete (dw, dd, D)',
+      description: 'Master word, line, and partial line deletion',
       wip: false,
       locked: false,
     },

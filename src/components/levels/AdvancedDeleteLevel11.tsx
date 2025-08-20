@@ -849,7 +849,7 @@ export default function AdvancedDeleteLevel11() {
         <div className="grid grid-cols-3 gap-4 text-sm mb-3">
           <div className="text-center">
             <div className="text-blue-400 font-bold">dw</div>
-            <div className="text-xs text-zinc-400">Delete word</div>
+            <div className="text-xs text-zinc-400">Delete to end of word</div>
           </div>
           <div className="text-center">
             <div className="text-orange-400 font-bold">dd</div>
