@@ -254,14 +254,13 @@ export default function RecapLevel12() {
       <>
         {beforeCursor}
         {isInsertMode ? (
-          <span className="bg-emerald-400 w-0.5 h-4 inline-block relative">
-            <span className="absolute left-0 text-zinc-300">
-              {charAtCursor}
-            </span>
-          </span>
-        ) : (
-          <span className="bg-emerald-400 text-zinc-900 px-0.5">
+          <>
+            <span className="bg-emerald-400 w-0.5 h-5 inline-block translate-y-1"></span>
             {charAtCursor}
+          </>
+        ) : (
+          <span className="bg-emerald-400 text-zinc-900 inline-block w-[1ch] text-center">
+            {charAtCursor === ' ' ? '\u00A0' : charAtCursor}
           </span>
         )}
         {restAfterCursor}
@@ -333,18 +332,18 @@ export default function RecapLevel12() {
                     </div>
 
                     <div className="col-span-4">
-                      <div className="text-xs text-zinc-500 mb-1">Before:</div>
+                      {/* <div className="text-xs text-zinc-500 mb-1">Before:</div> */}
                       <pre className="text-sm text-zinc-300 bg-zinc-800/50 px-2 py-1 rounded font-mono whitespace-pre-wrap">
                         {renderTextWithCursor(motion.before)}
                       </pre>
                     </div>
 
                     <div className="col-span-1 flex justify-center">
-                      <span className="text-zinc-600">→</span>
+                      <span className="text-zinc-300">→</span>
                     </div>
 
                     <div className="col-span-4">
-                      <div className="text-xs text-zinc-500 mb-1">After:</div>
+                      {/* <div className="text-xs text-zinc-500 mb-1">After:</div> */}
                       <pre className="text-sm text-zinc-300 bg-zinc-800/50 px-2 py-1 rounded font-mono whitespace-pre-wrap">
                         {renderTextWithCursor(motion.after)}
                       </pre>
@@ -383,4 +382,3 @@ export default function RecapLevel12() {
     </div>
   )
 }
-
