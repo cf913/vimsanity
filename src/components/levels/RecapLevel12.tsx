@@ -39,27 +39,15 @@ export default function RecapLevel12() {
         },
         {
           command: 'b',
-          description: 'Move to previous word',
+          description: 'Move to beginning of word',
           before: 'hello world |vim',
           after: 'hello |world vim',
         },
         {
-          command: 'b',
-          description: 'Move to start of current word',
-          before: 'hello wor|ld vim',
-          after: 'hello |world vim',
-        },
-        {
           command: 'e',
-          description: 'Move to end next word',
+          description: 'Move to end of word',
           before: 'hell|o world',
           after: 'hello worl|d',
-        },
-        {
-          command: 'e',
-          description: 'Move to end of current word',
-          before: 'he|llo world',
-          after: 'hell|o world',
         },
         {
           command: '0',
@@ -130,6 +118,42 @@ export default function RecapLevel12() {
       ],
     },
     {
+      title: 'More good ones',
+      color: 'emerald',
+      motions: [
+        {
+          command: '{3}j',
+          description: 'Move cursor down 3 lines',
+          before: 'lin|e 1\nline 2\nline 3\nline 4',
+          after: 'line 1\nline 2\nline 3\nlin|e 4',
+        },
+        {
+          command: 'J',
+          description: 'Append next line to current line',
+          before: 'lin|e 1\nline2',
+          after: 'line 1| line2',
+        },
+        {
+          command: '{3}w',
+          description: 'Move to next word, 3 times',
+          before: 'he|llo world vim enabled',
+          after: 'hello world vim |enabled',
+        },
+        {
+          command: 'gg',
+          description: 'Move to first line of file',
+          before: 'this\nis\na\nlong\n\\\\...hundreds of lines...\nlo|ng\nfile',
+          after: 'th|is\nis\na\nlong\n\\\\...hundreds of lines...long\nfile',
+        },
+        {
+          command: 'G',
+          description: 'Move to last line of file',
+          before: 'this\ni|s\na\nlong\n\\\\...hundreds of lines...\nlong\nfile',
+          after: 'this\nis\na\nlong\n\\\\...hundreds of lines...\nlong\nf|ile',
+        },
+      ],
+    },
+    {
       title: 'Insert',
       color: 'blue',
       motions: [
@@ -184,14 +208,14 @@ export default function RecapLevel12() {
         {
           command: 'u',
           description: 'Undo last change',
-          before: 'hello wor|ld',
-          after: 'hello |world',
+          before: 'hello worl|d',
+          after: 'hello |',
         },
         {
           command: 'Ctrl+r',
           description: 'Redo last change',
-          before: 'hello |world',
-          after: 'hello wor|ld',
+          before: 'hello |',
+          after: 'hello worl|d',
         },
       ],
     },
@@ -227,7 +251,7 @@ export default function RecapLevel12() {
           command: 'dd',
           description: 'Delete entire line',
           before: 'line 1\nhel|lo\nline 3',
-          after: 'line 1\n|line 3',
+          after: 'line 1\nlin|e 3',
         },
         {
           command: 'dw',
@@ -249,6 +273,49 @@ export default function RecapLevel12() {
         },
       ],
     },
+    {
+      title: 'More Delete goodness',
+      color: 'red',
+      motions: [
+        {
+          command: 'diw',
+          description: 'Delete word from anywhere in the word',
+          before: 'hello wor|ld',
+          after: 'hello |',
+        },
+        {
+          command: 'di[',
+          description: 'Delete In [ (works with any brackets)',
+          before: 'hello [wor|ld]',
+          after: 'hello [|]',
+        },
+        {
+          command: 'di"',
+          description: 'Delete In " (and quotes too!!)',
+          before: 'hello "wor|ld"',
+          after: 'hello "|"',
+        },
+        {
+          command: 'da"',
+          description:
+            'Delete Arround " (use a to also delete the quotes/brackets)',
+          before: 'hello "wor|ld"',
+          after: 'hello |',
+        },
+        {
+          command: 'dit',
+          description: 'Delete In <Tag>',
+          before: '<div>\n\thel|lo world\n</div>',
+          after: '<div>|</div>',
+        },
+        {
+          command: 'dat',
+          description: 'Delete Arround <Tag>',
+          before: '<div>\n\thel|lo world\n</div>',
+          after: '|',
+        },
+      ],
+    },
   ]
 
   const renderTextWithCursor = (text: string) => {
@@ -267,7 +334,7 @@ export default function RecapLevel12() {
         {beforeCursor}
         {isInsertMode ? (
           <>
-            <span className="bg-emerald-400 w-0.5 h-5 inline-block translate-y-1"></span>
+            <span className="bg-orange-400 w-0.5 h-5 inline-block translate-y-1"></span>
             {charAtCursor}
           </>
         ) : (
@@ -313,10 +380,34 @@ export default function RecapLevel12() {
           🎯 Vim Motions Recap
         </h2>
         <p className="text-zinc-400 text-lg">
-          Master reference for all vim motions you've learned
+          Reference for all vim motions you've learned + variants and some nice
+          ones i often use.
         </p>
       </div>
 
+      <div className="mt-12 p-6 bg-zinc-800/50 rounded-lg border border-zinc-700 mb-8">
+        <h4 className="text-lg font-semibold text-emerald-400 mb-3">
+          💡 Pro Tips
+        </h4>
+        <div className="grid md:grid-cols-2 gap-4 text-sm text-zinc-300">
+          <div>
+            <strong className="text-emerald-400">Cursor notation:</strong> The{' '}
+            <code>|</code> symbol shows cursor position
+          </div>
+          <div>
+            <strong className="text-blue-400">Modes:</strong> Commands work in
+            NORMAL mode
+          </div>
+          <div>
+            <strong className="text-amber-400">Combinations:</strong> Many
+            commands can be combined (e.g., <KBD>dw</KBD> = delete word)
+          </div>
+          <div>
+            <strong className="text-red-400">Bonus:</strong> Combine commands
+            with numbers! <KBD>3j</KBD> moves down 3 lines
+          </div>
+        </div>
+      </div>
       <div className="space-y-12">
         {motionCategories.map((category) => {
           const colors = getColorClasses(category.color)
@@ -367,29 +458,10 @@ export default function RecapLevel12() {
           )
         })}
       </div>
-
-      <div className="mt-12 p-6 bg-zinc-800/50 rounded-lg border border-zinc-700">
-        <h4 className="text-lg font-semibold text-emerald-400 mb-3">
-          💡 Pro Tips
-        </h4>
-        <div className="grid md:grid-cols-2 gap-4 text-sm text-zinc-300">
-          <div>
-            <strong className="text-emerald-400">Cursor notation:</strong> The{' '}
-            <code>|</code> symbol shows cursor position
-          </div>
-          <div>
-            <strong className="text-blue-400">Modes:</strong> Commands work in
-            NORMAL mode unless noted as INSERT
-          </div>
-          <div>
-            <strong className="text-amber-400">Combinations:</strong> Many
-            commands can be combined (e.g., <code>d + w</code> = delete word)
-          </div>
-          <div>
-            <strong className="text-red-400">Practice:</strong> Use the
-            playground (Level 0) to practice any combination!
-          </div>
-        </div>
+      <div>
+        <strong className="text-emerald-400">Note:</strong> Use <KBD>c</KBD>
+        instead of <KBD>d</KBD> when you're replacing something to save yourself
+        an insert command.
       </div>
     </div>
   )

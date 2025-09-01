@@ -19,12 +19,11 @@ interface GameAreaProps {
 }
 
 // Changelog version and message
-const GAME_VERSION = '0.0.18'
+const GAME_VERSION = '0.0.19'
 
 const CHANGELOG_MESSAGE = `
 <b>What's New in ${GAME_VERSION}</b><br/><br/>
-- Bugfix: fixed level 1 movements not working<br/><br/>
-- Added level 11: multi key delete commands<br/><br/>
+- Level 12: quickly review all commands you've practiced so far as well as some more advanced ones i use daily<br/><br/>
 Thanks for playing!
 `
 
