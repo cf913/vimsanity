@@ -122,10 +122,16 @@ const CommandInfoPopup: React.FC<CommandInfoPopupProps> = ({
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-zinc-800 transition-colors"
+              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-zinc-800 transition-colors group"
+              title="Press ESC to close"
             >
-              <X size={20} className="text-zinc-400" />
+              <X size={20} className="text-zinc-400 group-hover:text-zinc-200 transition-colors" />
             </button>
+
+            {/* ESC hint */}
+            <div className="absolute top-4 left-4 text-xs text-zinc-500">
+              Press <KBD>ESC</KBD> to close
+            </div>
 
             {/* Content */}
             <div className="space-y-4">

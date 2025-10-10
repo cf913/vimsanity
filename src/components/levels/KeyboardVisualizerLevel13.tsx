@@ -30,6 +30,13 @@ const KeyboardVisualizerLevel13: React.FC<
   // Handle keyboard events
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      // If ESC is pressed and popup is open, close it and don't process further
+      if (e.key === 'Escape' && selectedCommand) {
+        e.preventDefault()
+        setSelectedCommand(null)
+        return
+      }
+
       // Prevent default for vim keys
       const vimKeys = [
         'h',
@@ -63,7 +70,7 @@ const KeyboardVisualizerLevel13: React.FC<
         setSelectedCommand(command)
       }
     },
-    [currentMode]
+    [currentMode, selectedCommand]
   )
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
