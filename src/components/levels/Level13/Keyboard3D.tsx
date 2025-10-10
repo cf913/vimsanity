@@ -16,17 +16,18 @@ const Keyboard3D: React.FC<Keyboard3DProps> = ({
   onKeyClick,
   getKeyColor,
 }) => {
-  // Group keys by row for layout
-  const keysByRow = keyboardLayout.reduce(
-    (acc, key) => {
-      if (!acc[key.row]) {
-        acc[key.row] = []
-      }
-      acc[key.row].push(key)
-      return acc
-    },
-    {} as Record<number, typeof keyboardLayout>
-  )
+  // Key size constants for realistic layout
+  const KEY_SIZE = 52 // Base key width/height in pixels
+  const KEY_GAP = 6 // Gap between keys
+
+  // Row stagger offsets (in pixels) for realistic keyboard stagger
+  const ROW_STAGGER = {
+    0: 0,      // Number row - no offset
+    1: 0.25 * KEY_SIZE,  // QWERTY row - 0.25 key offset
+    2: 0.45 * KEY_SIZE,  // Home row - 0.45 key offset
+    3: 0.6 * KEY_SIZE,   // Bottom letter row - 0.6 key offset
+    4: 0,      // Spacebar row - no offset
+  }
 
   return (
     <div
@@ -63,44 +64,50 @@ const Keyboard3D: React.FC<Keyboard3DProps> = ({
               0 5px 10px rgba(0, 0, 0, 0.3),
               inset 0 1px 0 rgba(255, 255, 255, 0.05)
             `,
+            width: 'fit-content',
           }}
         >
-          {/* Render keyboard rows */}
-          <div className="space-y-2">
-            {Object.keys(keysByRow)
-              .sort((a, b) => Number(a) - Number(b))
-              .map((rowNum) => {
-                const row = keysByRow[Number(rowNum)]
-                return (
-                  <div
-                    key={rowNum}
-                    className="grid gap-2"
-                    style={{
-                      gridTemplateColumns: `repeat(16, minmax(0, 1fr))`,
-                    }}
-                  >
-                    {row.map((key) => {
-                      const isPressed = pressedKeys.has(key.key)
-                      const isHighlighted = highlightedKeys.has(key.key)
-                      const glowColor = getKeyColor ? getKeyColor(key.key) : 'emerald'
+          {/* Render keyboard with absolute positioning for stagger */}
+          <div
+            className="relative"
+            style={{
+              width: '900px',
+              height: '320px'
+            }}
+          >
+            {keyboardLayout.map((key) => {
+              const isPressed = pressedKeys.has(key.key)
+              const isHighlighted = highlightedKeys.has(key.key)
+              const glowColor = getKeyColor ? getKeyColor(key.key) : 'emerald'
 
-                      return (
-                        <Key3D
-                          key={key.key}
-                          keyLabel={key.label}
-                          displayLabel={key.displayLabel}
-                          width={key.width}
-                          isPressed={isPressed}
-                          isHighlighted={isHighlighted}
-                          glowColor={glowColor}
-                          isSpecial={key.isSpecial}
-                          onClick={() => onKeyClick?.(key.key)}
-                        />
-                      )
-                    })}
-                  </div>
-                )
-              })}
+              const rowStagger = ROW_STAGGER[key.row as keyof typeof ROW_STAGGER] || 0
+              const left = key.column * (KEY_SIZE + KEY_GAP) + rowStagger
+              const top = key.row * (KEY_SIZE + KEY_GAP)
+              const width = (key.width || 1) * KEY_SIZE + ((key.width || 1) - 1) * KEY_GAP
+
+              return (
+                <div
+                  key={key.key}
+                  style={{
+                    position: 'absolute',
+                    left: `${left}px`,
+                    top: `${top}px`,
+                    width: `${width}px`,
+                  }}
+                >
+                  <Key3D
+                    keyLabel={key.label}
+                    displayLabel={key.displayLabel}
+                    width={key.width}
+                    isPressed={isPressed}
+                    isHighlighted={isHighlighted}
+                    glowColor={glowColor}
+                    isSpecial={key.isSpecial}
+                    onClick={() => onKeyClick?.(key.key)}
+                  />
+                </div>
+              )
+            })}
           </div>
 
           {/* Ambient light effect overlay */}

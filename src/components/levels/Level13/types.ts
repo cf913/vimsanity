@@ -8,6 +8,7 @@ export interface KeyPosition {
   column: number
   width?: number
   isSpecial?: boolean
+  offsetX?: number // Horizontal offset for staggered layout
 }
 
 export interface VimCommand {

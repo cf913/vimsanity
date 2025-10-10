@@ -49,10 +49,7 @@ const Key3D: React.FC<Key3DProps> = ({
 
   return (
     <motion.div
-      className="relative"
-      style={{
-        gridColumn: `span ${Math.ceil(width)}`,
-      }}
+      className="relative w-full h-full"
       initial={false}
       animate={{
         scale: isPressed ? 0.95 : 1,
