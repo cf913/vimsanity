@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 interface Key3DProps {
   keyLabel: string
   displayLabel: string
+  shiftLabel?: string
   width?: number
   isPressed: boolean
   isHighlighted: boolean
@@ -15,6 +16,7 @@ interface Key3DProps {
 const Key3D: React.FC<Key3DProps> = ({
   keyLabel,
   displayLabel,
+  shiftLabel,
   width = 1,
   isPressed,
   isHighlighted,
@@ -114,9 +116,18 @@ const Key3D: React.FC<Key3DProps> = ({
           },
         }}
       >
-        <div className="flex items-center justify-center h-full">
-          <span className="select-none">{displayLabel || keyLabel}</span>
-        </div>
+        {shiftLabel ? (
+          // Key with shift character - show both
+          <div className="flex flex-col items-center justify-center h-full px-1">
+            <span className="select-none text-[10px] leading-none text-zinc-400">{shiftLabel}</span>
+            <span className="select-none text-sm leading-none mt-0.5">{displayLabel || keyLabel}</span>
+          </div>
+        ) : (
+          // Regular key - show single character
+          <div className="flex items-center justify-center h-full">
+            <span className="select-none">{displayLabel || keyLabel}</span>
+          </div>
+        )}
 
         {/* Pressed glow effect */}
         {isPressed && (

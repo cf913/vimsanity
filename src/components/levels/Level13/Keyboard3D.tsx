@@ -98,6 +98,7 @@ const Keyboard3D: React.FC<Keyboard3DProps> = ({
                   <Key3D
                     keyLabel={key.label}
                     displayLabel={key.displayLabel}
+                    shiftLabel={key.shiftLabel}
                     width={key.width}
                     isPressed={isPressed}
                     isHighlighted={isHighlighted}

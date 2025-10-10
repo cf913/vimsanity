@@ -4,6 +4,7 @@ export interface KeyPosition {
   key: string
   label: string
   displayLabel: string
+  shiftLabel?: string // Optional shift character (e.g., '!' for key '1')
   row: number
   column: number
   width?: number
