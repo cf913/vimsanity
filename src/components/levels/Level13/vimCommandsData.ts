@@ -1,0 +1,290 @@
+import { VimCommand, ProficiencyPreset } from './types'
+import { VIM_MODES, VimMode } from '../../../utils/constants'
+
+export const vimCommands: VimCommand[] = [
+  // Movement commands
+  {
+    key: 'h',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move cursor left',
+    example: { before: 'he|llo', after: 'h|ello' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'j',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move cursor down',
+    example: { before: 'lin|e 1\nline 2', after: 'line 1\nlin|e 2' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'k',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move cursor up',
+    example: { before: 'line 1\nlin|e 2', after: 'lin|e 1\nline 2' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'l',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move cursor right',
+    example: { before: 'h|ello', after: 'he|llo' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'w',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move to next word',
+    example: { before: 'hello |world vim', after: 'hello world |vim' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'b',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move to beginning of word',
+    example: { before: 'hello world |vim', after: 'hello |world vim' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'e',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move to end of word',
+    example: { before: 'hell|o world', after: 'hello worl|d' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: '0',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move to start of line',
+    example: { before: '  hello wo|rld', after: '|  hello world' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: '^',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move to first non-blank character',
+    example: { before: '  hello wo|rld', after: '  |hello world' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: '$',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move to end of line',
+    example: { before: 'hello |world', after: 'hello worl|d' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'f',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Find character forward (followed by character)',
+    example: { before: 'h|ello world', after: 'hell|o world' },
+    category: 'search',
+    colorClass: 'purple',
+  },
+  {
+    key: 't',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Till character forward (followed by character)',
+    example: { before: '|hello world', after: 'hel|lo world' },
+    category: 'search',
+    colorClass: 'purple',
+  },
+  {
+    key: 'g',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Go to commands (gg = top, G = bottom)',
+    example: { before: 'line 1\nline |2\nline 3', after: '|line 1\nline 2\nline 3' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: '%',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Jump to matching bracket/paren',
+    example: { before: '|(hello)', after: '(hello|)' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+
+  // Search commands
+  {
+    key: '/',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Search forward',
+    example: { before: 'vim i|s awesome vim', after: 'vim is awesome |vim' },
+    category: 'search',
+    colorClass: 'purple',
+  },
+  {
+    key: '?',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Search backward',
+    example: { before: 'vim is aweso|me vim', after: '|vim is awesome vim' },
+    category: 'search',
+    colorClass: 'purple',
+  },
+  {
+    key: 'n',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Next search match',
+    example: { before: '|vim text vim more', after: 'vim text |vim more' },
+    category: 'search',
+    colorClass: 'purple',
+  },
+
+  // Insert mode commands
+  {
+    key: 'i',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Insert before cursor',
+    example: { before: 'hel|lo (NORMAL)', after: 'hel|lo (INSERT)' },
+    category: 'mode',
+    colorClass: 'blue',
+  },
+  {
+    key: 'a',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Insert after cursor',
+    example: { before: 'hel|lo (NORMAL)', after: 'hell|o (INSERT)' },
+    category: 'mode',
+    colorClass: 'blue',
+  },
+  {
+    key: 'o',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Insert new line below',
+    example: { before: 'text|', after: 'text\n| (INSERT)' },
+    category: 'mode',
+    colorClass: 'blue',
+  },
+  {
+    key: 'Escape',
+    modes: [VIM_MODES.INSERT],
+    description: 'Return to normal mode',
+    example: { before: 'hel|lo (INSERT)', after: 'he|llo (NORMAL)' },
+    category: 'mode',
+    colorClass: 'blue',
+  },
+
+  // Delete commands
+  {
+    key: 'x',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Delete character under cursor',
+    example: { before: 'hel|lo', after: 'hel|o' },
+    category: 'delete',
+    colorClass: 'red',
+  },
+  {
+    key: 'd',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Delete operator (combine with motion: dw, dd, etc)',
+    example: { before: 'hello |world vim', after: 'hello |vim' },
+    category: 'delete',
+    colorClass: 'red',
+  },
+  {
+    key: 'c',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Change operator (delete and enter insert)',
+    example: { before: 'hello |world vim', after: 'hello | (INSERT)' },
+    category: 'editing',
+    colorClass: 'red',
+  },
+
+  // History commands
+  {
+    key: 'u',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Undo last change',
+    example: { before: 'hello worl|d', after: 'hello |' },
+    category: 'history',
+    colorClass: 'amber',
+  },
+  {
+    key: 'r',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Redo (with Ctrl modifier)',
+    example: { before: 'hello |', after: 'hello worl|d' },
+    category: 'history',
+    colorClass: 'amber',
+  },
+
+  // Special keys with text explanations
+  {
+    key: 'Backspace',
+    modes: [VIM_MODES.INSERT],
+    description: 'Delete character before cursor (in insert mode)',
+    example: { before: 'hell|o', after: 'hel|o' },
+    category: 'editing',
+    colorClass: 'red',
+  },
+  {
+    key: 'Enter',
+    modes: [VIM_MODES.INSERT],
+    description: 'Insert new line (in insert mode)',
+    example: { before: 'hello|world', after: 'hello\n|world' },
+    category: 'editing',
+    colorClass: 'blue',
+  },
+]
+
+export const proficiencyPresets: ProficiencyPreset[] = [
+  {
+    level: 'beginner',
+    title: 'Beginner',
+    description: 'Essential movement and basic insert mode',
+    highlightedKeys: ['h', 'j', 'k', 'l', 'i', 'Escape'],
+  },
+  {
+    level: 'intermediate',
+    title: 'Intermediate',
+    description: 'Word navigation, line operations, and more insert commands',
+    highlightedKeys: ['h', 'j', 'k', 'l', 'w', 'b', 'e', '0', '$', 'i', 'a', 'o', 'x', 'Escape'],
+  },
+  {
+    level: 'advanced',
+    title: 'Advanced',
+    description: 'Search, operators, and efficient editing',
+    highlightedKeys: [
+      'h', 'j', 'k', 'l', 'w', 'b', 'e', '0', '$', '^',
+      'f', 't', '/', '?', 'n',
+      'i', 'a', 'o',
+      'x', 'd', 'c',
+      'u',
+      'Escape'
+    ],
+  },
+  {
+    level: 'expert',
+    title: 'Expert',
+    description: 'Advanced motions, marks, and power user features',
+    highlightedKeys: [
+      'h', 'j', 'k', 'l', 'w', 'b', 'e', '0', '$', '^',
+      'f', 't', '/', '?', 'n',
+      'g', '%', 'm', '\'',
+      'i', 'a', 'o',
+      'x', 'd', 'c', 'y', 'p',
+      'u', 'r',
+      '.', '@',
+      'Escape'
+    ],
+  },
+]
+
+// Helper to get command for a key in a specific mode
+export const getCommandForKey = (key: string, mode: string): VimCommand | undefined => {
+  return vimCommands.find(
+    (cmd) => cmd.key.toLowerCase() === key.toLowerCase() && cmd.modes.includes(mode as VimMode)
+  )
+}

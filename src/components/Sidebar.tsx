@@ -115,6 +115,15 @@ const levels = {
       locked: false,
     },
   ],
+  madness: [
+    {
+      id: 13,
+      title: 'Vim Command Explorer',
+      description: 'Interactive 3D keyboard to discover what every key does',
+      wip: false,
+      locked: false,
+    },
+  ],
 }
 
 const Sidebar: React.FC<SidebarProps> = ({

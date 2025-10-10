@@ -137,7 +137,36 @@ When adding a new level, update both locations.
 ## Important Notes
 
 - The app is desktop-only (mobile users see `MobileWarning.tsx`)
-- Levels 0-12 are currently implemented
+- Levels 0-13 are currently implemented
 - Level 0 is a playground for development/testing
-- Some levels have subdirectories (Level6/, Level7/, Level8/, Level9/) for complex implementations
+- Level 13 is a special interactive keyboard visualizer with 3D animations
+- Some levels have subdirectories (Level6/, Level7/, Level8/, Level9/, Level13/) for complex implementations
 - The app uses a WIP banner to indicate in-development features
+
+## Level 13: Keyboard Visualizer Architecture
+
+Level 13 is a unique learning tool that uses a 3D keyboard visualization to help users discover Vim commands:
+
+### Structure
+- `Level13/types.ts` - TypeScript interfaces for keyboard layout and commands
+- `Level13/keyboardLayout.ts` - MacBook Pro-style keyboard layout data
+- `Level13/vimCommandsData.ts` - Comprehensive Vim command database with examples
+- `Level13/Key3D.tsx` - Individual 3D key component with glow animations
+- `Level13/Keyboard3D.tsx` - Full keyboard with floating animation
+- `Level13/ModeSwitcher.tsx` - Switch between Normal/Insert/Visual modes
+- `Level13/ProficiencySelector.tsx` - Select skill level (Beginner to Expert)
+- `Level13/CommandInfoPopup.tsx` - Animated popup showing command details
+
+### Key Features
+- **3D Animations**: Uses CSS `perspective` and Framer Motion for smooth wiggling keyboard
+- **Interactive Learning**: Press any physical key to see what it does in Vim
+- **Proficiency Levels**: Highlights different key sets based on user experience
+- **Mode-Aware**: Shows different commands for Normal, Insert, and Visual modes
+- **Color-Coded**: Categories (movement, editing, search) have distinct colors
+- **Auto-Dismiss Popup**: Command info disappears after 5 seconds
+
+### Implementation Notes
+- Does NOT use the vim motion hooks (standalone keyboard listener)
+- Custom keyboard event handlers with `normalizeKeyName` for cross-platform support
+- Glow effects use dynamic box-shadow animations
+- Keyboard layout supports variable-width keys (Space, Enter, Shift, etc.)
