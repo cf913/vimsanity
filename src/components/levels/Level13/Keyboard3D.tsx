@@ -20,15 +20,6 @@ const Keyboard3D: React.FC<Keyboard3DProps> = ({
   const KEY_SIZE = 52 // Base key width/height in pixels
   const KEY_GAP = 6 // Gap between keys
 
-  // Row stagger offsets (in pixels) for realistic keyboard stagger
-  const ROW_STAGGER = {
-    0: 0,      // Number row - no offset
-    1: 0.25 * KEY_SIZE,  // QWERTY row - 0.25 key offset
-    2: 0.45 * KEY_SIZE,  // Home row - 0.45 key offset
-    3: 0.6 * KEY_SIZE,   // Bottom letter row - 0.6 key offset
-    4: 0,      // Spacebar row - no offset
-  }
-
   return (
     <div
       className="flex items-center justify-center w-full py-12"
@@ -55,7 +46,7 @@ const Keyboard3D: React.FC<Keyboard3DProps> = ({
       >
         {/* Keyboard container with shadow */}
         <div
-          className="relative bg-zinc-900 rounded-2xl p-6 border border-zinc-700/50"
+          className="relative bg-zinc-900 rounded-2xl border border-zinc-700/50"
           style={{
             transformStyle: 'preserve-3d',
             boxShadow: `
@@ -65,14 +56,15 @@ const Keyboard3D: React.FC<Keyboard3DProps> = ({
               inset 0 1px 0 rgba(255, 255, 255, 0.05)
             `,
             width: 'fit-content',
+            padding: '24px',
           }}
         >
           {/* Render keyboard with absolute positioning for stagger */}
           <div
             className="relative"
             style={{
-              width: '900px',
-              height: '320px'
+              width: '870px',
+              height: '290px'
             }}
           >
             {keyboardLayout.map((key) => {
@@ -80,8 +72,7 @@ const Keyboard3D: React.FC<Keyboard3DProps> = ({
               const isHighlighted = highlightedKeys.has(key.key)
               const glowColor = getKeyColor ? getKeyColor(key.key) : 'emerald'
 
-              const rowStagger = ROW_STAGGER[key.row as keyof typeof ROW_STAGGER] || 0
-              const left = key.column * (KEY_SIZE + KEY_GAP) + rowStagger
+              const left = key.column * (KEY_SIZE + KEY_GAP)
               const top = key.row * (KEY_SIZE + KEY_GAP)
               const width = (key.width || 1) * KEY_SIZE + ((key.width || 1) - 1) * KEY_GAP
 
