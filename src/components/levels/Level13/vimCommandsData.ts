@@ -169,6 +169,50 @@ export const vimCommands: VimCommand[] = [
     category: 'movement',
     colorClass: 'emerald',
   },
+  {
+    key: '{',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Jump to previous paragraph',
+    example: {
+      before: 'text\n\nparagraph\nhe|llo\nmore',
+      after: 'text\n|\n\nparagraph\nhello\nmore',
+    },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: '}',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Jump to next paragraph',
+    example: {
+      before: 'text\n\npara|graph\nhello\n\nmore',
+      after: 'text\n\nparagraph\nhello\n|\n\nmore',
+    },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  // {
+  //   key: '[',
+  //   modes: [VIM_MODES.NORMAL],
+  //   description: 'Section backward motions (combined with other keys)',
+  //   example: {
+  //     before: 'func1()\n\nfunc|2()\n\nfunc3()',
+  //     after: 'func1()\n|\nfunc2()\n\nfunc3()',
+  //   },
+  //   category: 'movement',
+  //   colorClass: 'emerald',
+  // },
+  // {
+  //   key: ']',
+  //   modes: [VIM_MODES.NORMAL],
+  //   description: 'Section forward motions (combined with other keys)',
+  //   example: {
+  //     before: 'func1()\n\nfunc|2()\n\nfunc3()',
+  //     after: 'func1()\n\nfunc2()\n|\nfunc3()',
+  //   },
+  //   category: 'movement',
+  //   colorClass: 'emerald',
+  // },
 
   // Search commands
   {
