@@ -20,11 +20,12 @@ interface GameAreaProps {
 }
 
 // Changelog version and message
-const GAME_VERSION = '0.0.19'
+const GAME_VERSION = '0.1.0'
 
 const CHANGELOG_MESSAGE = `
 <b>What's New in ${GAME_VERSION}</b><br/><br/>
-- Level 12: quickly review all commands you've practiced so far as well as some more advanced ones i use daily<br/><br/>
+- Added an Intro level, not really a level but more of a quick glance at all the things you can do with vim motions. It's currently only showing NORMAL mode commands but you get the idea.<br/>
+- More coming soon<br/><br/>
 Thanks for playing!
 `
 
