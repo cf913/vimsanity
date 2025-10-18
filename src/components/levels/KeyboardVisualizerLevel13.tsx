@@ -19,7 +19,9 @@ const KeyboardVisualizerLevel13: React.FC<
   const [proficiencyLevel, setProficiencyLevel] =
     useState<ProficiencyLevel>('beginner')
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set())
-  const [selectedCommand, setSelectedCommand] = useState<VimCommand | null>(null)
+  const [selectedCommand, setSelectedCommand] = useState<VimCommand | null>(
+    null,
+  )
 
   // Get highlighted keys based on proficiency level
   const highlightedKeys = React.useMemo(() => {
@@ -70,7 +72,7 @@ const KeyboardVisualizerLevel13: React.FC<
         setSelectedCommand(command)
       }
     },
-    [currentMode, selectedCommand]
+    [currentMode, selectedCommand],
   )
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
@@ -99,7 +101,7 @@ const KeyboardVisualizerLevel13: React.FC<
       const command = getCommandForKey(key, currentMode)
       return command?.colorClass || 'emerald'
     },
-    [currentMode]
+    [currentMode],
   )
 
   return (
@@ -131,10 +133,10 @@ const KeyboardVisualizerLevel13: React.FC<
 
         {/* Controls */}
         <div className="flex justify-between items-start gap-4 mb-8">
-          <ModeSwitcher
-            currentMode={currentMode}
-            onModeChange={setCurrentMode}
-          />
+          {/* <ModeSwitcher */}
+          {/*   currentMode={currentMode} */}
+          {/*   onModeChange={setCurrentMode} */}
+          {/* /> */}
           <ProficiencySelector
             currentLevel={proficiencyLevel}
             onLevelChange={setProficiencyLevel}
