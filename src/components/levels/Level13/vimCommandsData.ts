@@ -44,6 +44,14 @@ export const vimCommands: VimCommand[] = [
     colorClass: 'emerald',
   },
   {
+    key: 'W',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move to next WORD (whitespace separated)',
+    example: { before: 'hello-|world vim', after: 'hello-world |vim' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
     key: 'b',
     modes: [VIM_MODES.NORMAL],
     description: 'Move to beginning of word',
@@ -52,10 +60,26 @@ export const vimCommands: VimCommand[] = [
     colorClass: 'emerald',
   },
   {
+    key: 'B',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move to beginning of WORD (whitespace separated)',
+    example: { before: 'hello world-|vim', after: 'hello |world-vim' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
     key: 'e',
     modes: [VIM_MODES.NORMAL],
     description: 'Move to end of word',
     example: { before: 'hell|o world', after: 'hello worl|d' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'E',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move to end of WORD (whitespace separated)',
+    example: { before: 'hell|o-world vim', after: 'hello-worl|d vim' },
     category: 'movement',
     colorClass: 'emerald',
   },
@@ -92,6 +116,14 @@ export const vimCommands: VimCommand[] = [
     colorClass: 'purple',
   },
   {
+    key: 'F',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Find character backward (followed by character)',
+    example: { before: 'hello worl|d', after: 'he|llo world' },
+    category: 'search',
+    colorClass: 'purple',
+  },
+  {
     key: 't',
     modes: [VIM_MODES.NORMAL],
     description: 'Till character forward (followed by character)',
@@ -100,10 +132,26 @@ export const vimCommands: VimCommand[] = [
     colorClass: 'purple',
   },
   {
+    key: 'T',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Till character backward (followed by character)',
+    example: { before: 'hello worl|d', after: 'hel|lo world' },
+    category: 'search',
+    colorClass: 'purple',
+  },
+  {
     key: 'g',
     modes: [VIM_MODES.NORMAL],
     description: 'Go to commands (gg = top, G = bottom)',
     example: { before: 'line 1\nline |2\nline 3', after: '|line 1\nline 2\nline 3' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'G',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Go to last line',
+    example: { before: 'line |1\nline 2\nline 3', after: 'line 1\nline 2\nline |3' },
     category: 'movement',
     colorClass: 'emerald',
   },
@@ -141,13 +189,29 @@ export const vimCommands: VimCommand[] = [
     category: 'search',
     colorClass: 'purple',
   },
+  {
+    key: 'N',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Previous search match',
+    example: { before: 'vim text |vim more', after: '|vim text vim more' },
+    category: 'search',
+    colorClass: 'purple',
+  },
 
-  // Insert mode commands
+  // Insert mode commands (lowercase)
   {
     key: 'i',
     modes: [VIM_MODES.NORMAL],
     description: 'Insert before cursor',
     example: { before: 'hel|lo (NORMAL)', after: 'hel|lo (INSERT)' },
+    category: 'mode',
+    colorClass: 'blue',
+  },
+  {
+    key: 'I',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Insert at beginning of line',
+    example: { before: '  hel|lo (NORMAL)', after: '  |hello (INSERT)' },
     category: 'mode',
     colorClass: 'blue',
   },
@@ -160,10 +224,26 @@ export const vimCommands: VimCommand[] = [
     colorClass: 'blue',
   },
   {
+    key: 'A',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Insert at end of line',
+    example: { before: 'hel|lo world (NORMAL)', after: 'hello world| (INSERT)' },
+    category: 'mode',
+    colorClass: 'blue',
+  },
+  {
     key: 'o',
     modes: [VIM_MODES.NORMAL],
     description: 'Insert new line below',
     example: { before: 'text|', after: 'text\n| (INSERT)' },
+    category: 'mode',
+    colorClass: 'blue',
+  },
+  {
+    key: 'O',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Insert new line above',
+    example: { before: 'text|', after: '| (INSERT)\ntext' },
     category: 'mode',
     colorClass: 'blue',
   },
@@ -186,6 +266,14 @@ export const vimCommands: VimCommand[] = [
     colorClass: 'red',
   },
   {
+    key: 'X',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Delete character before cursor',
+    example: { before: 'hel|lo', after: 'he|lo' },
+    category: 'delete',
+    colorClass: 'red',
+  },
+  {
     key: 'd',
     modes: [VIM_MODES.NORMAL],
     description: 'Delete operator (combine with motion: dw, dd, etc)',
@@ -194,9 +282,25 @@ export const vimCommands: VimCommand[] = [
     colorClass: 'red',
   },
   {
+    key: 'D',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Delete to end of line',
+    example: { before: 'hello |world vim', after: 'hello |' },
+    category: 'delete',
+    colorClass: 'red',
+  },
+  {
     key: 'c',
     modes: [VIM_MODES.NORMAL],
     description: 'Change operator (delete and enter insert)',
+    example: { before: 'hello |world vim', after: 'hello | (INSERT)' },
+    category: 'editing',
+    colorClass: 'red',
+  },
+  {
+    key: 'C',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Change to end of line',
     example: { before: 'hello |world vim', after: 'hello | (INSERT)' },
     category: 'editing',
     colorClass: 'red',
@@ -250,17 +354,17 @@ export const proficiencyPresets: ProficiencyPreset[] = [
     level: 'intermediate',
     title: 'Intermediate',
     description: 'Word navigation, line operations, and more insert commands',
-    highlightedKeys: ['h', 'j', 'k', 'l', 'w', 'b', 'e', '0', '$', 'i', 'a', 'o', 'x', 'Escape'],
+    highlightedKeys: ['h', 'j', 'k', 'l', 'w', 'b', 'e', '0', '$', 'i', 'I', 'a', 'A', 'o', 'O', 'x', 'Escape'],
   },
   {
     level: 'advanced',
     title: 'Advanced',
     description: 'Search, operators, and efficient editing',
     highlightedKeys: [
-      'h', 'j', 'k', 'l', 'w', 'b', 'e', '0', '$', '^',
-      'f', 't', '/', '?', 'n',
-      'i', 'a', 'o',
-      'x', 'd', 'c',
+      'h', 'j', 'k', 'l', 'w', 'W', 'b', 'B', 'e', 'E', '0', '$', '^',
+      'f', 'F', 't', 'T', '/', '?', 'n', 'N',
+      'i', 'I', 'a', 'A', 'o', 'O',
+      'x', 'X', 'd', 'D', 'c', 'C',
       'u',
       'Escape'
     ],
@@ -270,11 +374,11 @@ export const proficiencyPresets: ProficiencyPreset[] = [
     title: 'Expert',
     description: 'Advanced motions, marks, and power user features',
     highlightedKeys: [
-      'h', 'j', 'k', 'l', 'w', 'b', 'e', '0', '$', '^',
-      'f', 't', '/', '?', 'n',
-      'g', '%', 'm', '\'',
-      'i', 'a', 'o',
-      'x', 'd', 'c', 'y', 'p',
+      'h', 'j', 'k', 'l', 'w', 'W', 'b', 'B', 'e', 'E', '0', '$', '^',
+      'f', 'F', 't', 'T', '/', '?', 'n', 'N',
+      'g', 'G', '%', 'm', '\'',
+      'i', 'I', 'a', 'A', 'o', 'O',
+      'x', 'X', 'd', 'D', 'c', 'C', 'y', 'p',
       'u', 'r',
       '.', '@',
       'Escape'
@@ -282,9 +386,9 @@ export const proficiencyPresets: ProficiencyPreset[] = [
   },
 ]
 
-// Helper to get command for a key in a specific mode
+// Helper to get command for a key in a specific mode (case-sensitive)
 export const getCommandForKey = (key: string, mode: string): VimCommand | undefined => {
   return vimCommands.find(
-    (cmd) => cmd.key.toLowerCase() === key.toLowerCase() && cmd.modes.includes(mode as VimMode)
+    (cmd) => cmd.key === key && cmd.modes.includes(mode as VimMode)
   )
 }

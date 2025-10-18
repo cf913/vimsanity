@@ -63,11 +63,31 @@ const KeyboardVisualizerLevel13: React.FC<
         e.preventDefault()
       }
 
+      // Track the pressed key (normalized for special keys like "Shift")
       const normalizedKey = normalizeKeyName(e.key)
-      setPressedKeys((prev) => new Set(prev).add(normalizedKey))
 
-      // Look up command for this key in current mode
-      const command = getCommandForKey(normalizedKey, currentMode)
+      // Build the set of pressed keys
+      setPressedKeys((prev) => {
+        const newSet = new Set(prev)
+        newSet.add(normalizedKey)
+
+        // If this is a letter key with Shift, also add:
+        // 1. The lowercase version (for visual keyboard highlighting)
+        // 2. The Shift key itself
+        if (e.key.length === 1 && e.key !== e.key.toLowerCase() && /[A-Z]/.test(e.key)) {
+          newSet.add(e.key.toLowerCase()) // Add lowercase for visual keyboard
+          newSet.add('Shift') // Add Shift key for visual
+        }
+
+        return newSet
+      })
+
+      // For letter keys, use the actual key value (which respects shift state)
+      // e.key gives us the actual character: 'i' or 'I' depending on shift
+      const lookupKey = e.key.length === 1 ? e.key : normalizedKey
+
+      // Look up command for this key in current mode (case-sensitive)
+      const command = getCommandForKey(lookupKey, currentMode)
       if (command) {
         setSelectedCommand(command)
       }
@@ -80,6 +100,13 @@ const KeyboardVisualizerLevel13: React.FC<
     setPressedKeys((prev) => {
       const newSet = new Set(prev)
       newSet.delete(normalizedKey)
+
+      // If this was an uppercase letter, also remove the lowercase version and Shift
+      if (e.key.length === 1 && e.key !== e.key.toLowerCase() && /[A-Z]/.test(e.key)) {
+        newSet.delete(e.key.toLowerCase())
+        newSet.delete('Shift')
+      }
+
       return newSet
     })
   }, [])
@@ -98,7 +125,12 @@ const KeyboardVisualizerLevel13: React.FC<
   // Get color for a key based on the command category
   const getKeyColor = useCallback(
     (key: string): string => {
-      const command = getCommandForKey(key, currentMode)
+      // Try lowercase first (most common)
+      let command = getCommandForKey(key, currentMode)
+      // If not found and it's a letter, try uppercase
+      if (!command && key.length === 1) {
+        command = getCommandForKey(key.toUpperCase(), currentMode)
+      }
       return command?.colorClass || 'emerald'
     },
     [currentMode],
