@@ -69,10 +69,14 @@ const Keyboard3D: React.FC<Keyboard3DProps> = ({
           >
             {keyboardLayout.map((key) => {
               const isPressed = pressedKeys.has(key.key)
-              // Check if this key is highlighted (case-insensitive for letter keys)
-              // A key is highlighted if either the lowercase or uppercase version is in highlightedKeys
+              // Check if this key is highlighted
+              // A key is highlighted if:
+              // 1. The key itself is in highlightedKeys
+              // 2. For letter keys: the uppercase version is in highlightedKeys
+              // 3. For keys with shiftLabel: the shift variant is in highlightedKeys
               const isHighlighted = highlightedKeys.has(key.key) ||
-                (key.key.length === 1 && highlightedKeys.has(key.key.toUpperCase()))
+                (key.key.length === 1 && highlightedKeys.has(key.key.toUpperCase())) ||
+                (key.shiftLabel && highlightedKeys.has(key.shiftLabel))
               const glowColor = getKeyColor ? getKeyColor(key.key) : 'emerald'
 
               const left = key.column * (KEY_SIZE + KEY_GAP)

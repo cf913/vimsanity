@@ -6,7 +6,7 @@ import ModeSwitcher from './Level13/ModeSwitcher'
 import ProficiencySelector from './Level13/ProficiencySelector'
 import CommandInfoPopup from './Level13/CommandInfoPopup'
 import { getCommandForKey, proficiencyPresets } from './Level13/vimCommandsData'
-import { normalizeKeyName } from './Level13/keyboardLayout'
+import { normalizeKeyName, keyboardLayout } from './Level13/keyboardLayout'
 
 interface KeyboardVisualizerLevel13Props {
   isMuted?: boolean
@@ -125,11 +125,18 @@ const KeyboardVisualizerLevel13: React.FC<
   // Get color for a key based on the command category
   const getKeyColor = useCallback(
     (key: string): string => {
-      // Try lowercase first (most common)
+      // Try the key itself first
       let command = getCommandForKey(key, currentMode)
       // If not found and it's a letter, try uppercase
       if (!command && key.length === 1) {
         command = getCommandForKey(key.toUpperCase(), currentMode)
+      }
+      // If still not found, check if this key has a shift variant in the keyboard layout
+      if (!command) {
+        const keyInfo = keyboardLayout.find((k) => k.key === key)
+        if (keyInfo?.shiftLabel) {
+          command = getCommandForKey(keyInfo.shiftLabel, currentMode)
+        }
       }
       return command?.colorClass || 'emerald'
     },

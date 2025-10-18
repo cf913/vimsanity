@@ -24,7 +24,7 @@ export interface VimCommand {
   colorClass: string
 }
 
-export type ProficiencyLevel = 'beginner' | 'intermediate' | 'advanced' | 'expert'
+export type ProficiencyLevel = 'beginner' | 'intermediate' | 'advanced' | 'expert' | 'insanity'
 
 export interface ProficiencyPreset {
   level: ProficiencyLevel

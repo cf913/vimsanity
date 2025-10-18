@@ -536,11 +536,38 @@ export const vimCommands: VimCommand[] = [
     colorClass: 'red',
   },
   {
+    key: 'Backspace',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move cursor left (same as h)',
+    example: { before: 'hel|lo', after: 'he|llo' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
     key: 'Enter',
     modes: [VIM_MODES.INSERT],
     description: 'Insert new line (in insert mode)',
     example: { before: 'hello|world', after: 'hello\n|world' },
     category: 'editing',
+    colorClass: 'blue',
+  },
+  {
+    key: 'Enter',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move to first non-blank character of next line',
+    example: {
+      before: 'line 1|\nline 2\nline 3',
+      after: 'line 1\n|line 2\nline 3',
+    },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'Escape',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Cancel pending command or count. Go back to NORMAL mode.',
+    example: { before: '5d|', after: '|' },
+    category: 'mode',
     colorClass: 'blue',
   },
 ]
@@ -669,6 +696,89 @@ export const proficiencyPresets: ProficiencyPreset[] = [
       '.',
       '@',
       'Escape',
+    ],
+  },
+  {
+    level: 'insanity',
+    title: 'Insanity',
+    description: 'All documented Vim commands - complete madness!',
+    highlightedKeys: [
+      // Movement keys
+      'h',
+      'j',
+      'k',
+      'l',
+      'w',
+      'W',
+      'b',
+      'B',
+      'e',
+      'E',
+      '0',
+      '$', // Shift+4
+      '^', // Shift+6
+      '_', // Shift+-
+      'g',
+      'G',
+      'H',
+      'M',
+      'L',
+      '%', // Shift+5
+      '{', // Shift+[
+      '}', // Shift+]
+      // Search keys
+      'f',
+      'F',
+      't',
+      'T',
+      ';',
+      ',',
+      '*', // Shift+8
+      '/',
+      '?', // Shift+/
+      'n',
+      'N',
+      // Mode change keys
+      'i',
+      'I',
+      'a',
+      'A',
+      'o',
+      'O',
+      'Escape',
+      // Delete/edit keys
+      'x',
+      'X',
+      's',
+      'S',
+      'd',
+      'D',
+      'c',
+      'C',
+      'J',
+      'y',
+      'p',
+      'P',
+      'r',
+      // History/misc keys
+      'u',
+      '.',
+      'm',
+      "'",
+      '@', // Shift+2
+      // Special keys
+      'Backspace',
+      'Enter',
+      // Base number/symbol keys that have shift variants used in Vim
+      '0', // Also used for "move to start of line"
+      '4', // Has $ on shift
+      '5', // Has % on shift
+      '6', // Has ^ on shift
+      '8', // Has * on shift
+      '-', // Has _ on shift
+      '[', // Has { on shift
+      ']', // Has } on shift
+      '2', // Has @ on shift
     ],
   },
 ]
