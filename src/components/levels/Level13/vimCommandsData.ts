@@ -108,6 +108,14 @@ export const vimCommands: VimCommand[] = [
     colorClass: 'emerald',
   },
   {
+    key: '_',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move to first non-blank character of line',
+    example: { before: '  hello wo|rld', after: '  |hello world' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
     key: 'f',
     modes: [VIM_MODES.NORMAL],
     description: 'Find character forward (followed by character)',
@@ -264,6 +272,14 @@ export const vimCommands: VimCommand[] = [
   // },
 
   // Search commands
+  {
+    key: '*',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Search forward for word under cursor',
+    example: { before: 'vi|m is awesome vim', after: 'vim is awesome |vim' },
+    category: 'search',
+    colorClass: 'purple',
+  },
   {
     key: '/',
     modes: [VIM_MODES.NORMAL],
