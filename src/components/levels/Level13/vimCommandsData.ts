@@ -358,6 +358,14 @@ export const vimCommands: VimCommand[] = [
     category: 'editing',
     colorClass: 'red',
   },
+  {
+    key: 'J',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Join current line with next line',
+    example: { before: 'he|llo\nworld', after: 'hello| world' },
+    category: 'editing',
+    colorClass: 'amber',
+  },
 
   // Yank (copy) and paste commands
   {
