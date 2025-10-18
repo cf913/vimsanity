@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { VimMode, VIM_MODES } from '../../utils/constants'
-import { ProficiencyLevel, VimCommand } from './Level13/types'
-import Keyboard3D from './Level13/Keyboard3D'
-import ModeSwitcher from './Level13/ModeSwitcher'
-import ProficiencySelector from './Level13/ProficiencySelector'
-import CommandInfoPopup from './Level13/CommandInfoPopup'
-import { getCommandForKey, proficiencyPresets } from './Level13/vimCommandsData'
-import { normalizeKeyName, keyboardLayout } from './Level13/keyboardLayout'
+import { ProficiencyLevel, VimCommand } from './Level0/types'
+import Keyboard3D from './Level0/Keyboard3D'
+import ModeSwitcher from './Level0/ModeSwitcher'
+import ProficiencySelector from './Level0/ProficiencySelector'
+import CommandInfoPopup from './Level0/CommandInfoPopup'
+import { getCommandForKey, proficiencyPresets } from './Level0/vimCommandsData'
+import { normalizeKeyName, keyboardLayout } from './Level0/keyboardLayout'
 
-interface KeyboardVisualizerLevel13Props {
+interface KeyboardVisualizerLevel0Props {
   isMuted?: boolean
 }
 
-const KeyboardVisualizerLevel13: React.FC<
-  KeyboardVisualizerLevel13Props
+const KeyboardVisualizerLevel0: React.FC<
+  KeyboardVisualizerLevel0Props
 > = () => {
   const [currentMode, setCurrentMode] = useState<VimMode>(VIM_MODES.NORMAL)
   const [proficiencyLevel, setProficiencyLevel] =
@@ -74,7 +74,11 @@ const KeyboardVisualizerLevel13: React.FC<
         // If this is a letter key with Shift, also add:
         // 1. The lowercase version (for visual keyboard highlighting)
         // 2. The Shift key itself
-        if (e.key.length === 1 && e.key !== e.key.toLowerCase() && /[A-Z]/.test(e.key)) {
+        if (
+          e.key.length === 1 &&
+          e.key !== e.key.toLowerCase() &&
+          /[A-Z]/.test(e.key)
+        ) {
           newSet.add(e.key.toLowerCase()) // Add lowercase for visual keyboard
           newSet.add('Shift') // Add Shift key for visual
         }
@@ -102,7 +106,11 @@ const KeyboardVisualizerLevel13: React.FC<
       newSet.delete(normalizedKey)
 
       // If this was an uppercase letter, also remove the lowercase version and Shift
-      if (e.key.length === 1 && e.key !== e.key.toLowerCase() && /[A-Z]/.test(e.key)) {
+      if (
+        e.key.length === 1 &&
+        e.key !== e.key.toLowerCase() &&
+        /[A-Z]/.test(e.key)
+      ) {
         newSet.delete(e.key.toLowerCase())
         newSet.delete('Shift')
       }
@@ -201,7 +209,7 @@ const KeyboardVisualizerLevel13: React.FC<
               </span>
               <p className="text-zinc-400 mt-1">
                 {currentMode.toUpperCase()} - Switch modes above to see
-                different command sets
+                different command sets (Comming soon...)
               </p>
             </div>
           </div>
@@ -254,7 +262,7 @@ const KeyboardVisualizerLevel13: React.FC<
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded bg-amber-500/30 border border-amber-500"></div>
-              <span className="text-zinc-400">History</span>
+              <span className="text-zinc-400">History/Edit</span>
             </div>
           </div>
         </div>
@@ -263,4 +271,4 @@ const KeyboardVisualizerLevel13: React.FC<
   )
 }
 
-export default KeyboardVisualizerLevel13
+export default KeyboardVisualizerLevel0

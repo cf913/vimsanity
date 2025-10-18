@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import PlaygroundLevel from './levels/PlaygroundLevel'
+import KeyboardVisualizerLevel0 from './levels/KeyboardVisualizerLevel0'
 import GridMovementLevel from './levels/GridMovementLevel'
 import WordMovementLevel from './levels/WordMovementLevel'
 import LineOperations3 from './levels/LineOperations3'
@@ -12,7 +12,7 @@ import UndoRedoLevel9 from './levels/Level9/UndoRedoLevel9'
 import BasicDeleteLevel10 from './levels/BasicDeleteLevel10'
 import AdvancedDeleteLevel11 from './levels/AdvancedDeleteLevel11'
 import RecapLevel12 from './levels/RecapLevel12'
-import KeyboardVisualizerLevel13 from './levels/KeyboardVisualizerLevel13'
+import PlaygroundLevel from './levels/PlaygroundLevel'
 
 interface GameAreaProps {
   level: number
@@ -60,7 +60,7 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
   const renderLevel = () => {
     switch (level) {
       case 0:
-        return <PlaygroundLevel isMuted={isMuted} />
+        return <KeyboardVisualizerLevel0 isMuted={isMuted} />
       case 1:
         return <GridMovementLevel isMuted={isMuted} />
       case 2:
@@ -86,9 +86,9 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
       case 12:
         return <RecapLevel12 />
       case 13:
-        return <KeyboardVisualizerLevel13 isMuted={isMuted} />
+        return <PlaygroundLevel isMuted={isMuted} />
       default:
-        return <GridMovementLevel isMuted={isMuted} />
+        return <KeyboardVisualizerLevel0 isMuted={isMuted} />
     }
   }
 

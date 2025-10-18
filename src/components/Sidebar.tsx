@@ -12,14 +12,16 @@ interface SidebarProps {
 }
 
 const levels = {
-  navigate: [
+  intro: [
     {
       id: 0,
-      title: 'Dev playground, ignore this',
-      description: 'Practice all Vim motions in a free environment',
-      wip: true,
+      title: 'Vim Command Explorer',
+      description: 'Interactive 3D keyboard to discover what every key does',
+      wip: false,
       locked: false,
     },
+  ],
+  navigate: [
     {
       id: 1,
       title: 'Basic Movement (h, j, k, l)',
@@ -115,12 +117,12 @@ const levels = {
       locked: false,
     },
   ],
-  madness: [
+  playground: [
     {
       id: 13,
-      title: 'Vim Command Explorer',
-      description: 'Interactive 3D keyboard to discover what every key does',
-      wip: false,
+      title: 'Dev Playground',
+      description: 'Practice all Vim motions in a free environment',
+      wip: true,
       locked: false,
     },
   ],
@@ -207,7 +209,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       >
         <div className="flex items-center justify-between">
           <span className="font-medium text-sm">
-            {level.id ? `Level ${level.id}` : 'The Playground'}
+            {level.id === 0 ? 'Intro' : `Level ${level.id}`}
           </span>
           {level.wip ? (
             <span className="text-amber-600 flex items-center gap-1 font-bold">

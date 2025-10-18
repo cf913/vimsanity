@@ -138,24 +138,24 @@ When adding a new level, update both locations.
 
 - The app is desktop-only (mobile users see `MobileWarning.tsx`)
 - Levels 0-13 are currently implemented
-- Level 0 is a playground for development/testing
-- Level 13 is a special interactive keyboard visualizer with 3D animations
-- Some levels have subdirectories (Level6/, Level7/, Level8/, Level9/, Level13/) for complex implementations
+- Level 0 is an interactive keyboard visualizer (intro/exploration tool)
+- Level 13 is a playground for development/testing
+- Some levels have subdirectories (Level0/, Level6/, Level7/, Level8/, Level9/) for complex implementations
 - The app uses a WIP banner to indicate in-development features
 
-## Level 13: Keyboard Visualizer Architecture
+## Level 0: Keyboard Visualizer Architecture
 
-Level 13 is a unique learning tool that uses a 3D keyboard visualization to help users discover Vim commands:
+Level 0 is a unique learning tool that uses a 3D keyboard visualization to help users discover Vim commands:
 
 ### Structure
-- `Level13/types.ts` - TypeScript interfaces for keyboard layout and commands
-- `Level13/keyboardLayout.ts` - MacBook Pro-style keyboard layout data
-- `Level13/vimCommandsData.ts` - Comprehensive Vim command database with examples
-- `Level13/Key3D.tsx` - Individual 3D key component with glow animations
-- `Level13/Keyboard3D.tsx` - Full keyboard with floating animation
-- `Level13/ModeSwitcher.tsx` - Switch between Normal/Insert/Visual modes
-- `Level13/ProficiencySelector.tsx` - Select skill level (Beginner to Expert)
-- `Level13/CommandInfoPopup.tsx` - Animated popup showing command details
+- `Level0/types.ts` - TypeScript interfaces for keyboard layout and commands
+- `Level0/keyboardLayout.ts` - MacBook Pro-style keyboard layout data
+- `Level0/vimCommandsData.ts` - Comprehensive Vim command database with examples
+- `Level0/Key3D.tsx` - Individual 3D key component with glow animations
+- `Level0/Keyboard3D.tsx` - Full keyboard with floating animation
+- `Level0/ModeSwitcher.tsx` - Switch between Normal/Insert/Visual modes
+- `Level0/ProficiencySelector.tsx` - Select skill level (Beginner to Expert)
+- `Level0/CommandInfoPopup.tsx` - Animated popup showing command details
 
 ### Key Features
 - **3D Animations**: Uses CSS `perspective` and Framer Motion for smooth wiggling keyboard
