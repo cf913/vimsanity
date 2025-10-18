@@ -162,6 +162,39 @@ export const vimCommands: VimCommand[] = [
     colorClass: 'emerald',
   },
   {
+    key: 'H',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move to top of screen (High)',
+    example: {
+      before: 'line 1\nline 2\nline |3',
+      after: 'line |1\nline 2\nline 3',
+    },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'M',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move to middle of screen (Middle)',
+    example: {
+      before: 'line 1\nline 2\nline |3',
+      after: 'line 1\nline |2\nline |3',
+    },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'L',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Move to bottom of screen (Low)',
+    example: {
+      before: 'lin|e 1\nline 2\nline 3',
+      after: 'line 1\nline 2\nlin|e 3',
+    },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
     key: '%',
     modes: [VIM_MODES.NORMAL],
     description: 'Jump to matching bracket/paren',
