@@ -140,6 +140,22 @@ export const vimCommands: VimCommand[] = [
     colorClass: 'purple',
   },
   {
+    key: ';',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Repeat last f, F, t, or T motion forward',
+    example: { before: 'h|ello hello', after: 'hello h|ello' },
+    category: 'search',
+    colorClass: 'purple',
+  },
+  {
+    key: ',',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Repeat last f, F, t, or T motion backward',
+    example: { before: 'hello h|ello', after: 'h|ello hello' },
+    category: 'search',
+    colorClass: 'purple',
+  },
+  {
     key: 'g',
     modes: [VIM_MODES.NORMAL],
     description: 'Go to commands (gg = top, G = bottom)',
