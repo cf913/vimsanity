@@ -392,6 +392,22 @@ export const vimCommands: VimCommand[] = [
     colorClass: 'red',
   },
   {
+    key: 's',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Substitute character (delete and enter insert mode)',
+    example: { before: 'hel|lo', after: 'hel|o (INSERT)' },
+    category: 'editing',
+    colorClass: 'red',
+  },
+  {
+    key: 'S',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Substitute line (delete line and enter insert mode)',
+    example: { before: '  hel|lo world', after: '  | (INSERT)' },
+    category: 'editing',
+    colorClass: 'red',
+  },
+  {
     key: 'd',
     modes: [VIM_MODES.NORMAL],
     description: 'Delete operator (combine with motion: dw, dd, etc)',
