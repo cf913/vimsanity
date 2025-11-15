@@ -44,7 +44,7 @@ function App() {
 
   const [currentLevel, setCurrentLevel] = useState(() => {
     const savedValue = localStorage.getItem(STORAGE_KEYS.CURRENT_LEVEL)
-    return savedValue !== null ? parseInt(savedValue, 10) : 0
+    return savedValue !== null ? parseInt(savedValue, 10) : 1
   })
 
   const [isMuted, setIsMuted] = useState(() => {
