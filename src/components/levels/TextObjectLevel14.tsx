@@ -63,7 +63,12 @@ export default function TextObjectLevel14() {
 
       textWords.forEach((word, wordIdx) => {
         const isTargetWord = lineData.targetWords.includes(wordIdx)
-        const wordSquares = createWordSquares(word, lineIdx, charIdx, isTargetWord)
+        const wordSquares = createWordSquares(
+          word,
+          lineIdx,
+          charIdx,
+          isTargetWord,
+        )
         words.push(wordSquares)
         charIdx += word.length
 
@@ -95,7 +100,10 @@ export default function TextObjectLevel14() {
   const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
   const [pendingCommand, setPendingCommand] = useState<string>('')
   const [showExplosion, setShowExplosion] = useState(false)
-  const [explosionPos, setExplosionPos] = useState<{ line: number; charIdx: number } | null>(null)
+  const [explosionPos, setExplosionPos] = useState<{
+    line: number
+    charIdx: number
+  } | null>(null)
   const [virtualColumn, setVirtualColumn] = useState(0)
 
   const playerRef = useRef<HTMLSpanElement>(null)
@@ -103,9 +111,12 @@ export default function TextObjectLevel14() {
   // Count total target squares
   const countTotalTargets = (linesList: Line[]) => {
     return linesList.reduce((acc, line) => {
-      return acc + line.words.reduce((wordAcc, word) => {
-        return wordAcc + word.filter((sq) => sq.isTarget).length
-      }, 0)
+      return (
+        acc +
+        line.words.reduce((wordAcc, word) => {
+          return wordAcc + word.filter((sq) => sq.isTarget).length
+        }, 0)
+      )
     }, 0)
   }
 
@@ -183,7 +194,11 @@ export default function TextObjectLevel14() {
   }
 
   // Helper: Get word boundaries for current cursor position
-  const getCurrentWordBoundaries = (): { start: number; end: number; wordIdx: number } | null => {
+  const getCurrentWordBoundaries = (): {
+    start: number
+    end: number
+    wordIdx: number
+  } | null => {
     const { line, charIdx } = cursorPosition
     const lineSquares = getLineSquares(line)
     if (lineSquares.length === 0) return null
@@ -208,7 +223,11 @@ export default function TextObjectLevel14() {
   }
 
   // Helper: Show explosion effect and update score
-  const triggerExplosion = (lineIdx: number, charIdx: number, deletedTargetCount: number) => {
+  const triggerExplosion = (
+    lineIdx: number,
+    charIdx: number,
+    deletedTargetCount: number,
+  ) => {
     if (deletedTargetCount > 0) {
       setExplosionPos({ line: lineIdx, charIdx })
       setShowExplosion(true)
@@ -251,7 +270,10 @@ export default function TextObjectLevel14() {
         if (lineSquares[i].isSpace) {
           deleteEnd = i
           // Include spaces
-          while (deleteEnd < lineSquares.length && lineSquares[deleteEnd].isSpace) {
+          while (
+            deleteEnd < lineSquares.length &&
+            lineSquares[deleteEnd].isSpace
+          ) {
             deleteEnd++
           }
           break
@@ -298,9 +320,14 @@ export default function TextObjectLevel14() {
     triggerExplosion(line, charIdx, deletedTargetCount)
 
     // Adjust cursor position
-    const newLineSquares = getLineSquares(line).filter((_, idx) => idx < charIdx || idx >= deleteEnd)
+    const newLineSquares = getLineSquares(line).filter(
+      (_, idx) => idx < charIdx || idx >= deleteEnd,
+    )
     if (newLineSquares.length > 0) {
-      setCursorPosition({ line, charIdx: Math.min(charIdx, newLineSquares.length - 1) })
+      setCursorPosition({
+        line,
+        charIdx: Math.min(charIdx, newLineSquares.length - 1),
+      })
     }
   }
 
@@ -331,13 +358,21 @@ export default function TextObjectLevel14() {
     triggerExplosion(line, start, deletedTargetCount)
 
     // Move cursor to the position where the word was (or before it)
-    const newLineSquares = getLineSquares(line).filter((_, idx) => idx < start || idx > end)
+    const newLineSquares = getLineSquares(line).filter(
+      (_, idx) => idx < start || idx > end,
+    )
     if (newLineSquares.length > 0) {
-      setCursorPosition({ line, charIdx: Math.max(0, Math.min(start, newLineSquares.length - 1)) })
+      setCursorPosition({
+        line,
+        charIdx: Math.max(0, Math.min(start, newLineSquares.length - 1)),
+      })
     } else if (line > 0) {
       // Move to previous line if current line is empty
       const prevLineSquares = getLineSquares(line - 1)
-      setCursorPosition({ line: line - 1, charIdx: Math.max(0, prevLineSquares.length - 1) })
+      setCursorPosition({
+        line: line - 1,
+        charIdx: Math.max(0, prevLineSquares.length - 1),
+      })
     }
   }
 
@@ -382,7 +417,9 @@ export default function TextObjectLevel14() {
     setLines((prev) => {
       const newLines = [...prev]
       const currentLine = newLines[line]
-      const newWords = currentLine.words.filter((_, idx) => !wordsToDelete.includes(idx))
+      const newWords = currentLine.words.filter(
+        (_, idx) => !wordsToDelete.includes(idx),
+      )
       newLines[line] = { ...currentLine, words: newWords }
       return newLines
     })
@@ -390,12 +427,20 @@ export default function TextObjectLevel14() {
     triggerExplosion(line, start, deletedTargetCount)
 
     // Adjust cursor
-    const newLineSquares = getLineSquares(line).filter((_, idx) => idx < deleteStart || idx >= deleteEnd)
+    const newLineSquares = getLineSquares(line).filter(
+      (_, idx) => idx < deleteStart || idx >= deleteEnd,
+    )
     if (newLineSquares.length > 0) {
-      setCursorPosition({ line, charIdx: Math.max(0, Math.min(deleteStart, newLineSquares.length - 1)) })
+      setCursorPosition({
+        line,
+        charIdx: Math.max(0, Math.min(deleteStart, newLineSquares.length - 1)),
+      })
     } else if (line > 0) {
       const prevLineSquares = getLineSquares(line - 1)
-      setCursorPosition({ line: line - 1, charIdx: Math.max(0, prevLineSquares.length - 1) })
+      setCursorPosition({
+        line: line - 1,
+        charIdx: Math.max(0, prevLineSquares.length - 1),
+      })
     }
   }
 
@@ -438,7 +483,10 @@ export default function TextObjectLevel14() {
     } else if (line > 0) {
       // Move to end of previous line
       const prevLineSquares = getLineSquares(line - 1)
-      setCursorPosition({ line: line - 1, charIdx: Math.max(0, prevLineSquares.length - 1) })
+      setCursorPosition({
+        line: line - 1,
+        charIdx: Math.max(0, prevLineSquares.length - 1),
+      })
       setVirtualColumn(prevLineSquares.length - 1)
     }
   }
@@ -460,7 +508,10 @@ export default function TextObjectLevel14() {
     const { line } = cursorPosition
     if (line > 0) {
       const prevLineSquares = getLineSquares(line - 1)
-      const newCharIdx = Math.min(virtualColumn, Math.max(0, prevLineSquares.length - 1))
+      const newCharIdx = Math.min(
+        virtualColumn,
+        Math.max(0, prevLineSquares.length - 1),
+      )
       setCursorPosition({ line: line - 1, charIdx: newCharIdx })
     }
   }
@@ -469,7 +520,10 @@ export default function TextObjectLevel14() {
     const { line } = cursorPosition
     if (line < lines.length - 1) {
       const nextLineSquares = getLineSquares(line + 1)
-      const newCharIdx = Math.min(virtualColumn, Math.max(0, nextLineSquares.length - 1))
+      const newCharIdx = Math.min(
+        virtualColumn,
+        Math.max(0, nextLineSquares.length - 1),
+      )
       setCursorPosition({ line: line + 1, charIdx: newCharIdx })
     }
   }
@@ -518,7 +572,10 @@ export default function TextObjectLevel14() {
     if (checkIdx < 0) {
       if (line > 0) {
         const prevLineSquares = getLineSquares(line - 1)
-        setCursorPosition({ line: line - 1, charIdx: Math.max(0, prevLineSquares.length - 1) })
+        setCursorPosition({
+          line: line - 1,
+          charIdx: Math.max(0, prevLineSquares.length - 1),
+        })
         setVirtualColumn(prevLineSquares.length - 1)
       }
       return
@@ -562,7 +619,10 @@ export default function TextObjectLevel14() {
       checkIdx++
     }
 
-    setCursorPosition({ line, charIdx: Math.min(lineSquares.length - 1, checkIdx - 1) })
+    setCursorPosition({
+      line,
+      charIdx: Math.min(lineSquares.length - 1, checkIdx - 1),
+    })
     setVirtualColumn(checkIdx - 1)
   }
 
@@ -598,7 +658,7 @@ export default function TextObjectLevel14() {
         setLastKeyPressed('0')
       }
     },
-    '$': () => {
+    $: () => {
       if (mode === VIM_MODES.NORMAL && !pendingCommand) {
         moveToLineEnd()
         setLastKeyPressed('$')
@@ -711,6 +771,136 @@ export default function TextObjectLevel14() {
           <RefreshCw className="w-5 h-5 text-slate-400" />
         </button>
       </div>
+
+      {/* Instructions */}
+      <div className="text-center space-y-2 max-w-3xl">
+        <p className="text-slate-300">
+          Delete or change the{' '}
+          <span className="text-red-400 font-bold">red target words</span> using
+          text object commands
+        </p>
+      </div>
+
+      {/* Mode and Score */}
+      <div className="flex gap-6 items-center">
+        <ModeIndicator isInsertMode={mode === VIM_MODES.INSERT} />
+        <Scoreboard score={score} maxScore={totalTargets} />
+      </div>
+
+      {/* Character Grid Display */}
+      <div className="bg-zinc-900 rounded-xl p-8 border-2 border-zinc-700 shadow-2xl max-w-full overflow-x-auto">
+        <div className="space-y-2 font-mono">
+          {lines.map((line) => {
+            const lineSquares = line.words.flat()
+            return (
+              <div key={line.lineIdx} className="flex flex-row flex-wrap gap-1">
+                {line.words.map((word, wordIdx) => (
+                  <div
+                    key={`${line.lineIdx}-${wordIdx}`}
+                    className="flex flex-row"
+                  >
+                    {word.map((square) => {
+                      const absoluteCharIdx = lineSquares.indexOf(square)
+                      const isCursor =
+                        cursorPosition.line === line.lineIdx &&
+                        cursorPosition.charIdx === absoluteCharIdx
+
+                      const isExplosion =
+                        showExplosion &&
+                        explosionPos?.line === line.lineIdx &&
+                        explosionPos?.charIdx === absoluteCharIdx
+
+                      let baseClass =
+                        'inline-flex items-center justify-center min-w-8 h-8 transition-all duration-150 rounded-md font-medium text-sm '
+
+                      if (square.isSpace) {
+                        // Space square
+                        const baseSpace =
+                          'inline-block w-3 h-8 transition-all duration-150 rounded-md '
+                        const cursorSpace = isCursor
+                          ? mode === VIM_MODES.INSERT
+                            ? 'bg-orange-500/25 shadow-lg shadow-orange-500/10 '
+                            : 'bg-emerald-500/25 shadow-lg shadow-emerald-500/10 '
+                          : ''
+                        return (
+                          <span
+                            key={`${line.lineIdx}-${absoluteCharIdx}`}
+                            ref={isCursor ? playerRef : undefined}
+                            className={baseSpace + cursorSpace}
+                          />
+                        )
+                      }
+
+                      // Character square styling
+                      if (isCursor) {
+                        baseClass +=
+                          mode === VIM_MODES.INSERT
+                            ? 'bg-orange-500 text-white scale-110 shadow-lg shadow-orange-500/50 '
+                            : 'bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-500/50 '
+                      } else if (square.isTarget) {
+                        baseClass += 'bg-red-500 text-white shadow-md '
+                      } else {
+                        baseClass += 'bg-zinc-700 text-zinc-300 '
+                      }
+
+                      return (
+                        <span
+                          key={`${line.lineIdx}-${absoluteCharIdx}`}
+                          ref={isCursor ? playerRef : undefined}
+                          className={baseClass}
+                          style={{ position: 'relative' }}
+                        >
+                          {square.char}
+                          {isExplosion && (
+                            <div className="absolute inset-0 z-20">
+                              <ExplosionEffect />
+                            </div>
+                          )}
+                        </span>
+                      )
+                    })}
+                  </div>
+                ))}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Pending Command Indicator */}
+      {pendingCommand && (
+        <div className="text-emerald-400 font-mono text-lg">
+          Command: <KBD>{pendingCommand}</KBD>_
+        </div>
+      )}
+
+      {/* Help Section */}
+      <div className="flex gap-4 items-center">
+        <HelpCircleIcon className="w-5 h-5 text-slate-500" />
+        <div className="text-slate-500 text-sm space-y-1 max-w-3xl">
+          <p>
+            Navigate: <KBD>h</KBD> <KBD>j</KBD> <KBD>k</KBD> <KBD>l</KBD>{' '}
+            (char), <KBD>w</KBD> <KBD>b</KBD> <KBD>e</KBD> (word), <KBD>0</KBD>{' '}
+            <KBD>$</KBD> (line)
+          </p>
+          <p>
+            Delete red squares: <KBD>dw</KBD> (cursor to next word),{' '}
+            <KBD>diw</KBD> (entire word), <KBD>daw</KBD> (word + space)
+          </p>
+          <p className="text-xs text-slate-600">
+            Note: <KBD>ciw</KBD> and <KBD>caw</KBD> work like their delete
+            counterparts but enter INSERT mode. Press <KBD>Esc</KBD> to return
+            to NORMAL.
+          </p>
+        </div>
+      </div>
+
+      {/* Last Key Pressed */}
+      {lastKeyPressed && (
+        <div className="text-slate-500 text-sm font-mono">
+          Last command: <KBD>{lastKeyPressed}</KBD>
+        </div>
+      )}
 
       {/* Text Objects vs Motion-Based Deletion */}
       <div className="bg-zinc-800/50 rounded-xl p-6 border border-zinc-700 max-w-4xl">
@@ -886,128 +1076,6 @@ export default function TextObjectLevel14() {
           text
         </div>
       </div>
-
-      {/* Instructions */}
-      <div className="text-center space-y-2 max-w-3xl">
-        <p className="text-slate-300">
-          Delete or change the{' '}
-          <span className="text-red-400 font-bold">red target words</span> using
-          text object commands
-        </p>
-      </div>
-
-      {/* Mode and Score */}
-      <div className="flex gap-6 items-center">
-        <ModeIndicator isInsertMode={mode === VIM_MODES.INSERT} />
-        <Scoreboard score={score} maxScore={totalTargets} />
-      </div>
-
-      {/* Pending Command Indicator */}
-      {pendingCommand && (
-        <div className="text-emerald-400 font-mono text-lg">
-          Command: <KBD>{pendingCommand}</KBD>_
-        </div>
-      )}
-
-      {/* Character Grid Display */}
-      <div className="bg-zinc-900 rounded-xl p-8 border-2 border-zinc-700 shadow-2xl max-w-full overflow-x-auto">
-        <div className="space-y-2 font-mono">
-          {lines.map((line) => {
-            const lineSquares = line.words.flat()
-            return (
-              <div key={line.lineIdx} className="flex flex-row flex-wrap gap-1">
-                {line.words.map((word, wordIdx) => (
-                  <div key={`${line.lineIdx}-${wordIdx}`} className="flex flex-row">
-                    {word.map((square) => {
-                      const absoluteCharIdx = lineSquares.indexOf(square)
-                      const isCursor =
-                        cursorPosition.line === line.lineIdx &&
-                        cursorPosition.charIdx === absoluteCharIdx
-
-                      const isExplosion =
-                        showExplosion &&
-                        explosionPos?.line === line.lineIdx &&
-                        explosionPos?.charIdx === absoluteCharIdx
-
-                      let baseClass =
-                        'inline-flex items-center justify-center min-w-8 h-8 transition-all duration-150 rounded-md font-medium text-sm '
-
-                      if (square.isSpace) {
-                        // Space square
-                        const baseSpace =
-                          'inline-block w-3 h-8 transition-all duration-150 rounded-md '
-                        const cursorSpace = isCursor
-                          ? mode === VIM_MODES.INSERT
-                            ? 'bg-orange-500/25 shadow-lg shadow-orange-500/10 '
-                            : 'bg-emerald-500/25 shadow-lg shadow-emerald-500/10 '
-                          : ''
-                        return (
-                          <span
-                            key={`${line.lineIdx}-${absoluteCharIdx}`}
-                            ref={isCursor ? playerRef : undefined}
-                            className={baseSpace + cursorSpace}
-                          />
-                        )
-                      }
-
-                      // Character square styling
-                      if (isCursor) {
-                        baseClass +=
-                          mode === VIM_MODES.INSERT
-                            ? 'bg-orange-500 text-white scale-110 shadow-lg shadow-orange-500/50 '
-                            : 'bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-500/50 '
-                      } else if (square.isTarget) {
-                        baseClass += 'bg-red-500 text-white shadow-md '
-                      } else {
-                        baseClass += 'bg-zinc-700 text-zinc-300 '
-                      }
-
-                      return (
-                        <span
-                          key={`${line.lineIdx}-${absoluteCharIdx}`}
-                          ref={isCursor ? playerRef : undefined}
-                          className={baseClass}
-                          style={{ position: 'relative' }}
-                        >
-                          {square.char}
-                          {isExplosion && (
-                            <div className="absolute inset-0 z-20">
-                              <ExplosionEffect />
-                            </div>
-                          )}
-                        </span>
-                      )
-                    })}
-                  </div>
-                ))}
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Help Section */}
-      <div className="flex gap-4 items-center">
-        <HelpCircleIcon className="w-5 h-5 text-slate-500" />
-        <div className="text-slate-500 text-sm space-y-1 max-w-3xl">
-          <p>
-            Navigate: <KBD>h</KBD> <KBD>j</KBD> <KBD>k</KBD> <KBD>l</KBD> (char), <KBD>w</KBD> <KBD>b</KBD> <KBD>e</KBD> (word), <KBD>0</KBD> <KBD>$</KBD> (line)
-          </p>
-          <p>
-            Delete red squares: <KBD>dw</KBD> (cursor to next word), <KBD>diw</KBD> (entire word), <KBD>daw</KBD> (word + space)
-          </p>
-          <p className="text-xs text-slate-600">
-            Note: <KBD>ciw</KBD> and <KBD>caw</KBD> work like their delete counterparts but enter INSERT mode. Press <KBD>Esc</KBD> to return to NORMAL.
-          </p>
-        </div>
-      </div>
-
-      {/* Last Key Pressed */}
-      {lastKeyPressed && (
-        <div className="text-slate-500 text-sm font-mono">
-          Last command: <KBD>{lastKeyPressed}</KBD>
-        </div>
-      )}
 
       {/* Level Completion Message */}
       {levelCompleted && (
