@@ -21,12 +21,11 @@ interface GameAreaProps {
 }
 
 // Changelog version and message
-const GAME_VERSION = '0.1.0'
+const GAME_VERSION = '0.1.1'
 
 const CHANGELOG_MESSAGE = `
 <b>What's New in ${GAME_VERSION}</b><br/><br/>
-- Added an Intro level, not really a level but more of a quick glance at all the things you can do with vim motions. It's currently only showing NORMAL mode commands but you get the idea.<br/>
-- More coming soon<br/><br/>
+- Added level 14: delete text objects with dw, diw, daw
 Thanks for playing!
 `
 
