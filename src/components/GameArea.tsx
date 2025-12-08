@@ -12,6 +12,7 @@ import UndoRedoLevel9 from './levels/Level9/UndoRedoLevel9'
 import BasicDeleteLevel10 from './levels/BasicDeleteLevel10'
 import AdvancedDeleteLevel11 from './levels/AdvancedDeleteLevel11'
 import RecapLevel12 from './levels/RecapLevel12'
+import TextObjectLevel14 from './levels/TextObjectLevel14'
 import PlaygroundLevel from './levels/PlaygroundLevel'
 
 interface GameAreaProps {
@@ -88,6 +89,8 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
         return <RecapLevel12 />
       case 13:
         return <PlaygroundLevel isMuted={isMuted} />
+      case 14:
+        return <TextObjectLevel14 />
       default:
         return <KeyboardVisualizerLevel0 isMuted={isMuted} />
     }

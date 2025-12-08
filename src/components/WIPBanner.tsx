@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { X } from "lucide-react"
+import React, { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { X, MessageSquare } from 'lucide-react'
+import { usePostHog } from 'posthog-js/react'
 
 interface WIPBannerProps {
-  position?: "top" | "bottom" | "corner"
+  position?: 'top' | 'bottom' | 'corner'
 }
 
-const WIPBanner: React.FC<WIPBannerProps> = ({ position = "corner" }) => {
+const WIPBanner: React.FC<WIPBannerProps> = ({ position = 'corner' }) => {
   const [isVisible, setIsVisible] = useState(true)
   const [isHovered, setIsHovered] = useState(false)
+  const posthog = usePostHog()
 
   // Auto-hide the banner after 5 seconds, but keep it in DOM for user to show again
   useEffect(() => {
@@ -22,21 +24,43 @@ const WIPBanner: React.FC<WIPBannerProps> = ({ position = "corner" }) => {
   // Position styles based on the position prop
   const getPositionClasses = () => {
     switch (position) {
-      case "top":
-        return "top-0 left-1/2 -translate-x-1/2"
-      case "bottom":
-        return "bottom-4 right-4"
-      case "corner":
+      case 'top':
+        return 'top-0 left-1/2 -translate-x-1/2'
+      case 'bottom':
+        return 'bottom-4 right-4'
+      case 'corner':
       default:
-        return "top-4 right-4"
+        return 'top-4 right-4'
     }
+  }
+
+  // Handle feedback button click
+  const handleFeedbackClick = () => {
+    // Trigger PostHog survey or capture custom event
+    posthog?.capture('feedback_button_clicked', {
+      source: 'wip_banner',
+      timestamp: new Date().toISOString(),
+    })
+
+    // Option 1: If you have a PostHog survey configured, activate it
+    // posthog?.getSurveys((surveys) => {
+    //   const feedbackSurvey = surveys.find(s => s.name === 'Open Feedback')
+    //   if (feedbackSurvey) {
+    //     // PostHog will automatically show the survey
+    //   }
+    // })
+
+    // Option 2: For now, open a simple feedback form (you can customize this)
+    const feedbackUrl =
+      'https://github.com/yourusername/vimsanity/issues/new/choose'
+    window.open(feedbackUrl, '_blank', 'noopener,noreferrer')
   }
 
   // Animation variants
   const bannerVariants = {
     hidden: {
       opacity: 0,
-      y: position === "bottom" ? 20 : -20,
+      y: position === 'bottom' ? 20 : -20,
       scale: 0.95,
     },
     visible: {
@@ -44,7 +68,7 @@ const WIPBanner: React.FC<WIPBannerProps> = ({ position = "corner" }) => {
       y: 0,
       scale: 1,
       transition: {
-        type: "spring",
+        type: 'spring',
         stiffness: 300,
         damping: 25,
       },
@@ -56,7 +80,7 @@ const WIPBanner: React.FC<WIPBannerProps> = ({ position = "corner" }) => {
     },
     hover: {
       scale: 1.03,
-      boxShadow: "0px 5px 15px rgba(16, 185, 129, 0.4)",
+      boxShadow: '0px 5px 15px rgba(16, 185, 129, 0.4)',
     },
   }
 
@@ -81,8 +105,8 @@ const WIPBanner: React.FC<WIPBannerProps> = ({ position = "corner" }) => {
       whileHover={{ scale: 1.1 }}
       onClick={() => setIsVisible(true)}
       style={{
-        right: "1rem",
-        bottom: "1rem",
+        right: '1rem',
+        bottom: '1rem',
       }}
     >
       <div className="bg-emerald-600 text-white p-2 rounded-full shadow-lg flex items-center justify-center">
@@ -122,17 +146,28 @@ const WIPBanner: React.FC<WIPBannerProps> = ({ position = "corner" }) => {
                     Work in Progress
                   </span>
                   {isHovered && (
-                    <motion.p
-                      className="text-xs text-zinc-300 mt-1"
+                    <motion.div
+                      className="flex flex-col gap-1"
                       initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
+                      animate={{ opacity: 1, height: 'auto' }}
                     >
-                      This project is being improved weekly!
-                    </motion.p>
+                      <p className="text-xs text-zinc-300 mt-1">
+                        This project is being improved weekly!
+                      </p>
+                      <motion.button
+                        className="flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+                        onClick={handleFeedbackClick}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <MessageSquare size={12} />
+                        <span>Give Feedback</span>
+                      </motion.button>
+                    </motion.div>
                   )}
                 </div>
                 <motion.button
-                  className="text-zinc-400 hover:text-zinc-200 p-1 rounded-full"
+                  className="text-zinc-400 hover:text-zinc-200 p-1 rounded-full ml-auto"
                   whileHover={{ scale: 1.1, rotate: 90 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setIsVisible(false)}

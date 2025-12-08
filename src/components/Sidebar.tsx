@@ -107,6 +107,13 @@ const levels = {
       wip: false,
       locked: false,
     },
+    {
+      id: 14,
+      title: 'Text Objects (diw, daw, ciw, caw)',
+      description: 'Delete and change inner/around word text objects',
+      wip: false,
+      locked: false,
+    },
   ],
   recap: [
     {
