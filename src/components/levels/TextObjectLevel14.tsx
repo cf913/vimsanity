@@ -10,6 +10,7 @@ import { KBD } from '../common/KBD'
 import LevelTimer from '../common/LevelTimer'
 import ModeIndicator from '../common/ModeIndicator'
 import Scoreboard from '../common/Scoreboard'
+import { TextWithCursor } from '../common/TextWithCursor'
 import ConfettiBurst from './ConfettiBurst'
 
 type WordSquare = {
@@ -358,26 +359,159 @@ export default function TextObjectLevel14() {
         </button>
       </div>
 
+      {/* Explanation: Inner vs Around */}
+      <div className="bg-zinc-800/50 rounded-xl p-6 border border-zinc-700 max-w-4xl">
+        <h3 className="text-lg font-semibold text-emerald-400 mb-4 text-center">
+          What's the difference between <KBD>i</KBD> (inner) and <KBD>a</KBD>{' '}
+          (around)?
+        </h3>
+
+        <div className="grid grid-cols-2 gap-8">
+          {/* Inner Word Demo */}
+          <div className="space-y-3">
+            <div className="text-center">
+              <KBD>diw</KBD>
+              <span className="text-slate-400 ml-2">delete inner word</span>
+            </div>
+            <div className="bg-zinc-900 rounded-lg p-4 font-mono text-sm">
+              <div className="flex items-center justify-center gap-1">
+                <span className="text-slate-600">space</span>
+                <motion.span
+                  className="bg-purple-500/20 border-2 border-purple-500 px-2 py-1 rounded text-purple-300"
+                  animate={{
+                    opacity: [1, 0.3, 1],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                >
+                  WORD
+                </motion.span>
+                <span className="text-slate-600">space</span>
+              </div>
+              <p className="text-xs text-slate-500 mt-3 text-center">
+                Deletes only the word itself
+              </p>
+            </div>
+
+            {/* Before/After for diw */}
+            <div className="bg-zinc-900 rounded-lg p-3 space-y-2">
+              <div className="text-xs text-slate-500 mb-1">Example:</div>
+              <div className="font-mono text-xs">
+                <div className="text-slate-400">
+                  Before: <span className="text-slate-200">hello </span>
+                  <TextWithCursor
+                    text="world"
+                    cursorPosition={2}
+                    cursorMode="block"
+                    highlightColor="bg-purple-500/30 px-1"
+                    textColor="text-purple-300"
+                  />
+                  <span className="text-slate-200"> today</span>
+                </div>
+                <motion.div
+                  className="text-emerald-400 mt-1"
+                  initial={{ opacity: 0, x: -5 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                >
+                  After: <span className="text-slate-200">hello </span>
+                  <TextWithCursor
+                    text=" "
+                    cursorPosition={0}
+                    cursorMode="block"
+                  />
+                  <span className="text-slate-200">today</span>
+                </motion.div>
+              </div>
+              <p className="text-xs text-slate-500 italic mt-2">
+                Notice: two spaces remain
+              </p>
+            </div>
+          </div>
+
+          {/* Around Word Demo */}
+          <div className="space-y-3">
+            <div className="text-center">
+              <KBD>daw</KBD>
+              <span className="text-slate-400 ml-2">delete a word</span>
+            </div>
+            <div className="bg-zinc-900 rounded-lg p-4 font-mono text-sm">
+              <div className="flex items-center justify-center gap-1">
+                <span className="text-slate-600">space</span>
+                <motion.span
+                  className="bg-orange-500/20 border-2 border-orange-500 px-2 py-1 rounded text-orange-300 flex items-center gap-0"
+                  animate={{
+                    opacity: [1, 0.3, 1],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: 0.3,
+                  }}
+                >
+                  <span>WORD</span>
+                  <span className="text-orange-500/60 ml-1">_</span>
+                </motion.span>
+                <span className="text-slate-600">space</span>
+              </div>
+              <p className="text-xs text-slate-500 mt-3 text-center">
+                Deletes the word + trailing space
+              </p>
+            </div>
+
+            {/* Before/After for daw */}
+            <div className="bg-zinc-900 rounded-lg p-3 space-y-2">
+              <div className="text-xs text-slate-500 mb-1">Example:</div>
+              <div className="font-mono text-xs">
+                <div className="text-slate-400">
+                  Before: <span className="text-slate-200">hello </span>
+                  <TextWithCursor
+                    text="world "
+                    cursorPosition={2}
+                    cursorMode="block"
+                    highlightColor="bg-orange-500/30 px-1"
+                    textColor="text-orange-300"
+                  />
+                  <span className="text-slate-200">today</span>
+                </div>
+                <motion.div
+                  className="text-emerald-400 mt-1"
+                  initial={{ opacity: 0, x: -5 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                >
+                  After: <span className="text-slate-200">hello </span>
+                  <TextWithCursor
+                    text="today"
+                    cursorPosition={0}
+                    cursorMode="block"
+                  />
+                </motion.div>
+              </div>
+              <p className="text-xs text-slate-500 italic mt-2">
+                Notice: one clean space
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 text-center text-xs text-slate-500">
+          Same concept applies to <KBD>ciw</KBD> and <KBD>caw</KBD> for changing
+          text
+        </div>
+      </div>
+
       {/* Instructions */}
       <div className="text-center space-y-2 max-w-3xl">
         <p className="text-slate-300">
-          Delete or change the <span className="text-red-400 font-bold">red target words</span>{' '}
-          using text object commands
+          Delete or change the{' '}
+          <span className="text-red-400 font-bold">red target words</span> using
+          text object commands
         </p>
-        <div className="flex gap-4 justify-center text-sm">
-          <span className="text-slate-400">
-            <KBD>diw</KBD> = delete inner word
-          </span>
-          <span className="text-slate-400">
-            <KBD>daw</KBD> = delete a word
-          </span>
-          <span className="text-slate-400">
-            <KBD>ciw</KBD> = change inner word
-          </span>
-          <span className="text-slate-400">
-            <KBD>caw</KBD> = change a word
-          </span>
-        </div>
       </div>
 
       {/* Mode and Score */}
