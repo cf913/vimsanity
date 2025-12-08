@@ -201,10 +201,12 @@ export default function TextObjectLevel14() {
       case 'ciw':
         changeInnerWord()
         setLastKeyPressed('ciw')
+        setMode(VIM_MODES.INSERT)
         break
       case 'caw':
         changeAWord()
         setLastKeyPressed('caw')
+        setMode(VIM_MODES.INSERT)
         break
       default:
         break
@@ -329,7 +331,10 @@ export default function TextObjectLevel14() {
       }
     },
     Escape: () => {
-      if (pendingCommand) {
+      if (mode === VIM_MODES.INSERT) {
+        setMode(VIM_MODES.NORMAL)
+        setLastKeyPressed('Esc')
+      } else if (pendingCommand) {
         setPendingCommand('')
         setLastKeyPressed('')
       }
@@ -348,7 +353,7 @@ export default function TextObjectLevel14() {
       {/* Header */}
       <div className="flex items-center gap-4">
         <h2 className="text-2xl font-bold text-slate-200">
-          Text Objects: Inner & Around Word
+          Text Objects: Delete Inner & Around Word
         </h2>
         <button
           onClick={handleRestart}
@@ -359,44 +364,64 @@ export default function TextObjectLevel14() {
         </button>
       </div>
 
-      {/* Explanation: Inner vs Around */}
+      {/* Text Objects vs Motion-Based Deletion */}
       <div className="bg-zinc-800/50 rounded-xl p-6 border border-zinc-700 max-w-4xl">
-        <h3 className="text-lg font-semibold text-emerald-400 mb-4 text-center">
-          What's the difference between <KBD>i</KBD> (inner) and <KBD>a</KBD>{' '}
-          (around)?
+        <h3 className="text-lg font-semibold text-blue-400 mb-4 text-center">
+          Text Objects (<KBD>diw</KBD>/<KBD>daw</KBD>) vs Motion-Based Deletion
+          (<KBD>dw</KBD>)
         </h3>
 
-        <div className="grid grid-cols-2 gap-8">
-          {/* Inner Word Demo */}
+        <div className="grid grid-cols-3 gap-6">
+          {/* dw - Motion Based */}
+          <div className="space-y-3">
+            <div className="text-center">
+              <KBD>dw</KBD>
+              <span className="text-slate-400 ml-2 block text-xs mt-1">
+                delete word (motion-based)
+              </span>
+            </div>
+            <div className="bg-zinc-900 rounded-lg p-3 space-y-2">
+              <div className="text-xs text-slate-500 mb-1">Example:</div>
+              <div className="font-mono text-xs">
+                <div className="text-slate-400">
+                  Before: <span className="text-slate-200">hello </span>
+                  <TextWithCursor
+                    text="world"
+                    cursorPosition={0}
+                    cursorMode="block"
+                    highlightColor="bg-blue-500/30 px-1"
+                    textColor="text-blue-300"
+                  />
+                  <span className="text-slate-200"> today</span>
+                </div>
+                <motion.div
+                  className="text-emerald-400 mt-1"
+                  initial={{ opacity: 0, x: -5 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                >
+                  After: <span className="text-slate-200">hello </span>
+                  <TextWithCursor
+                    text="today"
+                    cursorPosition={0}
+                    cursorMode="block"
+                  />
+                </motion.div>
+              </div>
+              <p className="text-xs text-slate-500 italic mt-2">
+                Deletes from cursor to start of next word
+              </p>
+            </div>
+          </div>
+
+          {/* diw - Text Object */}
           <div className="space-y-3">
             <div className="text-center">
               <KBD>diw</KBD>
-              <span className="text-slate-400 ml-2">delete inner word</span>
+              <span className="text-slate-400 ml-2 block text-xs mt-1">
+                delete inner word (text object)
+              </span>
             </div>
-            <div className="bg-zinc-900 rounded-lg p-4 font-mono text-sm">
-              <div className="flex items-center justify-center gap-1">
-                <span className="text-slate-600">space</span>
-                <motion.span
-                  className="bg-purple-500/20 border-2 border-purple-500 px-2 py-1 rounded text-purple-300"
-                  animate={{
-                    opacity: [1, 0.3, 1],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                >
-                  WORD
-                </motion.span>
-                <span className="text-slate-600">space</span>
-              </div>
-              <p className="text-xs text-slate-500 mt-3 text-center">
-                Deletes only the word itself
-              </p>
-            </div>
-
-            {/* Before/After for diw */}
             <div className="bg-zinc-900 rounded-lg p-3 space-y-2">
               <div className="text-xs text-slate-500 mb-1">Example:</div>
               <div className="font-mono text-xs">
@@ -427,56 +452,32 @@ export default function TextObjectLevel14() {
                 </motion.div>
               </div>
               <p className="text-xs text-slate-500 italic mt-2">
-                Notice: two spaces remain
+                Deletes entire word, cursor position doesn't matter
               </p>
             </div>
           </div>
 
-          {/* Around Word Demo */}
+          {/* daw - Text Object */}
           <div className="space-y-3">
             <div className="text-center">
               <KBD>daw</KBD>
-              <span className="text-slate-400 ml-2">delete a word</span>
+              <span className="text-slate-400 ml-2 block text-xs mt-1">
+                delete a word (text object)
+              </span>
             </div>
-            <div className="bg-zinc-900 rounded-lg p-4 font-mono text-sm">
-              <div className="flex items-center justify-center gap-1">
-                <span className="text-slate-600">space</span>
-                <motion.span
-                  className="bg-orange-500/20 border-2 border-orange-500 px-2 py-1 rounded text-orange-300 flex items-center gap-0"
-                  animate={{
-                    opacity: [1, 0.3, 1],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                    delay: 0.3,
-                  }}
-                >
-                  <span>WORD</span>
-                  <span className="text-orange-500/60 ml-1">_</span>
-                </motion.span>
-                <span className="text-slate-600">space</span>
-              </div>
-              <p className="text-xs text-slate-500 mt-3 text-center">
-                Deletes the word + trailing space
-              </p>
-            </div>
-
-            {/* Before/After for daw */}
             <div className="bg-zinc-900 rounded-lg p-3 space-y-2">
               <div className="text-xs text-slate-500 mb-1">Example:</div>
               <div className="font-mono text-xs">
                 <div className="text-slate-400">
                   Before: <span className="text-slate-200">hello </span>
                   <TextWithCursor
-                    text="world "
+                    text="world"
                     cursorPosition={2}
                     cursorMode="block"
                     highlightColor="bg-orange-500/30 px-1"
                     textColor="text-orange-300"
                   />
-                  <span className="text-slate-200">today</span>
+                  <span className="text-slate-200"> today</span>
                 </div>
                 <motion.div
                   className="text-emerald-400 mt-1"
@@ -493,12 +494,45 @@ export default function TextObjectLevel14() {
                 </motion.div>
               </div>
               <p className="text-xs text-slate-500 italic mt-2">
-                Notice: one clean space
+                Deletes word + space, works anywhere in word
               </p>
             </div>
           </div>
         </div>
 
+        {/* Key Difference Summary */}
+        <div className="mt-6 p-4 bg-zinc-900/50 rounded-lg border border-blue-500/30">
+          <h4 className="text-sm font-semibold text-blue-300 mb-2">
+            Key Difference:
+          </h4>
+          <ul className="text-xs text-slate-400 space-y-1.5">
+            <li className="flex items-start gap-2">
+              <span className="text-blue-400 mt-0.5">•</span>
+              <span>
+                <KBD className="text-xs">dw</KBD> is{' '}
+                <strong className="text-slate-300">cursor-dependent</strong> -
+                deletes from current position to next word boundary
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-purple-400 mt-0.5">•</span>
+              <span>
+                <KBD className="text-xs">diw</KBD> is{' '}
+                <strong className="text-slate-300">position-independent</strong>{' '}
+                - deletes the entire word your cursor is on, regardless of
+                position
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-orange-400 mt-0.5">•</span>
+              <span>
+                <KBD className="text-xs">daw</KBD> is like{' '}
+                <KBD className="text-xs">diw</KBD> but also removes surrounding
+                whitespace for cleaner deletion
+              </span>
+            </li>
+          </ul>
+        </div>
         <div className="mt-4 text-center text-xs text-slate-500">
           Same concept applies to <KBD>ciw</KBD> and <KBD>caw</KBD> for changing
           text
@@ -516,7 +550,7 @@ export default function TextObjectLevel14() {
 
       {/* Mode and Score */}
       <div className="flex gap-6 items-center">
-        <ModeIndicator mode={mode} />
+        <ModeIndicator isInsertMode={mode === VIM_MODES.INSERT} />
         <Scoreboard score={score} maxScore={totalTargets} />
       </div>
 
@@ -547,12 +581,16 @@ export default function TextObjectLevel14() {
                 const isCursor =
                   cursorPosition.line === lineIdx &&
                   cursorPosition.word === wordIdx
+                const ringColor =
+                  mode === VIM_MODES.INSERT
+                    ? 'ring-orange-400'
+                    : 'ring-emerald-400'
                 return (
                   <motion.div
                     key={word.id}
                     className={`
                       ${word.color} text-white px-3 py-2 rounded-lg
-                      ${isCursor ? 'ring-4 ring-emerald-400 scale-110' : ''}
+                      ${isCursor ? `ring-4 ${ringColor} scale-110` : ''}
                       transition-all duration-200
                     `}
                     animate={isCursor ? { scale: 1.1 } : { scale: 1 }}
@@ -569,10 +607,16 @@ export default function TextObjectLevel14() {
       {/* Help Section */}
       <div className="flex gap-4 items-center">
         <HelpCircleIcon className="w-5 h-5 text-slate-500" />
-        <p className="text-slate-500 text-sm">
-          Use <KBD>h</KBD> <KBD>j</KBD> <KBD>k</KBD> <KBD>l</KBD> to navigate,
-          then use text object commands to delete red words
-        </p>
+        <div className="text-slate-500 text-sm space-y-1">
+          <p>
+            Use <KBD>h</KBD> <KBD>j</KBD> <KBD>k</KBD> <KBD>l</KBD> to navigate,
+            then use text object commands to delete red words
+          </p>
+          <p className="text-xs text-slate-600">
+            Note: Change commands (<KBD>ciw</KBD>, <KBD>caw</KBD>) enter INSERT
+            mode. Press <KBD>Esc</KBD> to return to NORMAL mode.
+          </p>
+        </div>
       </div>
 
       {/* Last Key Pressed */}
