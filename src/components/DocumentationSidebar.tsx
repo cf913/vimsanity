@@ -723,6 +723,198 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             </div>
           </>
         )
+      case 14:
+        return (
+          <>
+            <h3 className="text-lg font-semibold mb-2">
+              Text Objects
+            </h3>
+            <p className="text-sm mb-3">
+              Text objects let you operate on semantic units like words, regardless of cursor position:
+            </p>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">diw</kbd> -
+                  Delete inner word
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete the word under cursor (not surrounding spaces)
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Works from anywhere within the word
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">daw</kbd> -
+                  Delete around word
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete word AND surrounding whitespace
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Cleaner deletion - no leftover spaces
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">ciw</kbd> -
+                  Change inner word
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete word and enter insert mode
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Perfect for replacing a word
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">caw</kbd> -
+                  Change around word
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Delete word + whitespace, enter insert mode
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 space-y-2">
+              <div className="text-xs text-zinc-400">
+                <p className="font-medium text-zinc-300 mb-1">Text Object Pattern:</p>
+                <ul className="space-y-1 pl-2">
+                  <li>
+                    • <strong>operator</strong> + <strong>i/a</strong> + <strong>object</strong>
+                  </li>
+                  <li>
+                    • <strong>i</strong> = "inner" (just the object)
+                  </li>
+                  <li>
+                    • <strong>a</strong> = "around" (object + surroundings)
+                  </li>
+                  <li>
+                    • <strong>w</strong> = word object
+                  </li>
+                </ul>
+              </div>
+              <div className="text-xs text-zinc-400">
+                <p className="font-medium text-zinc-300 mb-1">Why Text Objects?</p>
+                <ul className="space-y-1 pl-2">
+                  <li>
+                    • No need to position cursor at word start
+                  </li>
+                  <li>
+                    • <strong>dw</strong> requires cursor at start
+                  </li>
+                  <li>
+                    • <strong>diw</strong> works from anywhere in word
+                  </li>
+                </ul>
+              </div>
+              <div className="text-xs text-zinc-400 mt-2">
+                <p className="italic">
+                  Tip: Text objects are one of Vim's superpowers. Once learned, you'll use ciw and diw constantly!
+                </p>
+              </div>
+            </div>
+          </>
+        )
+      case 15:
+        return (
+          <>
+            <h3 className="text-lg font-semibold mb-2">
+              Yank & Put (Copy & Paste)
+            </h3>
+            <p className="text-sm mb-3">
+              Vim's copy and paste system uses "yank" (copy) and "put" (paste):
+            </p>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">yy</kbd> -
+                  Yank entire line
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Copy the entire current line to the clipboard
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Most common yank command
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">yw</kbd> -
+                  Yank word
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Copy from cursor to end of current word
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Position cursor at word start for best results
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">p</kbd> -
+                  Put (paste) after
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Paste yanked text at cursor position
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  For lines: pastes on the line below
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  <kbd className="px-2 py-1 bg-zinc-700 rounded">P</kbd> -
+                  Put (paste) before
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  Paste yanked text before cursor position
+                </p>
+                <p className="text-xs text-zinc-400 ml-1">
+                  For lines: pastes on the current line
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 space-y-2">
+              <div className="text-xs text-zinc-400">
+                <p className="font-medium text-zinc-300 mb-1">Yank vs Delete:</p>
+                <ul className="space-y-1 pl-2">
+                  <li>
+                    • <strong>y</strong> (yank) = copy text, leave original
+                  </li>
+                  <li>
+                    • <strong>d</strong> (delete) = cut text, remove original
+                  </li>
+                  <li>
+                    • Both save to clipboard for pasting with p/P
+                  </li>
+                </ul>
+              </div>
+              <div className="text-xs text-zinc-400">
+                <p className="font-medium text-zinc-300 mb-1">Common Patterns:</p>
+                <ul className="space-y-1 pl-2">
+                  <li>
+                    • <strong>yy → p</strong> = duplicate a line below
+                  </li>
+                  <li>
+                    • <strong>yw → p</strong> = copy and paste a word
+                  </li>
+                  <li>
+                    • <strong>yy → jjj → p</strong> = copy line, move, paste
+                  </li>
+                </ul>
+              </div>
+              <div className="text-xs text-zinc-400 mt-2">
+                <p className="italic">
+                  Tip: Unlike most editors, Vim's delete commands also copy to the clipboard. So dd followed by p effectively "moves" a line!
+                </p>
+              </div>
+            </div>
+          </>
+        )
       default:
         return (
           <p className="text-sm">Select a level to see its documentation.</p>

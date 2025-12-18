@@ -22,12 +22,14 @@ interface GameAreaProps {
 }
 
 // Changelog version and message
-const GAME_VERSION = '0.1.2'
+const GAME_VERSION = '0.1.3'
+const DATE_VERSION = '2025-12-18'
 
 const CHANGELOG_MESSAGE = `
-<b>What's New in ${GAME_VERSION}</b><br/><br/>
+<b>What's New in ${GAME_VERSION} (${DATE_VERSION})</b><br/><br/>
 - Added level 15: Yank & Put (yy, yw, p, P)<br/>
 - Learn to copy and paste like a Vim pro!<br/><br/>
+- Updated Documentation sidebar for levels 14 and 15<br/><br/>
 Thanks for playing!
 `
 
