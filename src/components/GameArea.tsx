@@ -13,6 +13,7 @@ import BasicDeleteLevel10 from './levels/BasicDeleteLevel10'
 import AdvancedDeleteLevel11 from './levels/AdvancedDeleteLevel11'
 import RecapLevel12 from './levels/RecapLevel12'
 import TextObjectLevel14 from './levels/TextObjectLevel14'
+import YankPutLevel15 from './levels/YankPutLevel15'
 import PlaygroundLevel from './levels/PlaygroundLevel'
 
 interface GameAreaProps {
@@ -21,11 +22,12 @@ interface GameAreaProps {
 }
 
 // Changelog version and message
-const GAME_VERSION = '0.1.1'
+const GAME_VERSION = '0.1.2'
 
 const CHANGELOG_MESSAGE = `
 <b>What's New in ${GAME_VERSION}</b><br/><br/>
-- Added level 14: delete text objects with dw, diw, daw
+- Added level 15: Yank & Put (yy, yw, p, P)<br/>
+- Learn to copy and paste like a Vim pro!<br/><br/>
 Thanks for playing!
 `
 
@@ -90,6 +92,8 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
         return <PlaygroundLevel isMuted={isMuted} />
       case 14:
         return <TextObjectLevel14 />
+      case 15:
+        return <YankPutLevel15 />
       default:
         return <KeyboardVisualizerLevel0 isMuted={isMuted} />
     }

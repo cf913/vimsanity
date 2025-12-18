@@ -115,6 +115,15 @@ const levels = {
       locked: false,
     },
   ],
+  yank: [
+    {
+      id: 15,
+      title: 'Yank & Put (y, p)',
+      description: 'Copy and paste text with yank and put commands',
+      wip: false,
+      locked: false,
+    },
+  ],
   recap: [
     {
       id: 12,

@@ -137,9 +137,11 @@ When adding a new level, update both locations.
 ## Important Notes
 
 - The app is desktop-only (mobile users see `MobileWarning.tsx`)
-- Levels 0-13 are currently implemented
+- Levels 0-15 are currently implemented
 - Level 0 is an interactive keyboard visualizer (intro/exploration tool)
 - Level 13 is a playground for development/testing
+- Level 14 covers text objects (diw, daw, ciw, caw)
+- Level 15 covers yank and put (yy, yw, p, P)
 - Some levels have subdirectories (Level0/, Level6/, Level7/, Level8/, Level9/) for complex implementations
 - The app uses a WIP banner to indicate in-development features
 
