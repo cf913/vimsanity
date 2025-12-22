@@ -22,14 +22,16 @@ interface GameAreaProps {
 }
 
 // Changelog version and message
-const GAME_VERSION = '0.1.3'
-const DATE_VERSION = '2025-12-18'
+const GAME_VERSION = '0.1.4'
+const DATE_VERSION = '2025-12-22'
 
 const CHANGELOG_MESSAGE = `
 <b>What's New in ${GAME_VERSION} (${DATE_VERSION})</b><br/><br/>
-- Added level 15: Yank & Put (yy, yw, p, P)<br/>
-- Learn to copy and paste like a Vim pro!<br/><br/>
-- Updated Documentation sidebar for levels 14 and 15<br/><br/>
+- Level 0 Keyboard Visualizer improvements:<br/>
+  • Mode switching now works! Toggle between Normal, Insert, and Visual modes<br/>
+  • Added 45+ Visual mode commands (selection, operations, text objects)<br/>
+  • Enhanced key press effect with color flash animation<br/>
+  • Keys now highlight based on which commands exist in the current mode<br/><br/>
 Thanks for playing!
 `
 

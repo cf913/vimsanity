@@ -23,11 +23,28 @@ const KeyboardVisualizerLevel0: React.FC<
     null,
   )
 
-  // Get highlighted keys based on proficiency level
+  // Get highlighted keys based on proficiency level AND current mode
   const highlightedKeys = React.useMemo(() => {
     const preset = proficiencyPresets.find((p) => p.level === proficiencyLevel)
-    return new Set(preset?.highlightedKeys || [])
-  }, [proficiencyLevel])
+    const presetKeys = preset?.highlightedKeys || []
+
+    // Filter keys to only include those that have commands in the current mode
+    const modeFilteredKeys = presetKeys.filter((key) => {
+      // Check if this key has a command in the current mode
+      const hasCommand = getCommandForKey(key, currentMode)
+      if (hasCommand) return true
+
+      // Also check uppercase version for letters
+      if (key.length === 1) {
+        const upperCommand = getCommandForKey(key.toUpperCase(), currentMode)
+        if (upperCommand) return true
+      }
+
+      return false
+    })
+
+    return new Set(modeFilteredKeys)
+  }, [proficiencyLevel, currentMode])
 
   // Handle keyboard events
   const handleKeyDown = useCallback(
@@ -180,10 +197,10 @@ const KeyboardVisualizerLevel0: React.FC<
 
         {/* Controls */}
         <div className="flex justify-between items-start gap-4 mb-8">
-          {/* <ModeSwitcher */}
-          {/*   currentMode={currentMode} */}
-          {/*   onModeChange={setCurrentMode} */}
-          {/* /> */}
+          <ModeSwitcher
+            currentMode={currentMode}
+            onModeChange={setCurrentMode}
+          />
           <ProficiencySelector
             currentLevel={proficiencyLevel}
             onLevelChange={setProficiencyLevel}
@@ -209,7 +226,7 @@ const KeyboardVisualizerLevel0: React.FC<
               </span>
               <p className="text-zinc-400 mt-1">
                 {currentMode.toUpperCase()} - Switch modes above to see
-                different command sets (Comming soon...)
+                different command sets.
               </p>
             </div>
           </div>

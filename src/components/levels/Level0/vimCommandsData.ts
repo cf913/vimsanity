@@ -570,6 +570,399 @@ export const vimCommands: VimCommand[] = [
     category: 'mode',
     colorClass: 'blue',
   },
+
+  // ========================================
+  // VISUAL MODE COMMANDS
+  // ========================================
+
+  // Visual mode entry commands (from Normal mode)
+  {
+    key: 'v',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Enter visual (character) mode',
+    example: { before: 'hel|lo world (NORMAL)', after: 'hel|lo world (VISUAL)' },
+    category: 'mode',
+    colorClass: 'purple',
+  },
+  {
+    key: 'V',
+    modes: [VIM_MODES.NORMAL],
+    description: 'Enter visual line mode (select entire lines)',
+    example: {
+      before: 'hel|lo world (NORMAL)',
+      after: '|hello world (VISUAL LINE)',
+    },
+    category: 'mode',
+    colorClass: 'purple',
+  },
+
+  // Movement commands in Visual mode (extend selection)
+  {
+    key: 'h',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection left',
+    example: { before: 'he[ll]o', after: 'h[ell]o' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'j',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection down',
+    example: { before: 'lin[e 1]\nline 2', after: 'lin[e 1\nline] 2' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'k',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection up',
+    example: { before: 'line 1\nlin[e 2]', after: 'lin[e 1\nline] 2' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'l',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection right',
+    example: { before: 'h[el]lo', after: 'h[ell]o' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'w',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection to next word',
+    example: { before: 'he[llo] world', after: 'he[llo world]' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'W',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection to next WORD (whitespace separated)',
+    example: { before: 'he[llo-]world vim', after: 'he[llo-world] vim' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'b',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection to previous word',
+    example: { before: 'hello [world]', after: '[hello world]' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'B',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection to previous WORD',
+    example: { before: 'hello world-[vim]', after: '[hello world-vim]' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'e',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection to end of word',
+    example: { before: 'he[ll]o world', after: 'he[llo] world' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'E',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection to end of WORD',
+    example: { before: 'he[ll]o-world vim', after: 'he[llo-world] vim' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: '0',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection to start of line',
+    example: { before: '  hello [world]', after: '[  hello world]' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: '$',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection to end of line',
+    example: { before: 'hello [wor]ld', after: 'hello [world]' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: '^',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection to first non-blank character',
+    example: { before: '  hello [world]', after: '  [hello world]' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'G',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection to last line',
+    example: {
+      before: '[line 1]\nline 2\nline 3',
+      after: '[line 1\nline 2\nline 3]',
+    },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'g',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Go commands (gg = extend to top)',
+    example: {
+      before: 'line 1\nline 2\n[line 3]',
+      after: '[line 1\nline 2\nline 3]',
+    },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: '%',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection to matching bracket',
+    example: { before: '|[(hello)]', after: '[(hello)|]' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: '{',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection to previous paragraph',
+    example: {
+      before: 'text\n\n[paragraph]',
+      after: '[text\n\nparagraph]',
+    },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: '}',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Extend selection to next paragraph',
+    example: {
+      before: '[text]\n\nparagraph',
+      after: '[text\n\nparagraph]',
+    },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+
+  // Selection modifiers
+  {
+    key: 'o',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Toggle cursor to other end of selection',
+    example: { before: '|hello world]', after: '[hello world|' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'O',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Toggle cursor to other corner (in block mode)',
+    example: { before: '|hello]\n|world]', after: '[hello|\n[world|' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+
+  // Operations on selection
+  {
+    key: 'd',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Delete selection',
+    example: { before: 'hello [world] vim', after: 'hello | vim' },
+    category: 'delete',
+    colorClass: 'red',
+  },
+  {
+    key: 'x',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Delete selection (same as d)',
+    example: { before: 'hello [world] vim', after: 'hello | vim' },
+    category: 'delete',
+    colorClass: 'red',
+  },
+  {
+    key: 'y',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Yank (copy) selection',
+    example: { before: 'hello [world] vim', after: 'hello |world vim (copied)' },
+    category: 'editing',
+    colorClass: 'amber',
+  },
+  {
+    key: 'c',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Change selection (delete and enter insert mode)',
+    example: { before: 'hello [world] vim', after: 'hello | vim (INSERT)' },
+    category: 'editing',
+    colorClass: 'red',
+  },
+  {
+    key: 's',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Substitute selection (same as c)',
+    example: { before: 'hello [world] vim', after: 'hello | vim (INSERT)' },
+    category: 'editing',
+    colorClass: 'red',
+  },
+  {
+    key: 'r',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Replace every character in selection with typed character',
+    example: { before: 'hello [world]', after: 'hello |xxxxx' },
+    category: 'editing',
+    colorClass: 'red',
+  },
+
+  // Paste in visual mode
+  {
+    key: 'p',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Replace selection with paste buffer',
+    example: { before: 'hello [world]', after: 'hello |yanked_text' },
+    category: 'editing',
+    colorClass: 'amber',
+  },
+  {
+    key: 'P',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Replace selection with paste buffer (same as p)',
+    example: { before: 'hello [world]', after: 'hello |yanked_text' },
+    category: 'editing',
+    colorClass: 'amber',
+  },
+
+  // Indent operations
+  {
+    key: '<',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Decrease indent of selection',
+    example: { before: '    [hello world]', after: '  [hello world]' },
+    category: 'editing',
+    colorClass: 'amber',
+  },
+  {
+    key: '>',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Increase indent of selection',
+    example: { before: '[hello world]', after: '  [hello world]' },
+    category: 'editing',
+    colorClass: 'amber',
+  },
+
+  // Case changes
+  {
+    key: 'u',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Make selection lowercase',
+    example: { before: 'hello [WORLD]', after: 'hello [world]' },
+    category: 'editing',
+    colorClass: 'amber',
+  },
+  {
+    key: 'U',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Make selection uppercase',
+    example: { before: 'hello [world]', after: 'hello [WORLD]' },
+    category: 'editing',
+    colorClass: 'amber',
+  },
+  {
+    key: '~',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Toggle case of selection',
+    example: { before: 'hello [World]', after: 'hello [wORLD]' },
+    category: 'editing',
+    colorClass: 'amber',
+  },
+
+  // Text objects in visual mode
+  {
+    key: 'i',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Inner text object (iw = inner word, i" = inner quotes, etc.)',
+    example: { before: 'h[e]llo', after: '[hello]' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+  {
+    key: 'a',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Around text object (aw = around word, a" = around quotes, etc.)',
+    example: { before: 'h[e]llo world', after: '[hello ]world' },
+    category: 'movement',
+    colorClass: 'emerald',
+  },
+
+  // Join lines
+  {
+    key: 'J',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Join selected lines',
+    example: { before: '[hello\nworld]', after: 'hello world|' },
+    category: 'editing',
+    colorClass: 'amber',
+  },
+
+  // Search commands in visual mode
+  {
+    key: '/',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Search forward (extends selection to match)',
+    example: { before: 'he[llo] vim world', after: 'he[llo vim] world' },
+    category: 'search',
+    colorClass: 'purple',
+  },
+  {
+    key: '?',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Search backward (extends selection to match)',
+    example: { before: 'vim hello [world]', after: '[vim hello world]' },
+    category: 'search',
+    colorClass: 'purple',
+  },
+  {
+    key: 'n',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Next search match (extends selection)',
+    example: { before: 'vim [hello] vim', after: 'vim [hello vim]' },
+    category: 'search',
+    colorClass: 'purple',
+  },
+  {
+    key: 'N',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Previous search match (extends selection)',
+    example: { before: 'vim hello [vim]', after: '[vim hello vim]' },
+    category: 'search',
+    colorClass: 'purple',
+  },
+
+  // Exit visual mode
+  {
+    key: 'v',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Exit visual mode (return to normal)',
+    example: { before: 'he[llo] (VISUAL)', after: 'hel|lo (NORMAL)' },
+    category: 'mode',
+    colorClass: 'purple',
+  },
+  {
+    key: 'Escape',
+    modes: [VIM_MODES.VISUAL],
+    description: 'Exit visual mode (return to normal)',
+    example: { before: 'he[llo] (VISUAL)', after: 'hel|lo (NORMAL)' },
+    category: 'mode',
+    colorClass: 'blue',
+  },
 ]
 
 export const proficiencyPresets: ProficiencyPreset[] = [
@@ -582,7 +975,7 @@ export const proficiencyPresets: ProficiencyPreset[] = [
   {
     level: 'intermediate',
     title: 'Intermediate',
-    description: 'Word navigation, line operations, and more insert commands',
+    description: 'Word navigation, line operations, insert commands, and basic visual mode',
     highlightedKeys: [
       'h',
       'j',
@@ -600,13 +993,14 @@ export const proficiencyPresets: ProficiencyPreset[] = [
       'o',
       'O',
       'x',
+      'v', // Visual mode entry
       'Escape',
     ],
   },
   {
     level: 'advanced',
     title: 'Advanced',
-    description: 'Search, operators, and efficient editing',
+    description: 'Search, operators, efficient editing, and visual mode operations',
     highlightedKeys: [
       'h',
       'j',
@@ -642,6 +1036,10 @@ export const proficiencyPresets: ProficiencyPreset[] = [
       'c',
       'C',
       'u',
+      'v', // Visual mode
+      'V', // Visual line mode
+      'y', // Yank
+      'p', // Paste
       'Escape',
     ],
   },
@@ -692,6 +1090,8 @@ export const proficiencyPresets: ProficiencyPreset[] = [
       'A',
       'o',
       'O',
+      'v', // Visual mode
+      'V', // Visual line mode
       'Escape',
       // Delete/edit keys
       'x',
@@ -713,6 +1113,10 @@ export const proficiencyPresets: ProficiencyPreset[] = [
       'm',
       "'",
       '@', // Shift+2
+      // Visual mode operations
+      '<', // Decrease indent (Shift+,)
+      '>', // Increase indent (Shift+.)
+      '~', // Toggle case (Shift+`)
       // Special keys
       'Backspace',
       'Enter',
@@ -726,6 +1130,7 @@ export const proficiencyPresets: ProficiencyPreset[] = [
       '[', // Has { on shift
       ']', // Has } on shift
       '2', // Has @ on shift
+      '`', // Has ~ on shift
     ],
   },
 ]

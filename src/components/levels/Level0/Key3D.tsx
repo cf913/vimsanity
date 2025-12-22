@@ -129,17 +129,40 @@ const Key3D: React.FC<Key3DProps> = ({
           </div>
         )}
 
-        {/* Pressed glow effect */}
+        {/* Pressed flash effect - color pulse */}
         {isPressed && (
-          <motion.div
-            className={`absolute inset-0 rounded-lg ${colors.glow}`}
-            initial={{ opacity: 0, scale: 1 }}
-            animate={{ opacity: [0, 1, 0], scale: [1, 1.2, 1.4] }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
-            style={{
-              boxShadow: `0 0 40px ${getGlowColor(glowColor, 0.8)}`,
-            }}
-          />
+          <>
+            {/* Background color flash */}
+            <motion.div
+              className="absolute inset-0 rounded-lg"
+              initial={{ opacity: 0 }}
+              animate={{
+                opacity: [0, 0.6, 0],
+                scale: [1, 1.02, 1],
+              }}
+              transition={{
+                duration: 0.4,
+                ease: 'easeOut',
+                times: [0, 0.2, 1],
+              }}
+              style={{
+                backgroundColor: getGlowColor(glowColor, 1),
+              }}
+            />
+            {/* Outer glow ring */}
+            <motion.div
+              className="absolute inset-0 rounded-lg"
+              initial={{ opacity: 0, scale: 1 }}
+              animate={{
+                opacity: [0, 1, 0],
+                scale: [1, 1.15, 1.3],
+              }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              style={{
+                boxShadow: `0 0 30px ${getGlowColor(glowColor, 0.9)}, 0 0 60px ${getGlowColor(glowColor, 0.5)}`,
+              }}
+            />
+          </>
         )}
       </motion.button>
     </motion.div>
