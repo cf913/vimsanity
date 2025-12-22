@@ -22,16 +22,15 @@ interface GameAreaProps {
 }
 
 // Changelog version and message
-const GAME_VERSION = '0.1.4'
+const GAME_VERSION = '0.1.5'
 const DATE_VERSION = '2025-12-22'
 
 const CHANGELOG_MESSAGE = `
-<b>What's New in ${GAME_VERSION} (${DATE_VERSION})</b><br/><br/>
+<b>What's New in ${GAME_VERSION} (${DATE_VERSION})</b><br/><br/>i█
+- Light/Dark Theme: Toggle between light and dark modes!<br/>
 - Level 0 Keyboard Visualizer improvements:<br/>
   • Mode switching now works! Toggle between Normal, Insert, and Visual modes<br/>
-  • Added 45+ Visual mode commands (selection, operations, text objects)<br/>
-  • Enhanced key press effect with color flash animation<br/>
-  • Keys now highlight based on which commands exist in the current mode<br/><br/>
+  • Added 45+ Visual mode commands (selection, operations, text objects)<br/><br/>
 Thanks for playing!
 `
 
