@@ -52,7 +52,7 @@ export default function Recap8() {
     <div className="flex flex-col items-center gap-4">
       {/* TITLE AND INSTRUCTIONS */}
       <div className="text-center">
-        <p className="text-zinc-400">
+        <p className="text-text-muted">
           Use all the motions you've learnt so far to match the expected text.
         </p>
       </div>
@@ -64,10 +64,10 @@ export default function Recap8() {
 
         <button
           onClick={resetLevel}
-          className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
+          className="bg-bg-secondary p-2 rounded-lg hover:bg-bg-tertiary transition-colors"
           aria-label="Reset Level"
         >
-          <RefreshCw size={18} className="text-zinc-400" />
+          <RefreshCw size={18} className="text-text-muted" />
         </button>
         {/* Mode indicator */}
         <ModeIndicator isInsertMode={isInsertMode} />

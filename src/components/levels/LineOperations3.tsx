@@ -319,16 +319,16 @@ const LineOperations3: React.FC<LevelProps> = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center bg-zinc-900 text-white">
+    <div className="flex flex-col items-center justify-center bg-bg-primary text-white">
       <div className="w-full max-w-4xl">
         <div className="flex flex-col items-center mb-2">
           {/* <h1 className="text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">
             Line Navigation
           </h1> */}
-          <p className="text-zinc-400 text-center max-w-lg mb-4">
-            Use <kbd className="px-2 py-1 bg-zinc-800 rounded">0</kbd>,{' '}
-            <kbd className="px-2 py-1 bg-zinc-800 rounded">_</kbd> and{' '}
-            <kbd className="px-2 py-1 bg-zinc-800 rounded">$</kbd> to quickly
+          <p className="text-text-muted text-center max-w-lg mb-4">
+            Use <kbd className="px-2 py-1 bg-bg-secondary rounded">0</kbd>,{' '}
+            <kbd className="px-2 py-1 bg-bg-secondary rounded">_</kbd> and{' '}
+            <kbd className="px-2 py-1 bg-bg-secondary rounded">$</kbd> to quickly
             jump to ends of a line.
           </p>
 
@@ -336,10 +336,10 @@ const LineOperations3: React.FC<LevelProps> = () => {
             <Scoreboard score={score} maxScore={16} />
             <button
               onClick={resetLevel}
-              className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
+              className="bg-bg-secondary p-2 rounded-lg hover:bg-bg-tertiary transition-colors"
               aria-label="Reset Level"
             >
-              <RefreshCw size={18} className="text-zinc-400" />
+              <RefreshCw size={18} className="text-text-muted" />
             </button>
             {levelCompleted && (
               <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
@@ -349,7 +349,7 @@ const LineOperations3: React.FC<LevelProps> = () => {
             )}
           </div>
         </div>
-        <div className="relative w-full max-w-4xl bg-zinc-800 p-6 py-8 rounded-lg mx-auto overflow-y-scroll">
+        <div className="relative w-full max-w-4xl bg-bg-secondary p-6 py-8 rounded-lg mx-auto overflow-y-scroll">
           {/* Global Confetti Burst over the game area */}
           {showConfetti && <ConfettiBurst />}
 
@@ -358,9 +358,9 @@ const LineOperations3: React.FC<LevelProps> = () => {
             {linesOfWords.map((words, lineIdx) => (
               <div
                 key={`line-${lineIdx}`}
-                className={`flex flex-row overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 ${
+                className={`flex flex-row overflow-visible scrollbar-thin scrollbar-thumb-border-primary scrollbar-track-bg-primary ${
                   lineIdx === currentLineIndex
-                    ? 'bg-zinc-700/30 rounded-md'
+                    ? 'bg-bg-tertiary/30 rounded-md'
                     : ''
                 }`}
                 ref={lineIdx === currentLineIndex ? containerRef : undefined}
@@ -390,7 +390,7 @@ const LineOperations3: React.FC<LevelProps> = () => {
                       else if (isTarget)
                         base +=
                           'bg-purple-500 text-white scale-105 shadow-lg shadow-purple-500/60 animate-pulse '
-                      else base += 'bg-zinc-700 text-zinc-300 '
+                      else base += 'bg-bg-tertiary text-text-secondary '
 
                       if (square.isSpace) {
                         let baseSpace =

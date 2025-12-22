@@ -183,7 +183,7 @@ export default function UndoRedoLevel9() {
       <div className="w-full max-w-4xl flex flex-col gap-4">
         {/* Header */}
         <div className="text-center">
-          <p className="text-zinc-400 px-2">
+          <p className="text-text-muted px-2">
             Master the power of history navigation with <KBD>u</KBD> and
             <KBD>ctrl</KBD>+<KBD>r</KBD>
           </p>
@@ -192,23 +192,23 @@ export default function UndoRedoLevel9() {
         {/* Progress */}
         <div className="flex justify-center items-center mb-2 gap-4">
           <Scoreboard score={score} maxScore={MAX_SCORE} />
-          <div className="text-sm text-zinc-400">
+          <div className="text-sm text-text-muted">
             Challenge {currentChallenge + 1} of {challenges.length}
           </div>
         </div>
 
         {/* Challenge Info */}
-        <div className="bg-zinc-800 rounded-lg p-6 mb-6">
+        <div className="bg-bg-secondary rounded-lg p-6 mb-6">
           <h2 className="text-2xl font-semibold mb-2 text-purple-400">
             {challenge.title}
           </h2>
-          <p className="text-zinc-300 mb-4">{challenge.description}</p>
+          <p className="text-text-secondary mb-4">{challenge.description}</p>
 
-          <div className="bg-zinc-900 rounded-lg p-4 mb-4">
+          <div className="bg-bg-primary rounded-lg p-4 mb-4">
             <h3 className="text-lg font-semibold mb-2 text-pink-400">
               Instructions:
             </h3>
-            <ol className="list-decimal list-inside space-y-1 text-zinc-300">
+            <ol className="list-decimal list-inside space-y-1 text-text-secondary">
               {challenge.instructions.map((instruction, index) => (
                 <li key={index}>{instruction}</li>
               ))}
@@ -216,14 +216,14 @@ export default function UndoRedoLevel9() {
           </div>
 
           {/* Progress indicator */}
-          <div className="bg-zinc-900 rounded-lg p-4 mb-4">
+          <div className="bg-bg-primary rounded-lg p-4 mb-4">
             <h3 className="text-lg font-semibold mb-2 text-blue-400">
               Progress:
             </h3>
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">
                 <span
-                  className={`w-4 h-4 rounded-full ${currentUndoCount >= challenge.requiredUndos ? 'bg-green-500' : 'bg-zinc-600'}`}
+                  className={`w-4 h-4 rounded-full ${currentUndoCount >= challenge.requiredUndos ? 'bg-green-500' : 'bg-bg-hover'}`}
                 ></span>
                 <span>
                   Undos: {currentUndoCount}/{challenge.requiredUndos}
@@ -232,7 +232,7 @@ export default function UndoRedoLevel9() {
               {challenge.requiredRedos && (
                 <div className="flex items-center gap-2">
                   <span
-                    className={`w-4 h-4 rounded-full ${currentRedoCount >= challenge.requiredRedos ? 'bg-green-500' : 'bg-zinc-600'}`}
+                    className={`w-4 h-4 rounded-full ${currentRedoCount >= challenge.requiredRedos ? 'bg-green-500' : 'bg-bg-hover'}`}
                   ></span>
                   <span>
                     Redos: {currentRedoCount}/{challenge.requiredRedos}
@@ -241,7 +241,7 @@ export default function UndoRedoLevel9() {
               )}
               <div className="flex items-center gap-2">
                 <span
-                  className={`w-4 h-4 rounded-full ${challengeCompleted ? 'bg-green-500' : 'bg-zinc-600'}`}
+                  className={`w-4 h-4 rounded-full ${challengeCompleted ? 'bg-green-500' : 'bg-bg-hover'}`}
                 ></span>
                 <span>
                   Text matches expected: {challengeCompleted ? 'Yes' : 'No'}
@@ -260,13 +260,13 @@ export default function UndoRedoLevel9() {
         </div>
 
         {/* Editor */}
-        <div className="bg-zinc-800 rounded-lg p-6 mb-6">
+        <div className="bg-bg-secondary rounded-lg p-6 mb-6">
           <div className="flex justify-between items-center mb-4">
             <ModeIndicator isInsertMode={isInsertMode} />
             <div className="flex gap-2">
               <button
                 onClick={resetChallenge}
-                className="flex items-center gap-2 px-3 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors text-sm"
+                className="flex items-center gap-2 px-3 py-2 bg-bg-tertiary hover:bg-bg-hover rounded-lg transition-colors text-sm"
               >
                 <RefreshCw size={16} />
                 Reset Challenge
@@ -283,7 +283,7 @@ export default function UndoRedoLevel9() {
             </div>
           </div>
 
-          <div className="border border-zinc-600 rounded-lg overflow-hidden">
+          <div className="border border-border-secondary rounded-lg overflow-hidden">
             <TextEditorWithHistory
               key={`challenge-${currentChallenge}-${challengeCompleted ? 'completed' : 'active'}`}
               initialText={challenge.initialText}
@@ -348,11 +348,11 @@ export default function UndoRedoLevel9() {
         {/* Level Completion */}
         {isLevelCompleted && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-zinc-800 rounded-lg p-8 text-center max-w-md">
+            <div className="bg-bg-secondary rounded-lg p-8 text-center max-w-md">
               <h2 className="text-3xl font-bold mb-4 text-purple-400">
                 🎉 Level Complete!
               </h2>
-              <p className="text-zinc-300 mb-6">
+              <p className="text-text-secondary mb-6">
                 Congratulations! You've mastered undo and redo operations. You
                 can now navigate through your editing history like a pro!
               </p>

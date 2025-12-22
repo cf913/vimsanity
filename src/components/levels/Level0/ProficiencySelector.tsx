@@ -14,10 +14,10 @@ const ProficiencySelector: React.FC<ProficiencySelectorProps> = ({
 }) => {
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-sm font-medium text-zinc-400">
+      <label className="text-sm font-medium text-text-muted">
         Proficiency Level
       </label>
-      <div className="flex gap-2 p-2 bg-zinc-900/50 rounded-xl border border-zinc-700/50 backdrop-blur-sm">
+      <div className="flex gap-2 p-2 bg-bg-primary/50 rounded-xl border border-border-primary/50 backdrop-blur-sm">
         {proficiencyPresets.map((preset) => {
           const isActive = currentLevel === preset.level
 
@@ -31,7 +31,7 @@ const ProficiencySelector: React.FC<ProficiencySelectorProps> = ({
                 ${
                   isActive
                     ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
-                    : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-zinc-600'
+                    : 'bg-bg-secondary border-border-primary text-text-muted hover:border-border-secondary'
                 }
               `}
               whileHover={{ scale: 1.05 }}
@@ -43,7 +43,7 @@ const ProficiencySelector: React.FC<ProficiencySelectorProps> = ({
           )
         })}
       </div>
-      <p className="text-xs text-zinc-500 mt-1">
+      <p className="text-xs text-text-subtle mt-1">
         {proficiencyPresets.find((p) => p.level === currentLevel)?.description}
       </p>
     </div>

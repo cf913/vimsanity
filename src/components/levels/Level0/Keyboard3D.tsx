@@ -46,7 +46,7 @@ const Keyboard3D: React.FC<Keyboard3DProps> = ({
       >
         {/* Keyboard container with shadow */}
         <div
-          className="relative bg-zinc-900 rounded-2xl border border-zinc-700/50"
+          className="relative bg-bg-primary rounded-2xl border border-border-primary/50"
           style={{
             transformStyle: 'preserve-3d',
             boxShadow: `

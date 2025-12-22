@@ -1,12 +1,15 @@
 import React from 'react'
 import { BookOpen, X, ChevronRight, Construction } from 'lucide-react'
 import { motion } from 'framer-motion'
+import ThemeToggle from './common/ThemeToggle'
 
 interface SidebarProps {
   currentLevel: number
   setCurrentLevel: (level: number) => void
   isMuted: boolean
   setIsMuted: (muted: boolean) => void
+  theme: 'dark' | 'light'
+  onToggleTheme: () => void
   onClose: () => void
   onReturnToLanding: () => void
 }
@@ -147,6 +150,8 @@ const levels = {
 const Sidebar: React.FC<SidebarProps> = ({
   currentLevel,
   setCurrentLevel,
+  theme,
+  onToggleTheme,
   onClose,
   onReturnToLanding,
 }) => {
@@ -219,8 +224,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           currentLevel === level.id
             ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-emerald-400'
             : level.locked
-              ? 'bg-zinc-700/50 text-zinc-500 cursor-not-allowed border-zinc-700'
-              : 'bg-zinc-700/80 hover:bg-zinc-700 border-zinc-600 hover:border-zinc-500'
+              ? 'bg-bg-tertiary/50 text-text-subtle cursor-not-allowed border-border-primary'
+              : 'bg-bg-tertiary/80 hover:bg-bg-tertiary text-text-primary border-border-secondary hover:border-border-primary'
         }`}
       >
         <div className="flex items-center justify-between">
@@ -246,7 +251,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           ) : null}
         </div>
         <p className="text-sm mt-1 opacity-90">{level.title}</p>
-        <p className="text-xs mt-1 text-zinc-400 line-clamp-1">
+        <p className="text-xs mt-1 text-text-muted line-clamp-1">
           {level.description}
         </p>
       </motion.button>
@@ -255,7 +260,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <motion.div
-      className="w-64 h-full bg-zinc-800 p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-600 scrollbar-track-zinc-800"
+      className="w-64 h-full bg-bg-secondary p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-bg-hover scrollbar-track-bg-secondary"
       initial="hidden"
       animate="visible"
       variants={sidebarVariants}
@@ -283,7 +288,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
         <motion.button
           onClick={onClose}
-          className="p-2 hover:bg-zinc-700 rounded-lg transition-colors"
+          className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
           whileHover={{ scale: 1.1, rotate: 90 }}
           whileTap={{ scale: 0.9 }}
           transition={{ duration: 0.2 }}
@@ -297,7 +302,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           return (
             <>
               <motion.div className="mb-4 px-1" variants={itemVariants}>
-                <h2 className="text-sm uppercase tracking-wider text-zinc-400 font-semibold mb-2">
+                <h2 className="text-sm uppercase tracking-wider text-text-muted font-semibold mb-2">
                   {k}
                 </h2>
                 <div className="h-1 w-16 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full" />
@@ -309,27 +314,13 @@ const Sidebar: React.FC<SidebarProps> = ({
       </motion.div>
 
       <motion.div
-        className="mt-8 pt-4 border-t border-zinc-700"
+        className="mt-8 pt-4 border-t border-border-primary"
         variants={itemVariants}
       >
-        {/* <motion.button
-          onClick={() => setIsMuted(!isMuted)}
-          className="flex items-center gap-2 px-3 py-2 w-full rounded-lg hover:bg-zinc-700/70 transition-colors"
-          whileHover={buttonVariants.hover}
-          whileTap={buttonVariants.tap}
-        >
-          {isMuted ? (
-            <>
-              <VolumeX size={18} className="text-zinc-400" />
-              <span className="text-sm text-zinc-400">Unmute Sounds</span>
-            </>
-          ) : (
-            <>
-              <Volume2 size={18} className="text-emerald-400" />
-              <span className="text-sm text-zinc-300">Mute Sounds</span>
-            </>
-          )}
-        </motion.button> */}
+        <div className="flex items-center justify-between px-1">
+          <span className="text-sm text-text-muted">Theme</span>
+          <ThemeToggle theme={theme} onToggle={onToggleTheme} size="sm" />
+        </div>
       </motion.div>
     </motion.div>
   )

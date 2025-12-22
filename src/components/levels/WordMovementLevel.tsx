@@ -260,12 +260,12 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
     <div className="flex items-center justify-center w-full">
       <div className="w-full">
         <div className="text-center mb-4">
-          <p className="text-zinc-400">Use w, e, b to navigate horizontally</p>
+          <p className="text-text-muted">Use w, e, b to navigate horizontally</p>
           {levelCompleted ? (
             <div className="flex flex-col items-center justify-center min-h-[60vh] w-full animate-fade-in">
               {/* HISTORY */}
               <SessionHistory levelId={LEVEL_ID} />
-              <p className="mt-6 text-zinc-400 text-sm">
+              <p className="mt-6 text-text-muted text-sm">
                 Press <KBD>ESC</KBD> to restart
               </p>
             </div>
@@ -279,15 +279,15 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
                 />
                 <button
                   onClick={resetLevel}
-                  className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
+                  className="bg-bg-secondary p-2 rounded-lg hover:bg-bg-tertiary transition-colors"
                   aria-label="Reset Level"
                 >
-                  <RefreshCw size={18} className="text-zinc-400" />
+                  <RefreshCw size={18} className="text-text-muted" />
                 </button>
                 <button
                   onClick={changeText}
                   title="New Text"
-                  className="bg-zinc-700 hover:bg-zinc-600 p-2 rounded-lg text-zinc-200 transition-all duration-200 flex items-center justify-center hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+                  className="bg-bg-tertiary hover:bg-bg-hover p-2 rounded-lg text-text-primary transition-all duration-200 flex items-center justify-center hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
                 >
                   <Shuffle size={18} className="text-purple-400" />
                 </button>
@@ -298,12 +298,12 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
                   </div>
                 )}
               </div>
-              <div className="relative w-full max-w-4xl bg-zinc-800 p-6 rounded-lg mx-auto overflow-visible">
+              <div className="relative w-full max-w-4xl bg-bg-secondary p-6 rounded-lg mx-auto overflow-visible">
                 {/* Global Confetti Burst over the game area */}
                 {showConfetti && <ConfettiBurst />}
                 <div
                   ref={containerRef}
-                  className="flex flex-row flex-wrap overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 py-2"
+                  className="flex flex-row flex-wrap overflow-visible scrollbar-thin scrollbar-thumb-border-primary scrollbar-track-bg-primary py-2"
                   style={{ scrollBehavior: 'smooth' }}
                 >
                   {words.map((word, wordIdx) => (
@@ -333,7 +333,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
                         else if (isTarget)
                           base +=
                             'bg-purple-500 text-white scale-105 shadow-lg shadow-purple-500/60 animate-pulse '
-                        else base += 'bg-zinc-700 text-zinc-300 '
+                        else base += 'bg-bg-tertiary text-text-secondary '
                         return (
                           <span
                             key={square.idx}
@@ -364,7 +364,7 @@ const WordMovementLevel: React.FC<WordMovementLevelProps> = ({ isMuted }) => {
                     </div>
                   ))}
                 </div>
-                <div className="text-xs text-zinc-500 mt-4">
+                <div className="text-xs text-text-subtle mt-4">
                   NOTE: this should be one long line but we are wrapping words
                   to make it easier to spot the next target.
                   <br />

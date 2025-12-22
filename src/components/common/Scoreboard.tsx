@@ -6,10 +6,10 @@ export default function Scoreboard({
   maxScore: number
 }) {
   return (
-    <div className="bg-zinc-800 px-4 py-2 rounded-lg font-mono">
-      <span className="text-zinc-400 mr-2">Score:</span>
+    <div className="bg-bg-secondary px-4 py-2 rounded-lg font-mono">
+      <span className="text-text-muted mr-2">Score:</span>
       <span className="text-emerald-400 font-bold">{score}</span>
-      <span className="text-zinc-600"> / {maxScore}</span>
+      <span className="text-text-subtle"> / {maxScore}</span>
     </div>
   )
 }

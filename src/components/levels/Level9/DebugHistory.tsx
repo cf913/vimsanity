@@ -117,11 +117,11 @@ export function DebugHistory() {
   }
 
   return (
-    <div className="p-4 bg-zinc-800 text-white rounded-lg max-w-2xl">
+    <div className="p-4 bg-bg-secondary text-white rounded-lg max-w-2xl">
       <h2 className="text-xl font-bold mb-4">Debug History Component</h2>
       
       <div className="mb-4">
-        <div className="text-lg font-mono bg-zinc-900 p-2 rounded border">
+        <div className="text-lg font-mono bg-bg-primary p-2 rounded border">
           Text: "{text}" | Cursor: {cursorIndex} | Mode: {mode}
         </div>
       </div>
@@ -167,7 +167,7 @@ export function DebugHistory() {
 
       <div>
         <div className="text-sm font-semibold mb-2">Debug Log:</div>
-        <div className="bg-zinc-900 p-2 rounded text-xs max-h-40 overflow-y-auto">
+        <div className="bg-bg-primary p-2 rounded text-xs max-h-40 overflow-y-auto">
           {logs.map((log, index) => (
             <div key={index} className="mb-1">{log}</div>
           ))}

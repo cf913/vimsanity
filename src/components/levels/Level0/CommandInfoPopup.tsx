@@ -43,7 +43,7 @@ const CommandInfoPopup: React.FC<CommandInfoPopupProps> = ({
             {charAtCursor}
           </>
         ) : (
-          <span className="bg-emerald-400 text-zinc-900 inline-block w-[1ch] text-center">
+          <span className="bg-emerald-400 text-bg-primary inline-block w-[1ch] text-center">
             {charAtCursor === ' ' ? '\u00A0' : charAtCursor}
           </span>
         )}
@@ -108,7 +108,7 @@ const CommandInfoPopup: React.FC<CommandInfoPopupProps> = ({
           <div
             className={`
               relative rounded-2xl border-2 p-6
-              bg-zinc-900/95 backdrop-blur-md
+              bg-bg-primary/95 backdrop-blur-md
               ${getColorClasses(command.colorClass).bg}
               ${getColorClasses(command.colorClass).border}
             `}
@@ -122,10 +122,10 @@ const CommandInfoPopup: React.FC<CommandInfoPopupProps> = ({
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-zinc-800 transition-colors group"
+              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-bg-secondary transition-colors group"
               title="Press ESC to close"
             >
-              <div className="text-xs text-zinc-500">
+              <div className="text-xs text-text-subtle">
                 Press <KBD>ESC</KBD> to close
               </div>
               {/* <X */}
@@ -154,7 +154,7 @@ const CommandInfoPopup: React.FC<CommandInfoPopupProps> = ({
                     {command.modes.map((mode) => (
                       <span
                         key={mode}
-                        className="text-xs px-2 py-0.5 bg-zinc-800 rounded text-zinc-400"
+                        className="text-xs px-2 py-0.5 bg-bg-secondary rounded text-text-muted"
                       >
                         {mode.toUpperCase()}
                       </span>
@@ -178,17 +178,17 @@ const CommandInfoPopup: React.FC<CommandInfoPopupProps> = ({
               {/* Example */}
               <div className="grid grid-cols-[1fr,auto,1fr] gap-4 items-center">
                 <div>
-                  <div className="text-xs text-zinc-500 mb-1">Before:</div>
-                  <pre className="text-sm text-zinc-300 bg-zinc-800/50 px-3 py-2 rounded font-mono whitespace-pre-wrap">
+                  <div className="text-xs text-text-subtle mb-1">Before:</div>
+                  <pre className="text-sm text-text-secondary bg-bg-secondary/50 px-3 py-2 rounded font-mono whitespace-pre-wrap">
                     {renderTextWithCursor(command.example.before)}
                   </pre>
                 </div>
 
-                <div className="text-zinc-400 text-xl">→</div>
+                <div className="text-text-muted text-xl">→</div>
 
                 <div>
-                  <div className="text-xs text-zinc-500 mb-1">After:</div>
-                  <pre className="text-sm text-zinc-300 bg-zinc-800/50 px-3 py-2 rounded font-mono whitespace-pre-wrap">
+                  <div className="text-xs text-text-subtle mb-1">After:</div>
+                  <pre className="text-sm text-text-secondary bg-bg-secondary/50 px-3 py-2 rounded font-mono whitespace-pre-wrap">
                     {renderTextWithCursor(command.example.after)}
                   </pre>
                 </div>

@@ -616,18 +616,18 @@ const SearchLevel5: React.FC<LevelProps> = () => {
 
   return (
     <div
-      className={`flex flex-col items-center justify-center bg-zinc-900 text-white ${isSearching ? 'searching' : ''}`}
+      className={`flex flex-col items-center justify-center bg-bg-primary text-white ${isSearching ? 'searching' : ''}`}
       tabIndex={-1}
     >
       <div className="w-full max-w-6xl px-4">
         <div className="flex flex-col items-center mb-2">
-          <p className="text-zinc-400 text-center max-w-lg mb-4">
-            Use <kbd className="px-2 py-1 bg-zinc-800 rounded">/</kbd> to search
+          <p className="text-text-muted text-center max-w-lg mb-4">
+            Use <kbd className="px-2 py-1 bg-bg-secondary rounded">/</kbd> to search
             forward,
-            <kbd className="px-2 py-1 bg-zinc-800 rounded">?</kbd> to search
+            <kbd className="px-2 py-1 bg-bg-secondary rounded">?</kbd> to search
             backward,
-            <kbd className="px-2 py-1 bg-zinc-800 rounded">n</kbd> for next
-            match, and <kbd className="px-2 py-1 bg-zinc-800 rounded">N</kbd>{' '}
+            <kbd className="px-2 py-1 bg-bg-secondary rounded">n</kbd> for next
+            match, and <kbd className="px-2 py-1 bg-bg-secondary rounded">N</kbd>{' '}
             for previous match.
           </p>
 
@@ -635,10 +635,10 @@ const SearchLevel5: React.FC<LevelProps> = () => {
             <Scoreboard score={score} maxScore={10} />
             <button
               onClick={resetLevel}
-              className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
+              className="bg-bg-secondary p-2 rounded-lg hover:bg-bg-tertiary transition-colors"
               aria-label="Reset Level"
             >
-              <RefreshCw size={18} className="text-zinc-400" />
+              <RefreshCw size={18} className="text-text-muted" />
             </button>
             {levelCompleted && (
               <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
@@ -649,7 +649,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
           </div>
         </div>
         <div
-          className="relative w-full max-w-6xl bg-zinc-800 p-6 py-8 rounded-lg mx-auto overflow-y-scroll"
+          className="relative w-full max-w-6xl bg-bg-secondary p-6 py-8 rounded-lg mx-auto overflow-y-scroll"
           ref={containerRef}
           tabIndex={0}
           onClick={() => isSearching && clearSearch()}
@@ -710,7 +710,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
                       }
                     }
                   }}
-                  className="bg-zinc-700 text-white px-2 py-1 rounded flex-grow focus:outline-none focus:ring-2 focus:ring-emerald-400 font-mono"
+                  className="bg-bg-tertiary text-white px-2 py-1 rounded flex-grow focus:outline-none focus:ring-2 focus:ring-emerald-400 font-mono"
                   autoFocus
                   autoComplete="off"
                   spellCheck="false"
@@ -729,9 +729,9 @@ const SearchLevel5: React.FC<LevelProps> = () => {
             {linesOfWords.map((words, lineIdx) => (
               <div
                 key={`line-${lineIdx}`}
-                className={`flex flex-row overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 ${
+                className={`flex flex-row overflow-visible scrollbar-thin scrollbar-thumb-border-primary scrollbar-track-bg-primary ${
                   lineIdx === currentLineIndex
-                    ? 'bg-zinc-700/30 rounded-md'
+                    ? 'bg-bg-tertiary/30 rounded-md'
                     : ''
                 }`}
                 ref={lineIdx === currentLineIndex ? containerRef : undefined}
@@ -774,7 +774,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
                           'bg-amber-500 text-white scale-105 shadow-lg shadow-amber-500/50 '
                       else if (isSearchHighlight)
                         base += 'bg-amber-500/30 text-amber-200 '
-                      else base += 'bg-zinc-700 text-zinc-300 '
+                      else base += 'bg-bg-tertiary text-text-secondary '
 
                       if (square.isSpace) {
                         let baseSpace =
@@ -823,10 +823,10 @@ const SearchLevel5: React.FC<LevelProps> = () => {
                 ))}
               </div>
             ))}
-            <div className="text-xs text-zinc-500 mt-4 max-w-xl">
+            <div className="text-xs text-text-subtle mt-4 max-w-xl">
               <span className="font-semibold">NOTE:</span> While this level is
               case insensitive for learning purposes, Vim's{' '}
-              <kbd className="px-1 py-1 bg-zinc-700 rounded text-white font-mono">
+              <kbd className="px-1 py-1 bg-bg-tertiary rounded text-white font-mono">
                 /
               </kbd>{' '}
               search is usually case sensitive by default.

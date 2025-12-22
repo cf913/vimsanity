@@ -215,8 +215,8 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
   //         <RefreshCw className="mr-2" size={20} />
   //         Restart (ESC)
   //       </button>
-  //       <p className="mt-2 text-zinc-400 text-sm">
-  //         Press <kbd className="px-2 py-1 bg-zinc-700 rounded">ESC</kbd> to
+  //       <p className="mt-2 text-text-muted text-sm">
+  //         Press <kbd className="px-2 py-1 bg-bg-tertiary rounded">ESC</kbd> to
   //         restart
   //       </p>
   //     </div>
@@ -226,7 +226,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
   return (
     <div className="w-full h-full flex flex-col justify-center">
       <div className="text-center mb-4">
-        <p className="text-zinc-400">
+        <p className="text-text-muted">
           Use <KBD>h</KBD>, <KBD>j</KBD>, <KBD>k</KBD>, <KBD>l</KBD> to move the
           cursor to the target
         </p>
@@ -234,7 +234,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
           <div className="flex flex-col items-center justify-center min-h-[60vh] w-full animate-fade-in">
             {/* HISTORY */}
             <SessionHistory levelId={LEVEL_ID} />
-            <p className="mt-6 text-zinc-400 text-sm">
+            <p className="mt-6 text-text-muted text-sm">
               Press <KBD>ESC</KBD> to restart
             </p>
           </div>
@@ -248,10 +248,10 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
               </div>
               <button
                 onClick={handleRestart}
-                className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
+                className="bg-bg-secondary p-2 rounded-lg hover:bg-bg-tertiary transition-colors"
                 aria-label="Reset Level"
               >
-                <RefreshCw size={18} className="text-zinc-400" />
+                <RefreshCw size={18} className="text-text-muted" />
               </button>
             </div>
             <div className="relative flex justify-center">
@@ -283,7 +283,7 @@ const GridMovementLevel: React.FC<GridMovementLevelProps> = ({ isMuted }) => {
                             }`
                           : isTarget
                             ? 'bg-purple-500 shadow-lg shadow-purple-500/60 animate-pulse'
-                            : 'bg-zinc-800'
+                            : 'bg-bg-secondary'
                       }`}
                       style={{
                         boxShadow: isPlayer

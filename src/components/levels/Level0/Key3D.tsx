@@ -67,10 +67,10 @@ const Key3D: React.FC<Key3DProps> = ({
         onClick={onClick}
         className={`
           relative w-full h-12 rounded-lg font-mono text-sm
-          border border-zinc-600/50
+          border border-border-secondary/50
           transition-all duration-200
-          ${isSpecial ? 'text-zinc-400 text-xs' : 'text-zinc-200'}
-          ${isHighlighted && !isPressed ? colors.highlight : 'bg-gradient-to-b from-zinc-700 to-zinc-800'}
+          ${isSpecial ? 'text-text-muted text-xs' : 'text-text-primary'}
+          ${isHighlighted && !isPressed ? colors.highlight : 'bg-gradient-to-b from-bg-tertiary to-bg-secondary'}
         `}
         style={{
           transformStyle: 'preserve-3d',
@@ -119,7 +119,7 @@ const Key3D: React.FC<Key3DProps> = ({
         {shiftLabel ? (
           // Key with shift character - show both
           <div className="flex flex-col items-center justify-center h-full px-1">
-            <span className="select-none text-[10px] leading-none text-zinc-400">{shiftLabel}</span>
+            <span className="select-none text-[10px] leading-none text-text-muted">{shiftLabel}</span>
             <span className="select-none text-sm leading-none mt-0.5">{displayLabel || keyLabel}</span>
           </div>
         ) : (

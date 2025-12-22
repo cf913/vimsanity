@@ -49,7 +49,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ levelId }) => {
   const latest = sessions[sessions.length - 1].duration
 
   return (
-    <div className="w-full mt-6 p-4 rounded-xl bg-gradient-to-br from-zinc-900 to-zinc-800 shadow-lg flex flex-col items-center">
+    <div className="w-full mt-6 p-4 rounded-xl bg-gradient-to-br from-bg-primary to-bg-secondary shadow-lg flex flex-col items-center">
       <h3 className="font-bold text-lg text-emerald-400 mb-2 tracking-tight">
         Session History
       </h3>
@@ -129,7 +129,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ levelId }) => {
           />
         </LineChart>
       </ResponsiveContainer>
-      <div className="flex gap-6 mt-4 text-sm text-zinc-300 w-full justify-center items-end">
+      <div className="flex gap-6 mt-4 text-sm text-text-secondary w-full justify-center items-end">
         <div className="flex flex-col items-center">
           <span className="font-semibold text-emerald-400">Best</span>
           <span className="font-mono">{formatSeconds(best)}</span>

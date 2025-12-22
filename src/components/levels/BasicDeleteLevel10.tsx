@@ -698,7 +698,7 @@ export default function BasicDeleteLevel10() {
         <h2 className="text-2xl font-bold mb-2 text-red-400">
           Basic Delete Operations
         </h2>
-        <p className="text-zinc-400 px-2">
+        <p className="text-text-muted px-2">
           Use <KBD>x</KBD>, <KBD>D</KBD>, <KBD>C</KBD>, and <KBD>S</KBD> to
           delete different targets. Practice all movement motions!
         </p>
@@ -714,16 +714,16 @@ export default function BasicDeleteLevel10() {
         <Scoreboard score={score} maxScore={MAX_SCORE} />
         <button
           onClick={handleRestart}
-          className="bg-zinc-800 p-3 rounded-lg hover:bg-zinc-700 transition-colors"
+          className="bg-bg-secondary p-3 rounded-lg hover:bg-bg-hover transition-colors"
           aria-label="Reset Level"
         >
-          <RefreshCw size={18} className="text-zinc-400" />
+          <RefreshCw size={18} className="text-text-muted" />
         </button>
         <ModeIndicator isInsertMode={mode === VIM_MODES.INSERT} />
       </div>
 
       {/* Grid */}
-      <div className="grid gap-1 p-6 bg-zinc-800 rounded-lg border-2 border-zinc-600">
+      <div className="grid gap-1 p-6 bg-bg-secondary rounded-lg border-2 border-border-secondary">
         {grid.map((row, rowIdx) => (
           <div key={rowIdx} className="flex gap-1">
             {row.map((char, colIdx) => {
@@ -751,13 +751,13 @@ export default function BasicDeleteLevel10() {
                     ${
                       isCursor
                         ? `${cursorBg} text-black scale-110 shadow-lg ring-2 ${cursorRing}`
-                        : 'bg-zinc-700'
+                        : 'bg-bg-tertiary'
                     }
                     ${
                       targetInfo && !isDeletedCell && !isCursor
                         ? `${targetInfo.color} font-bold ring-1 ${targetInfo.ring}`
                         : !isCursor
-                          ? 'text-zinc-300'
+                          ? 'text-text-secondary'
                           : 'text-black'
                     }
                     ${isDeletedCell ? 'bg-green-600 text-green-200' : ''}
@@ -782,25 +782,25 @@ export default function BasicDeleteLevel10() {
       </div>
 
       {/* Instructions */}
-      <div className="bg-zinc-800 rounded-lg p-4 max-w-2xl">
+      <div className="bg-bg-secondary rounded-lg p-4 max-w-2xl">
         <div className="grid grid-cols-4 gap-4 text-sm mb-3">
           <div className="text-center">
             <div className="text-red-400 font-bold">x</div>
-            <div className="text-xs text-zinc-400">Delete character</div>
+            <div className="text-xs text-text-muted">Delete character</div>
           </div>
           <div className="text-center">
             <div className="text-orange-400 font-bold">D</div>
-            <div className="text-xs text-zinc-400">Delete to end</div>
+            <div className="text-xs text-text-muted">Delete to end</div>
           </div>
           <div className="text-center">
             <div className="text-blue-400 font-bold">C</div>
-            <div className="text-xs text-zinc-400">
+            <div className="text-xs text-text-muted">
               Delete to end and insert
             </div>
           </div>
           <div className="text-center">
             <div className="text-purple-400 font-bold">S</div>
-            <div className="text-xs text-zinc-400">Delete line and insert</div>
+            <div className="text-xs text-text-muted">Delete line and insert</div>
           </div>
         </div>
         {/* <div className="text-xs text-zinc-500 text-center border-t border-zinc-700 pt-2"> */}
@@ -818,11 +818,11 @@ export default function BasicDeleteLevel10() {
       {/* Level completion */}
       {levelCompleted && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-zinc-800 rounded-lg p-8 text-center max-w-md">
+          <div className="bg-bg-secondary rounded-lg p-8 text-center max-w-md">
             <h2 className="text-3xl font-bold mb-4 text-red-400">
               🎉 Level Complete!
             </h2>
-            <p className="text-zinc-300 mb-6">
+            <p className="text-text-secondary mb-6">
               Excellent! You've mastered basic delete operations: <KBD>x</KBD>,{' '}
               <KBD>D</KBD>, <KBD>C</KBD>, and <KBD>S</KBD>. These are essential
               Vim commands for efficient editing!
@@ -830,7 +830,7 @@ export default function BasicDeleteLevel10() {
             <div className="text-2xl font-bold text-green-400 mb-4">
               Score: {score}/{MAX_SCORE}
             </div>
-            <p className="text-zinc-400 text-sm">
+            <p className="text-text-muted text-sm">
               Press <KBD>Esc</KBD> to play again
             </p>
           </div>

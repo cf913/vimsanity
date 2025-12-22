@@ -93,12 +93,12 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = () => {
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="text-center">
-        <p className="text-zinc-400">
-          Use <kbd className="px-2 py-1 bg-zinc-800 rounded">I</kbd> to insert
-          at line start, <kbd className="px-2 py-1 bg-zinc-800 rounded">A</kbd>{' '}
+        <p className="text-text-muted">
+          Use <kbd className="px-2 py-1 bg-bg-secondary rounded">I</kbd> to insert
+          at line start, <kbd className="px-2 py-1 bg-bg-secondary rounded">A</kbd>{' '}
           to append at line end,{' '}
-          <kbd className="px-2 py-1 bg-zinc-800 rounded">o</kbd> to open line
-          below, and <kbd className="px-2 py-1 bg-zinc-800 rounded">O</kbd> to
+          <kbd className="px-2 py-1 bg-bg-secondary rounded">o</kbd> to open line
+          below, and <kbd className="px-2 py-1 bg-bg-secondary rounded">O</kbd> to
           open line above.
         </p>
       </div>
@@ -109,10 +109,10 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = () => {
 
         <button
           onClick={resetLevel}
-          className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
+          className="bg-bg-secondary p-2 rounded-lg hover:bg-bg-tertiary transition-colors"
           aria-label="Reset Level"
         >
-          <RefreshCw size={18} className="text-zinc-400" />
+          <RefreshCw size={18} className="text-text-muted" />
         </button>
         {/* Mode indicator */}
         <ModeIndicator isInsertMode={isInsertMode} />
@@ -162,7 +162,7 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = () => {
           <h3 className="text-xl font-bold text-emerald-400">
             Level Complete!
           </h3>
-          <p className="text-zinc-300">
+          <p className="text-text-secondary">
             You've mastered line position insert commands!
           </p>
         </div>

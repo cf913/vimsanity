@@ -765,7 +765,7 @@ export default function TextObjectLevel14() {
         </h2>
         <button
           onClick={handleRestart}
-          className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors border border-zinc-700"
+          className="p-2 rounded-lg bg-bg-secondary hover:bg-bg-tertiary transition-colors border border-border-primary"
           title="Restart Level"
         >
           <RefreshCw className="w-5 h-5 text-slate-400" />
@@ -788,7 +788,7 @@ export default function TextObjectLevel14() {
       </div>
 
       {/* Character Grid Display */}
-      <div className="bg-zinc-900 rounded-xl p-8 border-2 border-zinc-700 shadow-2xl max-w-full overflow-x-auto">
+      <div className="bg-bg-primary rounded-xl p-8 border-2 border-border-primary shadow-2xl max-w-full overflow-x-auto">
         <div className="space-y-2 font-mono">
           {lines.map((line) => {
             const lineSquares = line.words.flat()
@@ -840,7 +840,7 @@ export default function TextObjectLevel14() {
                       } else if (square.isTarget) {
                         baseClass += 'bg-red-500 text-white shadow-md '
                       } else {
-                        baseClass += 'bg-zinc-700 text-zinc-300 '
+                        baseClass += 'bg-bg-tertiary text-text-secondary '
                       }
 
                       return (
@@ -903,7 +903,7 @@ export default function TextObjectLevel14() {
       )}
 
       {/* Text Objects vs Motion-Based Deletion */}
-      <div className="bg-zinc-800/50 rounded-xl p-6 border border-zinc-700 max-w-4xl">
+      <div className="bg-bg-secondary/50 rounded-xl p-6 border border-border-primary max-w-4xl">
         <h3 className="text-lg font-semibold text-blue-400 mb-4 text-center">
           Text Objects (<KBD>diw</KBD>/<KBD>daw</KBD>) vs Motion-Based Deletion
           (<KBD>dw</KBD>)
@@ -918,7 +918,7 @@ export default function TextObjectLevel14() {
                 delete word (motion-based)
               </span>
             </div>
-            <div className="bg-zinc-900 rounded-lg p-3 space-y-2">
+            <div className="bg-bg-primary rounded-lg p-3 space-y-2">
               <div className="text-xs text-slate-500 mb-1">Example:</div>
               <div className="font-mono text-xs">
                 <div className="text-slate-400">
@@ -960,7 +960,7 @@ export default function TextObjectLevel14() {
                 delete inner word (text object)
               </span>
             </div>
-            <div className="bg-zinc-900 rounded-lg p-3 space-y-2">
+            <div className="bg-bg-primary rounded-lg p-3 space-y-2">
               <div className="text-xs text-slate-500 mb-1">Example:</div>
               <div className="font-mono text-xs">
                 <div className="text-slate-400">
@@ -1003,7 +1003,7 @@ export default function TextObjectLevel14() {
                 delete a word (text object)
               </span>
             </div>
-            <div className="bg-zinc-900 rounded-lg p-3 space-y-2">
+            <div className="bg-bg-primary rounded-lg p-3 space-y-2">
               <div className="text-xs text-slate-500 mb-1">Example:</div>
               <div className="font-mono text-xs">
                 <div className="text-slate-400">
@@ -1039,7 +1039,7 @@ export default function TextObjectLevel14() {
         </div>
 
         {/* Key Difference Summary */}
-        <div className="mt-6 p-4 bg-zinc-900/50 rounded-lg border border-blue-500/30">
+        <div className="mt-6 p-4 bg-bg-primary/50 rounded-lg border border-blue-500/30">
           <h4 className="text-sm font-semibold text-blue-300 mb-2">
             Key Difference:
           </h4>
@@ -1084,7 +1084,7 @@ export default function TextObjectLevel14() {
           animate={{ scale: 1, opacity: 1 }}
           className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50"
         >
-          <div className="bg-zinc-900 rounded-2xl p-12 border-4 border-emerald-500 text-center space-y-6">
+          <div className="bg-bg-primary rounded-2xl p-12 border-4 border-emerald-500 text-center space-y-6">
             <h2 className="text-4xl font-bold text-emerald-400">
               Level Complete! 🎉
             </h2>

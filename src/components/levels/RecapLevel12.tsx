@@ -338,7 +338,7 @@ export default function RecapLevel12() {
             {charAtCursor}
           </>
         ) : (
-          <span className="bg-emerald-400 text-zinc-900 inline-block w-[1ch] text-center">
+          <span className="bg-emerald-400 text-bg-primary inline-block w-[1ch] text-center">
             {charAtCursor === ' ' ? '\u00A0' : charAtCursor}
           </span>
         )}
@@ -379,17 +379,17 @@ export default function RecapLevel12() {
         <h2 className="text-3xl font-bold mb-3 text-emerald-400">
           🎯 Vim Motions Recap
         </h2>
-        <p className="text-zinc-400 text-lg">
+        <p className="text-text-muted text-lg">
           Reference for all vim motions you've learned + variants and some nice
           ones i often use.
         </p>
       </div>
 
-      <div className="mt-12 p-6 bg-zinc-800/50 rounded-lg border border-zinc-700 mb-8">
+      <div className="mt-12 p-6 bg-bg-secondary/50 rounded-lg border border-border-primary mb-8">
         <h4 className="text-lg font-semibold text-emerald-400 mb-3">
           💡 Pro Tips
         </h4>
-        <div className="grid md:grid-cols-2 gap-4 text-sm text-zinc-300">
+        <div className="grid md:grid-cols-2 gap-4 text-sm text-text-secondary">
           <div>
             <strong className="text-emerald-400">Cursor notation:</strong> The{' '}
             <code>|</code> symbol shows cursor position
@@ -418,7 +418,7 @@ export default function RecapLevel12() {
                 <h3 className={`text-2xl font-bold ${colors.header}`}>
                   {category.title}
                 </h3>
-                <div className="h-px bg-gradient-to-r from-zinc-600 to-transparent flex-1" />
+                <div className="h-px bg-gradient-to-r from-border-secondary to-transparent flex-1" />
               </div>
 
               <div className="grid gap-3">
@@ -429,25 +429,25 @@ export default function RecapLevel12() {
                   >
                     <div className="col-span-3 flex gap-2 items-center">
                       <KBD>{motion.command}</KBD>
-                      <span className="text-sm text-zinc-400">
+                      <span className="text-sm text-text-muted">
                         {motion.description}
                       </span>
                     </div>
 
                     <div className="col-span-4">
-                      {/* <div className="text-xs text-zinc-500 mb-1">Before:</div> */}
-                      <pre className="text-sm text-zinc-300 bg-zinc-800/50 px-2 py-1 rounded font-mono whitespace-pre-wrap">
+                      {/* <div className="text-xs text-text-subtle mb-1">Before:</div> */}
+                      <pre className="text-sm text-text-secondary bg-bg-secondary/50 px-2 py-1 rounded font-mono whitespace-pre-wrap">
                         {renderTextWithCursor(motion.before)}
                       </pre>
                     </div>
 
                     <div className="col-span-1 flex justify-center">
-                      <span className="text-zinc-300">→</span>
+                      <span className="text-text-secondary">→</span>
                     </div>
 
                     <div className="col-span-4">
-                      {/* <div className="text-xs text-zinc-500 mb-1">After:</div> */}
-                      <pre className="text-sm text-zinc-300 bg-zinc-800/50 px-2 py-1 rounded font-mono whitespace-pre-wrap">
+                      {/* <div className="text-xs text-text-subtle mb-1">After:</div> */}
+                      <pre className="text-sm text-text-secondary bg-bg-secondary/50 px-2 py-1 rounded font-mono whitespace-pre-wrap">
                         {renderTextWithCursor(motion.after)}
                       </pre>
                     </div>

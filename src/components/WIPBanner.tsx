@@ -134,14 +134,14 @@ const WIPBanner: React.FC<WIPBannerProps> = ({ position = 'corner' }) => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            <div className="bg-gradient-to-r from-zinc-800 to-zinc-900 p-3 rounded-lg shadow-lg border border-emerald-500/30 backdrop-blur-sm">
+            <div className="bg-gradient-to-r from-bg-secondary to-bg-primary p-3 rounded-lg shadow-lg border border-emerald-500/30 backdrop-blur-sm">
               <div className="flex items-center">
                 <motion.div
                   className="w-3 h-3 bg-emerald-500 rounded-full mr-2"
                   variants={dotVariants}
                   animate="pulse"
                 />
-                <div className="text-zinc-100 font-medium mr-2">
+                <div className="text-text-primary font-medium mr-2">
                   <span className="text-emerald-400 font-bold">
                     Work in Progress
                   </span>
@@ -151,7 +151,7 @@ const WIPBanner: React.FC<WIPBannerProps> = ({ position = 'corner' }) => {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                     >
-                      <p className="text-xs text-zinc-300 mt-1">
+                      <p className="text-xs text-text-secondary mt-1">
                         This project is being improved weekly!
                       </p>
                       <motion.button
@@ -167,7 +167,7 @@ const WIPBanner: React.FC<WIPBannerProps> = ({ position = 'corner' }) => {
                   )}
                 </div>
                 <motion.button
-                  className="text-zinc-400 hover:text-zinc-200 p-1 rounded-full ml-auto"
+                  className="text-text-muted hover:text-text-primary p-1 rounded-full ml-auto"
                   whileHover={{ scale: 1.1, rotate: 90 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setIsVisible(false)}

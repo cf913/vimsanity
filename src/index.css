@@ -1,5 +1,107 @@
 @import 'tailwindcss';
 
+/* ============================================
+   THEME SYSTEM - CSS Variables
+   ============================================ */
+
+/* Dark Theme (Default) */
+:root {
+  /* Backgrounds */
+  --bg-primary: #18181b;      /* zinc-900 */
+  --bg-secondary: #27272a;    /* zinc-800 */
+  --bg-tertiary: #3f3f46;     /* zinc-700 */
+  --bg-hover: #52525b;        /* zinc-600 */
+
+  /* Text */
+  --text-primary: #f4f4f5;    /* zinc-100 */
+  --text-secondary: #d4d4d8;  /* zinc-300 */
+  --text-muted: #a1a1aa;      /* zinc-400 */
+  --text-subtle: #71717a;     /* zinc-500 */
+
+  /* Borders */
+  --border-primary: #3f3f46;  /* zinc-700 */
+  --border-secondary: #52525b;/* zinc-600 */
+
+  /* Shadows */
+  --shadow-color: 0, 0, 0;
+  --shadow-opacity: 0.3;
+
+  /* RGB versions for rgba() usage in inline styles */
+  --bg-primary-rgb: 24, 24, 27;
+  --bg-secondary-rgb: 39, 39, 42;
+  --bg-tertiary-rgb: 63, 63, 70;
+  --text-primary-rgb: 244, 244, 245;
+  --accent-emerald-rgb: 16, 185, 129;
+  --accent-purple-rgb: 168, 85, 247;
+  --accent-amber-rgb: 245, 158, 11;
+  --accent-orange-rgb: 249, 115, 22;
+  --accent-red-rgb: 239, 68, 68;
+  --accent-blue-rgb: 59, 130, 246;
+  --accent-cyan-rgb: 6, 182, 212;
+}
+
+/* Light Theme */
+[data-theme="light"] {
+  /* Backgrounds */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f4f4f5;    /* zinc-100 */
+  --bg-tertiary: #e4e4e7;     /* zinc-200 */
+  --bg-hover: #d4d4d8;        /* zinc-300 */
+
+  /* Text */
+  --text-primary: #18181b;    /* zinc-900 */
+  --text-secondary: #3f3f46;  /* zinc-700 */
+  --text-muted: #52525b;      /* zinc-600 */
+  --text-subtle: #71717a;     /* zinc-500 */
+
+  /* Borders */
+  --border-primary: #e4e4e7;  /* zinc-200 */
+  --border-secondary: #d4d4d8;/* zinc-300 */
+
+  /* Shadows */
+  --shadow-color: 0, 0, 0;
+  --shadow-opacity: 0.08;
+
+  /* RGB versions for rgba() usage */
+  --bg-primary-rgb: 255, 255, 255;
+  --bg-secondary-rgb: 244, 244, 245;
+  --bg-tertiary-rgb: 228, 228, 231;
+  --text-primary-rgb: 24, 24, 27;
+}
+
+/* Connect CSS variables to Tailwind via @theme */
+@theme {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-tertiary: var(--bg-tertiary);
+  --color-bg-hover: var(--bg-hover);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+
+  --color-border-primary: var(--border-primary);
+  --color-border-secondary: var(--border-secondary);
+}
+
+/* Smooth theme transitions */
+*,
+*::before,
+*::after {
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease, box-shadow 200ms ease;
+}
+
+/* Disable transitions for animations and transforms to prevent conflicts */
+.no-transition,
+[data-no-transition] {
+  transition: none !important;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
@@ -14,9 +116,13 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+    border-color: var(--border-primary);
   }
 }
+
+/* ============================================
+   SEARCH FUNCTIONALITY STYLES
+   ============================================ */
 
 /* Custom styles for search functionality */
 .searching input:focus {
@@ -31,7 +137,7 @@ body.searching * {
 
 body.searching input {
   caret-color: #10b981;
-  color: white;
+  color: var(--text-primary);
 }
 
 /* Make sure the input has proper z-index */

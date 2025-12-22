@@ -169,14 +169,14 @@ export function Cell({
       key={cell.id}
       className={`relative flex flex-col justify-center items-center p-4 rounded-lg transition-all duration-200 ${
         isActive
-          ? 'bg-zinc-700 ring-2 ring-emerald-500 shadow-lg'
-          : 'bg-zinc-800'
+          ? 'bg-bg-tertiary ring-2 ring-emerald-500 shadow-lg'
+          : 'bg-bg-secondary'
       } ${cell.completed ? 'border-2 border-emerald-500' : ''}`}
     >
       <div className="text-2xl font-mono mb-2 min-h-[2rem]">
         {isActive ? <TextEditor {...textEditorProps} /> : text || '\u00A0'}
       </div>
-      <div className="text-sm text-zinc-400 absolute bottom-2">
+      <div className="text-sm text-text-muted absolute bottom-2">
         Expected: {cell.expected}
       </div>
       {cell.completed && (

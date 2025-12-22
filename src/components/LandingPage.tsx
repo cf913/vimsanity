@@ -92,7 +92,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
   })
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-zinc-900 to-zinc-800 text-zinc-100 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-10 overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-bg-primary to-bg-secondary text-text-primary px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-10 overflow-hidden">
       <div
         className="fixed inset-0 w-full h-full overflow-hidden z-0"
         style={{
@@ -193,7 +193,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             </motion.div>
 
             <motion.p
-              className="text-xl sm:text-2xl text-zinc-300 mt-4 max-w-2xl mx-auto leading-relaxed"
+              className="text-xl sm:text-2xl text-text-secondary mt-4 max-w-2xl mx-auto leading-relaxed"
               variants={item}
             >
               Learn Vim motions the fun way
@@ -221,7 +221,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 ].map((feature, index) => (
                   <motion.div
                     key={index}
-                    className="bg-zinc-800/80 backdrop-blur-sm p-5 rounded-xl border border-zinc-700/50 shadow-lg transform transition-all"
+                    className="bg-bg-secondary/80 backdrop-blur-sm p-5 rounded-xl border border-border-primary/50 shadow-lg transform transition-all"
                     variants={item}
                     whileHover={featureCardVariants.hover}
                     initial={{ opacity: 0, y: 10 }}
@@ -234,7 +234,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                     <h3 className="text-lg font-medium text-emerald-400 mb-2">
                       {feature.title}
                     </h3>
-                    <p className="text-zinc-400">{feature.description}</p>
+                    <p className="text-text-muted">{feature.description}</p>
                   </motion.div>
                 ))}
               </motion.div>
@@ -242,12 +242,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
             <motion.div className="mt-8" variants={item}>
               <motion.div
-                className="mb-4 max-w-lg mx-auto text-center p-3 rounded-lg bg-zinc-800/60 border border-zinc-700/50 backdrop-blur-sm"
+                className="mb-4 max-w-lg mx-auto text-center p-3 rounded-lg bg-bg-secondary/60 border border-border-primary/50 backdrop-blur-sm"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2, duration: 0.3 }}
               >
-                <p className="text-zinc-300 text-sm">
+                <p className="text-text-secondary text-sm">
                   Type less. Move faster. Have fun.
                 </p>
               </motion.div>
@@ -282,12 +282,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
       {/* SEO-friendly footer with additional info */}
       <motion.footer
-        className="fixed bottom-0 left-0 right-0 py-3 sm:py-5 w-full backdrop-blur-sm bg-zinc-900/30"
+        className="fixed bottom-0 left-0 right-0 py-3 sm:py-5 w-full backdrop-blur-sm bg-bg-primary/30"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="text-center text-zinc-500 text-sm">
+        <div className="text-center text-text-subtle text-sm">
           <p>VimSanity - Learn Vim Motions Fast</p>
         </div>
       </motion.footer>

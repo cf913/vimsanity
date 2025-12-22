@@ -68,26 +68,26 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = () => {
   return (
     <div className="w-full">
       <div className="text-center mb-4">
-        <p className="text-zinc-400">
+        <p className="text-text-muted">
           Vim Playground - {mode === 'normal' ? 'Normal Mode' : 'Insert Mode'}
         </p>
       </div>
 
-      <div className="relative w-full max-w-2xl bg-zinc-800 p-6 rounded-lg">
+      <div className="relative w-full max-w-2xl bg-bg-secondary p-6 rounded-lg">
         <TextEditor {...editorProps} />
       </div>
 
       <div className="mt-8">
         {/* Position display */}
         <div className="mt-4 flex justify-between items-center">
-          <div className="text-sm text-zinc-400">
+          <div className="text-sm text-text-muted">
             <p>
               Normal mode: h,j,k,l (movement), w,e,b (word nav), 0,$ (line nav),
               i (insert), x (delete), dd (delete line)
             </p>
             <p>Insert mode: Type to insert text, Escape to exit</p>
           </div>
-          <div className="px-3 py-1 bg-zinc-700 rounded text-zinc-300 text-sm font-mono">
+          <div className="px-3 py-1 bg-bg-tertiary rounded text-text-secondary text-sm font-mono">
             {(() => {
               // Calculate current row (1-indexed for display)
               const rowEndIndices = []
@@ -120,11 +120,11 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = () => {
         </div>
       </div>
 
-      <div className="flex gap-4 text-zinc-400 mt-4 justify-center">
+      <div className="flex gap-4 text-text-muted mt-4 justify-center">
         {mode === 'normal' ? (
           <>
             <kbd
-              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+              className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
                 lastKeyPressed === 'h'
                   ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
                   : ''
@@ -133,7 +133,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = () => {
               h
             </kbd>
             <kbd
-              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+              className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
                 lastKeyPressed === 'j'
                   ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
                   : ''
@@ -142,7 +142,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = () => {
               j
             </kbd>
             <kbd
-              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+              className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
                 lastKeyPressed === 'k'
                   ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
                   : ''
@@ -151,7 +151,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = () => {
               k
             </kbd>
             <kbd
-              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+              className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
                 lastKeyPressed === 'l'
                   ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
                   : ''
@@ -160,7 +160,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = () => {
               l
             </kbd>
             <kbd
-              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+              className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
                 lastKeyPressed === 'i'
                   ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
                   : ''
@@ -169,7 +169,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = () => {
               i
             </kbd>
             <kbd
-              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+              className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
                 lastKeyPressed === 'x'
                   ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
                   : ''
@@ -178,7 +178,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = () => {
               x
             </kbd>
             <kbd
-              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+              className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
                 lastKeyPressed === 'd'
                   ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
                   : ''
@@ -187,7 +187,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = () => {
               d
             </kbd>
             <kbd
-              className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+              className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
                 lastKeyPressed === 'd'
                   ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
                   : ''
@@ -198,7 +198,7 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = () => {
           </>
         ) : (
           <kbd
-            className={`px-3 py-1 bg-zinc-800 rounded-lg transition-all duration-150 ${
+            className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
               lastKeyPressed === 'Escape'
                 ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
                 : ''

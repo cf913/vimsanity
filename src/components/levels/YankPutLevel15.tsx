@@ -585,7 +585,7 @@ export default function YankPutLevel15() {
         <h2 className="text-2xl font-bold mb-2 text-amber-400">
           Yank & Put (Copy & Paste)
         </h2>
-        <p className="text-zinc-400 px-2">
+        <p className="text-text-muted px-2">
           Use <KBD>yy</KBD> to yank a line, <KBD>yw</KBD> to yank a word,{' '}
           <KBD>p</KBD> to paste after, <KBD>P</KBD> to paste before
         </p>
@@ -595,18 +595,18 @@ export default function YankPutLevel15() {
         <Scoreboard score={score} maxScore={MAX_SCORE} />
         <button
           onClick={handleRestart}
-          className="bg-zinc-800 p-3 rounded-lg hover:bg-zinc-700 transition-colors"
+          className="bg-bg-secondary p-3 rounded-lg hover:bg-bg-tertiary transition-colors"
           aria-label="Reset Level"
         >
-          <RefreshCw size={18} className="text-zinc-400" />
+          <RefreshCw size={18} className="text-text-muted" />
         </button>
         <ModeIndicator isInsertMode={mode === VIM_MODES.INSERT} />
       </div>
 
       {/* Clipboard Indicator */}
       <motion.div
-        className={`bg-zinc-800 rounded-lg p-4 border-2 ${
-          yankBuffer ? 'border-amber-500/50' : 'border-zinc-600'
+        className={`bg-bg-secondary rounded-lg p-4 border-2 ${
+          yankBuffer ? 'border-amber-500/50' : 'border-border-secondary'
         } min-w-[300px]`}
         animate={showYankAnimation ? { scale: [1, 1.05, 1] } : {}}
         transition={{ duration: 0.3 }}
@@ -614,13 +614,13 @@ export default function YankPutLevel15() {
         <div className="flex items-center gap-2 mb-1">
           <Clipboard
             size={16}
-            className={yankBuffer ? 'text-amber-400' : 'text-zinc-500'}
+            className={yankBuffer ? 'text-amber-400' : 'text-text-subtle'}
           />
-          <span className="text-xs text-zinc-400 uppercase tracking-wide">
+          <span className="text-xs text-text-muted uppercase tracking-wide">
             Clipboard
           </span>
           {yankType && (
-            <span className="text-xs text-zinc-500 ml-auto">
+            <span className="text-xs text-text-subtle ml-auto">
               [{yankType === 'line' ? 'LINE' : 'WORD'}]
             </span>
           )}
@@ -635,13 +635,13 @@ export default function YankPutLevel15() {
               "
             </span>
           ) : (
-            <span className="text-zinc-600 italic">empty</span>
+            <span className="text-border-secondary italic">empty</span>
           )}
         </div>
       </motion.div>
 
       {/* Grid */}
-      <div className="bg-zinc-800 rounded-lg border-2 border-zinc-600">
+      <div className="bg-bg-secondary rounded-lg border-2 border-border-secondary">
         <div className="grid gap-1 p-6">
           {grid.map((row, rowIdx) => (
             <div key={rowIdx} className="flex gap-1" data-row={rowIdx}>
@@ -666,7 +666,7 @@ export default function YankPutLevel15() {
                             ? 'bg-cyan-900/30 border border-dashed border-cyan-500/50 text-cyan-400'
                             : isSource && !isCursor
                               ? 'bg-amber-900/30 text-amber-300'
-                              : 'bg-zinc-700 text-zinc-300'
+                              : 'bg-bg-tertiary text-text-secondary'
                       }
                     `}
                     animate={
@@ -691,7 +691,7 @@ export default function YankPutLevel15() {
         </div>
 
         {/* Command Line */}
-        <div className="bg-zinc-900 rounded-b-lg px-4 py-2 border-t border-zinc-600 font-mono text-sm min-h-[2.5rem] flex items-center">
+        <div className="bg-bg-primary rounded-b-lg px-4 py-2 border-t border-border-secondary font-mono text-sm min-h-[2.5rem] flex items-center">
           {pendingCommand && (
             <span className="text-yellow-300">
               {pendingCommand}
@@ -699,33 +699,33 @@ export default function YankPutLevel15() {
             </span>
           )}
           {!pendingCommand && (
-            <span className="text-zinc-500">-- NORMAL --</span>
+            <span className="text-text-subtle">-- NORMAL --</span>
           )}
         </div>
       </div>
 
       {/* Instructions */}
-      <div className="bg-zinc-800 rounded-lg p-4 max-w-2xl">
+      <div className="bg-bg-secondary rounded-lg p-4 max-w-2xl">
         <div className="grid grid-cols-4 gap-4 text-sm mb-3">
           <div className="text-center">
             <div className="text-amber-400 font-bold">yy</div>
-            <div className="text-xs text-zinc-400">Yank line</div>
+            <div className="text-xs text-text-muted">Yank line</div>
           </div>
           <div className="text-center">
             <div className="text-amber-400 font-bold">yw</div>
-            <div className="text-xs text-zinc-400">Yank word</div>
+            <div className="text-xs text-text-muted">Yank word</div>
           </div>
           <div className="text-center">
             <div className="text-cyan-400 font-bold">p</div>
-            <div className="text-xs text-zinc-400">Put after</div>
+            <div className="text-xs text-text-muted">Put after</div>
           </div>
           <div className="text-center">
             <div className="text-cyan-400 font-bold">P</div>
-            <div className="text-xs text-zinc-400">Put before</div>
+            <div className="text-xs text-text-muted">Put before</div>
           </div>
         </div>
 
-        <div className="text-xs text-zinc-500 text-center">
+        <div className="text-xs text-text-subtle text-center">
           <span className="text-amber-400/70">Amber</span> = source to copy |{' '}
           <span className="text-cyan-400/70">Cyan dashed</span> = paste target |{' '}
           <KBD>u</KBD> to undo
@@ -733,9 +733,9 @@ export default function YankPutLevel15() {
       </div>
 
       {/* Tasks */}
-      <div className="bg-zinc-800/50 rounded-lg p-4 max-w-2xl">
-        <h3 className="text-sm font-semibold text-zinc-300 mb-2">Tasks:</h3>
-        <ol className="text-sm text-zinc-400 space-y-1 list-decimal list-inside">
+      <div className="bg-bg-secondary/50 rounded-lg p-4 max-w-2xl">
+        <h3 className="text-sm font-semibold text-text-secondary mb-2">Tasks:</h3>
+        <ol className="text-sm text-text-muted space-y-1 list-decimal list-inside">
           <li
             className={
               completedTargets.has('line-paste')
@@ -771,18 +771,18 @@ export default function YankPutLevel15() {
       {/* Level completion */}
       {levelCompleted && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-zinc-800 rounded-lg p-8 text-center max-w-md">
+          <div className="bg-bg-secondary rounded-lg p-8 text-center max-w-md">
             <h2 className="text-3xl font-bold mb-4 text-amber-400">
               Level Complete!
             </h2>
-            <p className="text-zinc-300 mb-6">
+            <p className="text-text-secondary mb-6">
               You've mastered Vim's yank and put commands! You can now copy and
               paste text like a pro.
             </p>
             <div className="text-2xl font-bold text-green-400 mb-4">
               Score: {score}/{MAX_SCORE}
             </div>
-            <p className="text-zinc-400 text-sm">
+            <p className="text-text-muted text-sm">
               Press <KBD>Esc</KBD> to play again
             </p>
           </div>
@@ -800,7 +800,7 @@ export default function YankPutLevel15() {
       {/* Feedback Message */}
       {feedbackMessage && (
         <motion.div
-          className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 p-3 bg-zinc-800 border border-amber-500/50 rounded-lg max-w-md backdrop-blur-sm"
+          className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 p-3 bg-bg-secondary border border-amber-500/50 rounded-lg max-w-md backdrop-blur-sm"
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}

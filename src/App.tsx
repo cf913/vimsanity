@@ -6,6 +6,7 @@ import GameArea from './components/GameArea'
 import LandingPage from './components/LandingPage'
 import MobileWarning from './components/MobileWarning'
 import WIPBanner from './components/WIPBanner'
+import ThemeToggle from './components/common/ThemeToggle'
 import { Analytics } from '@vercel/analytics/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { isMobile } from './utils/isMobile'
@@ -18,6 +19,7 @@ const STORAGE_KEYS = {
   CURRENT_LEVEL: 'vimsanity-current-level',
   IS_MUTED: 'vimsanity-is-muted',
   SHOW_MOBILE_WARNING: 'vimsanity-show-mobile-warning',
+  THEME: 'vimsanity-theme',
 }
 
 function App() {
@@ -50,6 +52,11 @@ function App() {
   const [isMuted, setIsMuted] = useState(() => {
     const savedValue = localStorage.getItem(STORAGE_KEYS.IS_MUTED)
     return savedValue !== null ? savedValue === 'true' : false
+  })
+
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    const savedValue = localStorage.getItem(STORAGE_KEYS.THEME)
+    return savedValue === 'light' ? 'light' : 'dark' // Default to dark
   })
 
   // Save state changes to localStorage
@@ -85,6 +92,16 @@ function App() {
       showMobileWarning.toString(),
     )
   }, [showMobileWarning])
+
+  // Apply theme to document and persist
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem(STORAGE_KEYS.THEME, theme)
+  }, [theme])
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))
+  }
 
   // Custom state setters that update both state and localStorage
   const onCloseSidebar = () => {
@@ -142,12 +159,12 @@ function App() {
 
   // Otherwise render the game interface
   return (
-    <div className="min-h-screen bg-zinc-900 text-zinc-100 flex overflow-hidden">
+    <div className="min-h-screen bg-bg-primary text-text-primary flex overflow-hidden">
       {/* Left Sidebar with AnimatePresence for smooth transitions */}
       <AnimatePresence mode="wait">
         {isSidebarOpen && (
           <motion.div
-            className="fixed h-full bg-zinc-800 z-50 w-64 shadow-xl"
+            className="fixed h-full bg-bg-secondary z-50 w-64 shadow-xl"
             initial={{ x: -320 }}
             animate={{ x: 0 }}
             exit={{ x: -320 }}
@@ -163,6 +180,8 @@ function App() {
               setCurrentLevel={setCurrentLevel}
               isMuted={isMuted}
               setIsMuted={setIsMuted}
+              theme={theme}
+              onToggleTheme={toggleTheme}
               onClose={onCloseSidebar}
               onReturnToLanding={handleReturnToLanding}
             />
@@ -174,7 +193,7 @@ function App() {
       <AnimatePresence mode="wait">
         {isDocSidebarOpen && (
           <motion.div
-            className="fixed h-full bg-zinc-800 z-50 w-72 shadow-xl right-0"
+            className="fixed h-full bg-bg-secondary z-50 w-72 shadow-xl right-0"
             initial={{ x: 320 }}
             animate={{ x: 0 }}
             exit={{ x: 320 }}
@@ -229,7 +248,7 @@ function App() {
         {/* Left sidebar toggle button */}
         <motion.button
           onClick={onToggleSidebar}
-          className="fixed top-4 left-4 z-50 p-2 bg-zinc-700 rounded-md hover:bg-zinc-600 shadow-md"
+          className="fixed top-4 left-4 z-50 p-2 bg-bg-tertiary rounded-md hover:bg-bg-hover shadow-md"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           initial={false}
@@ -247,10 +266,15 @@ function App() {
           {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </motion.button>
 
+        {/* Theme toggle button */}
+        <div className="fixed top-4 right-16 z-50">
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
+        </div>
+
         {/* Right documentation sidebar toggle button */}
         <motion.button
           onClick={onToggleDocSidebar}
-          className="fixed top-4 right-4 z-50 p-2 bg-zinc-700 rounded-md hover:bg-zinc-600 shadow-md"
+          className="fixed top-4 right-4 z-50 p-2 bg-bg-tertiary rounded-md hover:bg-bg-hover shadow-md"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           initial={false}

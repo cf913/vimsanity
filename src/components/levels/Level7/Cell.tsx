@@ -59,14 +59,14 @@ export function Cell7({
       key={cell.id}
       className={`relative p-4 rounded-lg transition-all duration-200 ${
         isActive
-          ? 'bg-zinc-700 ring-2 ring-emerald-500 shadow-lg'
-          : 'bg-zinc-800'
+          ? 'bg-bg-tertiary ring-2 ring-emerald-500 shadow-lg'
+          : 'bg-bg-secondary'
       } ${cell.completed ? 'border-2 border-emerald-500' : ''}`}
     >
       <div className="text-xl font-mono mb-2 min-h-[2rem]">
         {isActive ? <TextEditor {...textEditorProps} /> : text || '\u00A0'}
       </div>
-      <div className="text-sm text-zinc-400 mt-2 border-t border-zinc-700 pt-2">
+      <div className="text-sm text-text-muted mt-2 border-t border-border-primary pt-2">
         <div className="font-semibold mb-1">Expected:</div>
         <div className="whitespace-pre-wrap">
           {cell.expected.split('\n').map((part, i, arr) => (

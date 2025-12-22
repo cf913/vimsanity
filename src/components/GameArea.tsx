@@ -118,13 +118,13 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
         >
           {/* Sparkle animation */}
           {/* Only a single emerald star accent, no background sparkles */}
-          <div className="relative z-10 bg-zinc-900 bg-opacity-95 rounded-2xl shadow-2xl border-2 border-emerald-500 p-8 max-w-md w-full flex flex-col items-center animate-scale-in font-mono">
+          <div className="relative z-10 bg-bg-primary bg-opacity-95 rounded-2xl shadow-2xl border-2 border-emerald-500 p-8 max-w-md w-full flex flex-col items-center animate-scale-in font-mono">
             <div
-              className="text-slate-300 text-base mb-5 leading-relaxed w-full text-left"
+              className="text-text-secondary text-base mb-5 leading-relaxed w-full text-left"
               dangerouslySetInnerHTML={{ __html: CHANGELOG_MESSAGE }}
             />
             <button
-              className="mt-4 px-6 py-2 bg-zinc-800 border-2 border-emerald-500 text-emerald-400 font-semibold rounded-xl shadow hover:bg-zinc-700 hover:text-emerald-300 transition-all duration-200 text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50 active:scale-95"
+              className="mt-4 px-6 py-2 bg-bg-secondary border-2 border-emerald-500 text-emerald-400 font-semibold rounded-xl shadow hover:bg-bg-tertiary hover:text-emerald-300 transition-all duration-200 text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50 active:scale-95"
               onClick={dismissChangelog}
               autoFocus
             >

@@ -879,7 +879,7 @@ export default function AdvancedDeleteLevel11() {
         <h2 className="text-2xl font-bold mb-2 text-purple-400">
           Advanced Delete Operations
         </h2>
-        <p className="text-zinc-400 px-2">
+        <p className="text-text-muted px-2">
           Use <KBD>dw</KBD> to delete words, <KBD>dd</KBD> to delete lines,{' '}
           <KBD>D</KBD> to delete to end, <KBD>dh</KBD> to delete left, and{' '}
           <KBD>dl</KBD> to delete under cursor
@@ -890,16 +890,16 @@ export default function AdvancedDeleteLevel11() {
         <Scoreboard score={score} maxScore={MAX_SCORE} />
         <button
           onClick={handleRestart}
-          className="bg-zinc-800 p-3 rounded-lg hover:bg-zinc-700 transition-colors"
+          className="bg-bg-secondary p-3 rounded-lg hover:bg-bg-tertiary transition-colors"
           aria-label="Reset Level"
         >
-          <RefreshCw size={18} className="text-zinc-400" />
+          <RefreshCw size={18} className="text-text-muted" />
         </button>
         <ModeIndicator isInsertMode={mode === VIM_MODES.INSERT} />
       </div>
 
       {/* Grid */}
-      <div className="bg-zinc-800 rounded-lg border-2 border-zinc-600">
+      <div className="bg-bg-secondary rounded-lg border-2 border-border-secondary">
         <div className="grid gap-1 p-6">
           {grid.map((row, rowIdx) => (
             <div key={rowIdx} className="flex gap-1">
@@ -927,13 +927,13 @@ export default function AdvancedDeleteLevel11() {
                     ${
                       isCursor
                         ? `${cursorBg} text-black scale-110 shadow-lg ring-2 ${cursorRing}`
-                        : 'bg-zinc-700'
+                        : 'bg-bg-tertiary'
                     }
                     ${
                       targetInfo && !isCursor
                         ? `${targetInfo.color} font-bold ring-1 ${targetInfo.ring}`
                         : !isCursor
-                          ? 'text-zinc-300'
+                          ? 'text-text-secondary'
                           : 'text-black'
                     }
                     ${
@@ -957,7 +957,7 @@ export default function AdvancedDeleteLevel11() {
         </div>
 
         {/* Command Line (vim-style) */}
-        <div className="bg-zinc-900 rounded-b-lg px-4 py-2 border-t border-zinc-600 font-mono text-sm min-h-[2.5rem] flex items-center">
+        <div className="bg-bg-primary rounded-b-lg px-4 py-2 border-t border-border-secondary font-mono text-sm min-h-[2.5rem] flex items-center">
           {pendingCommand && (
             <span className="text-yellow-300">
               :{pendingCommand}
@@ -971,50 +971,50 @@ export default function AdvancedDeleteLevel11() {
             </span>
           )}
           {!pendingCommand && !pendingFindCommand && (
-            <span className="text-zinc-500">-- NORMAL --</span>
+            <span className="text-text-subtle">-- NORMAL --</span>
           )}
         </div>
       </div>
 
       {/* Instructions */}
-      <div className="bg-zinc-800 rounded-lg p-4 max-w-4xl">
+      <div className="bg-bg-secondary rounded-lg p-4 max-w-4xl">
         <div className="grid grid-cols-5 gap-4 text-sm mb-3">
           <div className="text-center">
             <div className="text-blue-400 font-bold">dw</div>
-            <div className="text-xs text-zinc-400">Delete to end of word</div>
+            <div className="text-xs text-text-muted">Delete to end of word</div>
           </div>
           <div className="text-center">
             <div className="text-orange-400 font-bold">dd</div>
-            <div className="text-xs text-zinc-400">Delete entire line</div>
+            <div className="text-xs text-text-muted">Delete entire line</div>
           </div>
           <div className="text-center">
             <div className="text-purple-400 font-bold">D</div>
-            <div className="text-xs text-zinc-400">Delete to end of line</div>
+            <div className="text-xs text-text-muted">Delete to end of line</div>
           </div>
           <div className="text-center">
             <div className="text-red-400 font-bold">dh</div>
-            <div className="text-xs text-zinc-400">Delete character left</div>
+            <div className="text-xs text-text-muted">Delete character left</div>
           </div>
           <div className="text-center">
             <div className="text-green-400 font-bold">dl</div>
-            <div className="text-xs text-zinc-400">
+            <div className="text-xs text-text-muted">
               Delete char under cursor
             </div>
           </div>
         </div>
         
         {/* Philosophy Section */}
-        <div className="mt-6 bg-zinc-700/50 rounded-lg p-4 text-sm">
+        <div className="mt-6 bg-bg-tertiary/50 rounded-lg p-4 text-sm">
           <h3 className="text-emerald-400 font-semibold mb-3">Vim's Delete Philosophy: Operators + Motions</h3>
-          <p className="text-zinc-300 mb-3">
+          <p className="text-text-secondary mb-3">
             In Vim, <span className="text-blue-400 font-mono">d</span> is a <strong>delete operator</strong> that combines with <strong>motions</strong> to create powerful commands. 
             The pattern is: <span className="text-yellow-300 font-mono">operator + motion = action</span>
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
             <div>
-              <p className="text-zinc-400 font-medium mb-2">More delete combinations:</p>
-              <ul className="text-zinc-300 space-y-1 text-xs">
+              <p className="text-text-muted font-medium mb-2">More delete combinations:</p>
+              <ul className="text-text-secondary space-y-1 text-xs">
                 <li><span className="text-orange-400 font-mono">dj</span> - Delete current and next line</li>
                 <li><span className="text-orange-400 font-mono">dk</span> - Delete current and previous line</li>
                 <li><span className="text-blue-400 font-mono">db</span> - Delete back to word start</li>
@@ -1024,8 +1024,8 @@ export default function AdvancedDeleteLevel11() {
             </div>
             
             <div>
-              <p className="text-zinc-400 font-medium mb-2">Change operator (c):</p>
-              <ul className="text-zinc-300 space-y-1 text-xs">
+              <p className="text-text-muted font-medium mb-2">Change operator (c):</p>
+              <ul className="text-text-secondary space-y-1 text-xs">
                 <li><span className="text-green-400 font-mono">cw</span> - Change word (delete + insert mode)</li>
                 <li><span className="text-green-400 font-mono">ch</span> - Change character left</li>
                 <li><span className="text-green-400 font-mono">cl</span> - Change character under cursor</li>
@@ -1035,7 +1035,7 @@ export default function AdvancedDeleteLevel11() {
             </div>
           </div>
           
-          <p className="text-zinc-400 text-xs italic">
+          <p className="text-text-muted text-xs italic">
             💡 The key difference: <span className="text-red-400">d</span> deletes and stays in normal mode, 
             <span className="text-green-400">c</span> deletes and enters insert mode for immediate editing.
           </p>
@@ -1045,18 +1045,18 @@ export default function AdvancedDeleteLevel11() {
       {/* Level completion */}
       {levelCompleted && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-zinc-800 rounded-lg p-8 text-center max-w-md">
+          <div className="bg-bg-secondary rounded-lg p-8 text-center max-w-md">
             <h2 className="text-3xl font-bold mb-4 text-purple-400">
               🎉 Level Complete!
             </h2>
-            <p className="text-zinc-300 mb-6">
+            <p className="text-text-secondary mb-6">
               Excellent! You've mastered advanced delete operations. You can now
               delete words, lines, and text to end of line!
             </p>
             <div className="text-2xl font-bold text-green-400 mb-4">
               Score: {score}/{MAX_SCORE}
             </div>
-            <p className="text-zinc-400 text-sm">
+            <p className="text-text-muted text-sm">
               Press <KBD>Esc</KBD> to play again
             </p>
           </div>

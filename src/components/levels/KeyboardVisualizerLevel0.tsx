@@ -190,7 +190,7 @@ const KeyboardVisualizerLevel0: React.FC<
           <h2 className="text-4xl font-bold mb-3 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">
             Vim Command Explorer
           </h2>
-          <p className="text-zinc-400 text-lg">
+          <p className="text-text-muted text-lg">
             Press any key to discover what it does in Vim
           </p>
         </div>
@@ -208,13 +208,13 @@ const KeyboardVisualizerLevel0: React.FC<
         </div>
 
         {/* Info text */}
-        <div className="bg-zinc-900/50 rounded-xl border border-zinc-700/50 p-4 mb-8 backdrop-blur-sm">
+        <div className="bg-bg-primary/50 rounded-xl border border-border-primary/50 p-4 mb-8 backdrop-blur-sm">
           <div className="grid md:grid-cols-2 gap-4 text-sm">
             <div>
               <span className="text-emerald-400 font-semibold">
                 💡 How it works:
               </span>
-              <p className="text-zinc-400 mt-1">
+              <p className="text-text-muted mt-1">
                 Press any key on your keyboard to see what it does in the
                 selected Vim mode. Highlighted keys show commands available at
                 your proficiency level.
@@ -224,7 +224,7 @@ const KeyboardVisualizerLevel0: React.FC<
               <span className="text-blue-400 font-semibold">
                 🎯 Current mode:
               </span>
-              <p className="text-zinc-400 mt-1">
+              <p className="text-text-muted mt-1">
                 {currentMode.toUpperCase()} - Switch modes above to see
                 different command sets.
               </p>
@@ -256,30 +256,30 @@ const KeyboardVisualizerLevel0: React.FC<
 
       {/* Legend */}
       <div className="w-full max-w-6xl mx-auto px-8 py-8 relative z-10">
-        <div className="bg-zinc-900/50 rounded-xl border border-zinc-700/50 p-4 backdrop-blur-sm">
-          <h3 className="text-sm font-semibold text-zinc-400 mb-3">
+        <div className="bg-bg-primary/50 rounded-xl border border-border-primary/50 p-4 backdrop-blur-sm">
+          <h3 className="text-sm font-semibold text-text-muted mb-3">
             Color Legend:
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded bg-emerald-500/30 border border-emerald-500"></div>
-              <span className="text-zinc-400">Movement</span>
+              <span className="text-text-muted">Movement</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded bg-blue-500/30 border border-blue-500"></div>
-              <span className="text-zinc-400">Mode Change</span>
+              <span className="text-text-muted">Mode Change</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded bg-red-500/30 border border-red-500"></div>
-              <span className="text-zinc-400">Delete/Edit</span>
+              <span className="text-text-muted">Delete/Edit</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded bg-purple-500/30 border border-purple-500"></div>
-              <span className="text-zinc-400">Search</span>
+              <span className="text-text-muted">Search</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded bg-amber-500/30 border border-amber-500"></div>
-              <span className="text-zinc-400">History/Edit</span>
+              <span className="text-text-muted">History/Edit</span>
             </div>
           </div>
         </div>

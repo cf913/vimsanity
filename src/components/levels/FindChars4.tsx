@@ -445,14 +445,14 @@ const FindChars4: React.FC<LevelProps> = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center bg-zinc-900 text-white">
+    <div className="flex flex-col items-center justify-center bg-bg-primary text-white">
       <div className="w-full max-w-4xl">
         <div className="flex flex-col items-center mb-2">
-          <p className="text-zinc-400 text-center max-w-lg mb-4">
-            Use <kbd className="px-2 py-1 bg-zinc-800 rounded">f</kbd>,{' '}
-            <kbd className="px-2 py-1 bg-zinc-800 rounded">F</kbd>,{' '}
-            <kbd className="px-2 py-1 bg-zinc-800 rounded">t</kbd> and{' '}
-            <kbd className="px-2 py-1 bg-zinc-800 rounded">T</kbd> to quickly
+          <p className="text-text-muted text-center max-w-lg mb-4">
+            Use <kbd className="px-2 py-1 bg-bg-secondary rounded">f</kbd>,{' '}
+            <kbd className="px-2 py-1 bg-bg-secondary rounded">F</kbd>,{' '}
+            <kbd className="px-2 py-1 bg-bg-secondary rounded">t</kbd> and{' '}
+            <kbd className="px-2 py-1 bg-bg-secondary rounded">T</kbd> to quickly
             jump to a character occurence in the current line.
           </p>
 
@@ -460,10 +460,10 @@ const FindChars4: React.FC<LevelProps> = () => {
             <Scoreboard score={score} maxScore={100} />
             <button
               onClick={resetLevel}
-              className="bg-zinc-800 p-2 rounded-lg hover:bg-zinc-700 transition-colors"
+              className="bg-bg-secondary p-2 rounded-lg hover:bg-bg-tertiary transition-colors"
               aria-label="Reset Level"
             >
-              <RefreshCw size={18} className="text-zinc-400" />
+              <RefreshCw size={18} className="text-text-muted" />
             </button>
             {levelCompleted && (
               <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
@@ -494,7 +494,7 @@ const FindChars4: React.FC<LevelProps> = () => {
             )}
           </div>
         </div>
-        <div className="relative flex  flex-col w-full max-w-4xl bg-zinc-800 p-6 py-8 rounded-lg mx-auto">
+        <div className="relative flex  flex-col w-full max-w-4xl bg-bg-secondary p-6 py-8 rounded-lg mx-auto">
           {/* Global Confetti Burst over the game area */}
           {showConfetti && <ConfettiBurst />}
 
@@ -504,9 +504,9 @@ const FindChars4: React.FC<LevelProps> = () => {
               {linesOfWords.map((words, lineIdx) => (
                 <div
                   key={`line-${lineIdx}`}
-                  className={`flex flex-row overflow-visible scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 ${
+                  className={`flex flex-row overflow-visible scrollbar-thin scrollbar-thumb-border-primary scrollbar-track-bg-primary ${
                     lineIdx === currentLineIndex
-                      ? 'bg-zinc-700/30 rounded-md'
+                      ? 'bg-bg-tertiary/30 rounded-md'
                       : ''
                   }`}
                   ref={lineIdx === currentLineIndex ? containerRef : undefined}
@@ -547,7 +547,7 @@ const FindChars4: React.FC<LevelProps> = () => {
                             'bg-purple-500 text-white scale-105 shadow-lg shadow-purple-500/60 animate-pulse '
                         else if (isMatchingChar)
                           base += 'bg-amber-500/30 text-amber-200 '
-                        else base += 'bg-zinc-700 text-zinc-300 '
+                        else base += 'bg-bg-tertiary text-text-secondary '
 
                         if (square.isSpace) {
                           let baseSpace =
@@ -601,19 +601,19 @@ const FindChars4: React.FC<LevelProps> = () => {
               ))}
             </div>
           </div>
-          <div className="text-xs text-zinc-500 mt-4 max-w-xl">
+          <div className="text-xs text-text-subtle mt-4 max-w-xl">
             <span className="font-semibold">NOTE:</span> While this level is
             case insensitive for learning purposes, Vim's line search is indeed
             case sensitive.
           </div>
-          <div className="text-xs text-zinc-500 mt-4 max-w-xl">
+          <div className="text-xs text-text-subtle mt-4 max-w-xl">
             <span className="text-emerald-400 font-semibold">PRO TIP:</span>{' '}
             After using any character search command (f, F, t, T), press{' '}
-            <kbd className="px-1 py-0.5 bg-zinc-700 rounded text-zinc-300">
+            <kbd className="px-1 py-0.5 bg-bg-tertiary rounded text-text-secondary">
               ;
             </kbd>{' '}
             to repeat the search in the same direction or{' '}
-            <kbd className="px-1 py-0.5 bg-zinc-700 rounded text-zinc-300">
+            <kbd className="px-1 py-0.5 bg-bg-tertiary rounded text-text-secondary">
               ,
             </kbd>{' '}
             to repeat in the opposite direction. This lets you quickly navigate
@@ -635,7 +635,7 @@ const FindChars4: React.FC<LevelProps> = () => {
           )}
           {lastKeyPressed.length > 1 && (
             <div className="flex items-center">
-              <span className="text-emerald-400 font-mono px-3 py-1 bg-zinc-800 rounded-lg">
+              <span className="text-emerald-400 font-mono px-3 py-1 bg-bg-secondary rounded-lg">
                 {lastKeyPressed}
               </span>
             </div>

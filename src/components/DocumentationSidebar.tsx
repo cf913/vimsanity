@@ -53,19 +53,19 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
               <p className="text-sm font-medium">Available motions:</p>
               <ul className="text-sm space-y-1 list-disc pl-4">
                 <li>
-                  <kbd className="px-1 bg-zinc-700 rounded">h j k l</kbd> -
+                  <kbd className="px-1 bg-bg-tertiary rounded">h j k l</kbd> -
                   Basic movement
                 </li>
                 <li>
-                  <kbd className="px-1 bg-zinc-700 rounded">w b e</kbd> - Word
+                  <kbd className="px-1 bg-bg-tertiary rounded">w b e</kbd> - Word
                   movement
                 </li>
                 <li>
-                  <kbd className="px-1 bg-zinc-700 rounded">0 $</kbd> - Line
+                  <kbd className="px-1 bg-bg-tertiary rounded">0 $</kbd> - Line
                   operations
                 </li>
                 <li>
-                  <kbd className="px-1 bg-zinc-700 rounded">f t</kbd> - Find
+                  <kbd className="px-1 bg-bg-tertiary rounded">f t</kbd> - Find
                   characters
                 </li>
               </ul>
@@ -82,42 +82,42 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">h</kbd> - Move
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">h</kbd> - Move
                   left
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Like the left arrow key
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">j</kbd> - Move
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">j</kbd> - Move
                   down
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Like the down arrow key
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">k</kbd> - Move
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">k</kbd> - Move
                   up
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Like the up arrow key
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">l</kbd> - Move
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">l</kbd> - Move
                   right
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Like the right arrow key
                 </p>
               </div>
             </div>
-            <div className="mt-4 text-xs text-zinc-400">
+            <div className="mt-4 text-xs text-text-muted">
               <p className="italic">
                 Tip: Think of "j" as having a hook that goes down and "k" as
                 having a stick that points up.
@@ -135,35 +135,35 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">w</kbd> - Move
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">w</kbd> - Move
                   to next word start
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Jump to the beginning of the next word
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">W as in "Word"</p>
+                <p className="text-xs text-text-muted ml-1">W as in "Word"</p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">b</kbd> - Move
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">b</kbd> - Move
                   to previous word start
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   B as in "Back" or "Beginning"
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">e</kbd> - Move
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">e</kbd> - Move
                   to word end
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Jump to the end of the current word
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">E as in "End"</p>
+                <p className="text-xs text-text-muted ml-1">E as in "End"</p>
               </div>
             </div>
-            <div className="mt-4 text-xs text-zinc-400">
+            <div className="mt-4 text-xs text-text-muted">
               <p className="italic">
                 Tip: These motions work across lines and consider punctuation as
                 separate words.
@@ -181,28 +181,28 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">0</kbd> - Move
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">0</kbd> - Move
                   to start of line
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Jump to the first character of the line
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">_</kbd> - Move
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">_</kbd> - Move
                   to the first non-blank character
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Useful for skipping leading whitespace/indentation
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">$</kbd> - Move
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">$</kbd> - Move
                   to end of line
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Jump to the last character of the line
                 </p>
               </div>
@@ -219,59 +219,59 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">f + char</kbd>{' '}
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">f + char</kbd>{' '}
                   - Find character forward
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Move to the next occurrence of {'{char}'} on the current line
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">F + char</kbd>{' '}
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">F + char</kbd>{' '}
                   - Find character backward
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Move to the previous occurrence of {'{char}'} on the current
                   line
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">t + char</kbd>{' '}
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">t + char</kbd>{' '}
                   - Till character forward
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Move to just before the next occurrence of {'{char}'} on the
                   current line
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">T + char</kbd>{' '}
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">T + char</kbd>{' '}
                   - Till character backward
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Move to just after the previous occurrence of {'{char}'} on
                   the current line
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">j</kbd> - Move
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">j</kbd> - Move
                   down
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">Move down one line</p>
+                <p className="text-xs text-text-muted ml-1">Move down one line</p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">k</kbd> - Move
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">k</kbd> - Move
                   up
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">Move up one line</p>
+                <p className="text-xs text-text-muted ml-1">Move up one line</p>
               </div>
             </div>
-            <div className="mt-4 text-xs text-zinc-400">
+            <div className="mt-4 text-xs text-text-muted">
               <p className="italic">
                 Tip: After pressing 'f', 'F', 't', or 'T', you need to type the
                 character you want to find. The cursor will move to (or just
@@ -291,54 +291,54 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">/</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">/</kbd> -
                   Search forward
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Search for a pattern going forward from your current position
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Type your search pattern and press Enter to confirm
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">?</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">?</kbd> -
                   Search backward
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Search for a pattern going backward from your current position
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Type your search pattern and press Enter to confirm
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">n</kbd> - Next
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">n</kbd> - Next
                   match
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Jump to the next occurrence of your search pattern
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Continues in the direction of your original search
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">N</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">N</kbd> -
                   Previous match
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Jump to the previous occurrence of your search pattern
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Moves opposite to the direction of your original search
                 </p>
               </div>
             </div>
-            <div className="mt-4 text-xs text-zinc-400">
+            <div className="mt-4 text-xs text-text-muted">
               <p className="italic">
                 Tip: Search is one of Vim's most powerful navigation tools. You
                 can use it to quickly jump to specific words, variables, or
@@ -358,33 +358,33 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">i</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">i</kbd> -
                   Insert before cursor
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Begin inserting text at the current cursor position
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">a</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">a</kbd> -
                   Append after cursor
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Begin inserting text after the current cursor position
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">Escape</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">Escape</kbd> -
                   Exit insert mode
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Return to normal mode after making text changes
                 </p>
               </div>
             </div>
-            <div className="mt-4 text-xs text-zinc-400">
+            <div className="mt-4 text-xs text-text-muted">
               <p className="italic">
                 Tip: Always remember to press Escape to return to normal mode
                 after making changes. This is one of the most common mistakes
@@ -404,42 +404,42 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">I</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">I</kbd> -
                   Insert at line beginning
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Move to the start of the line and enter insert mode
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">A</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">A</kbd> -
                   Append at line end
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Move to the end of the line and enter insert mode
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">o</kbd> - Open
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">o</kbd> - Open
                   line below
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Create a new line below the current line and enter insert mode
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">O</kbd> - Open
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">O</kbd> - Open
                   line above
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Create a new line above the current line and enter insert mode
                 </p>
               </div>
             </div>
-            <div className="mt-4 text-xs text-zinc-400">
+            <div className="mt-4 text-xs text-text-muted">
               <p className="italic">
                 Tip: These commands combine movement and insert mode in one
                 keystroke, making them very efficient for common editing tasks.
@@ -458,32 +458,32 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">u</kbd> - Undo
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">u</kbd> - Undo
                   last change
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Reverses the most recent edit operation
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Can be used multiple times to undo several changes
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">Ctrl+r</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">Ctrl+r</kbd> -
                   Redo change
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Restores a change that was previously undone
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Only works after using undo (u)
                 </p>
               </div>
             </div>
             <div className="mt-4 space-y-2">
-              <div className="text-xs text-zinc-400">
-                <p className="font-medium text-zinc-300 mb-1">
+              <div className="text-xs text-text-muted">
+                <p className="font-medium text-text-secondary mb-1">
                   How Vim History Works:
                 </p>
                 <ul className="space-y-1 pl-2">
@@ -493,7 +493,7 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
                   <li>• You can undo/redo through multiple changes</li>
                 </ul>
               </div>
-              <div className="text-xs text-zinc-400">
+              <div className="text-xs text-text-muted">
                 <p className="italic">
                   Tip: Think of undo/redo as time travel through your editing
                   session. You can safely experiment knowing you can always go
@@ -515,81 +515,81 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">x</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">x</kbd> -
                   Delete character
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Delete the character under the cursor
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Most basic deletion command
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">D</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">D</kbd> -
                   Delete to end of line
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Delete from cursor position to end of line
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Equivalent to d$ but faster to type
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">C</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">C</kbd> -
                   Change to end of line
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Delete from cursor position to end of line and enter INSERT
                   mode
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Combines deletion with immediate editing
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">S</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">S</kbd> -
                   Substitute line
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Delete entire line and enter insert mode
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Like x followed by i, but in one command
                 </p>
               </div>
             </div>
-            <div className="mt-4 space-y-2 border-t border-zinc-700 pt-4 ">
+            <div className="mt-4 space-y-2 border-t border-border-primary pt-4 ">
               <p className="text-sm mb-3">Command variants:</p>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">X</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">X</kbd> -
                   Delete character
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Delete the character before the cursor
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">s</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">s</kbd> -
                   Substitute char
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Delete char under cursor and enter insert mode
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Like x followed by i, but in one command
                 </p>
               </div>
             </div>
             <div className="mt-4 space-y-2">
-              <div className="text-xs text-zinc-400">
-                <p className="font-medium text-zinc-300 mb-1">Command Types:</p>
+              <div className="text-xs text-text-muted">
+                <p className="font-medium text-text-secondary mb-1">Command Types:</p>
                 <ul className="space-y-1 pl-2">
                   <li>
                     • <strong>Delete:</strong> x, D (remove text)
@@ -602,7 +602,7 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
                   </li>
                 </ul>
               </div>
-              <div className="text-xs text-zinc-400">
+              <div className="text-xs text-text-muted">
                 <p className="italic">
                   Tip: These single-key commands are the foundation of Vim
                   editing. Master them for lightning-fast text manipulation!
@@ -623,80 +623,80 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">dw</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">dw</kbd> -
                   Delete word
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Delete from cursor to the end of the current word
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Includes trailing space after the word
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">dd</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">dd</kbd> -
                   Delete entire line
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Delete the entire current line
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Most common line deletion command
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">D</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">D</kbd> -
                   Delete to end of line
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Delete from cursor position to end of line
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Same as the single-key D command from Level 10
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">dh</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">dh</kbd> -
                   Delete character left
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Delete the character to the left of cursor
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Like pressing backspace
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">dl</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">dl</kbd> -
                   Delete character under cursor
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Delete the character under the cursor
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Same as x command
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">u</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">u</kbd> -
                   Undo
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Undo the last delete operation
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Essential for correcting mistakes
                 </p>
               </div>
             </div>
             <div className="mt-4 space-y-2">
-              <div className="text-xs text-zinc-400">
-                <p className="font-medium text-zinc-300 mb-1">Delete Command Pattern:</p>
+              <div className="text-xs text-text-muted">
+                <p className="font-medium text-text-secondary mb-1">Delete Command Pattern:</p>
                 <ul className="space-y-1 pl-2">
                   <li>
                     • <strong>d</strong> = delete operator
@@ -715,7 +715,7 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
                   </li>
                 </ul>
               </div>
-              <div className="text-xs text-zinc-400">
+              <div className="text-xs text-text-muted">
                 <p className="italic">
                   Tip: These commands combine the delete operator (d) with motions to create powerful deletion commands. Master these for efficient text editing!
                 </p>
@@ -735,53 +735,53 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">diw</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">diw</kbd> -
                   Delete inner word
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Delete the word under cursor (not surrounding spaces)
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Works from anywhere within the word
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">daw</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">daw</kbd> -
                   Delete around word
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Delete word AND surrounding whitespace
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Cleaner deletion - no leftover spaces
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">ciw</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">ciw</kbd> -
                   Change inner word
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Delete word and enter insert mode
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Perfect for replacing a word
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">caw</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">caw</kbd> -
                   Change around word
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Delete word + whitespace, enter insert mode
                 </p>
               </div>
             </div>
             <div className="mt-4 space-y-2">
-              <div className="text-xs text-zinc-400">
-                <p className="font-medium text-zinc-300 mb-1">Text Object Pattern:</p>
+              <div className="text-xs text-text-muted">
+                <p className="font-medium text-text-secondary mb-1">Text Object Pattern:</p>
                 <ul className="space-y-1 pl-2">
                   <li>
                     • <strong>operator</strong> + <strong>i/a</strong> + <strong>object</strong>
@@ -797,8 +797,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
                   </li>
                 </ul>
               </div>
-              <div className="text-xs text-zinc-400">
-                <p className="font-medium text-zinc-300 mb-1">Why Text Objects?</p>
+              <div className="text-xs text-text-muted">
+                <p className="font-medium text-text-secondary mb-1">Why Text Objects?</p>
                 <ul className="space-y-1 pl-2">
                   <li>
                     • No need to position cursor at word start
@@ -811,7 +811,7 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
                   </li>
                 </ul>
               </div>
-              <div className="text-xs text-zinc-400 mt-2">
+              <div className="text-xs text-text-muted mt-2">
                 <p className="italic">
                   Tip: Text objects are one of Vim's superpowers. Once learned, you'll use ciw and diw constantly!
                 </p>
@@ -831,56 +831,56 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">yy</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">yy</kbd> -
                   Yank entire line
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Copy the entire current line to the clipboard
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Most common yank command
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">yw</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">yw</kbd> -
                   Yank word
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Copy from cursor to end of current word
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Position cursor at word start for best results
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">p</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">p</kbd> -
                   Put (paste) after
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Paste yanked text at cursor position
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   For lines: pastes on the line below
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  <kbd className="px-2 py-1 bg-zinc-700 rounded">P</kbd> -
+                  <kbd className="px-2 py-1 bg-bg-tertiary rounded">P</kbd> -
                   Put (paste) before
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   Paste yanked text before cursor position
                 </p>
-                <p className="text-xs text-zinc-400 ml-1">
+                <p className="text-xs text-text-muted ml-1">
                   For lines: pastes on the current line
                 </p>
               </div>
             </div>
             <div className="mt-4 space-y-2">
-              <div className="text-xs text-zinc-400">
-                <p className="font-medium text-zinc-300 mb-1">Yank vs Delete:</p>
+              <div className="text-xs text-text-muted">
+                <p className="font-medium text-text-secondary mb-1">Yank vs Delete:</p>
                 <ul className="space-y-1 pl-2">
                   <li>
                     • <strong>y</strong> (yank) = copy text, leave original
@@ -893,8 +893,8 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
                   </li>
                 </ul>
               </div>
-              <div className="text-xs text-zinc-400">
-                <p className="font-medium text-zinc-300 mb-1">Common Patterns:</p>
+              <div className="text-xs text-text-muted">
+                <p className="font-medium text-text-secondary mb-1">Common Patterns:</p>
                 <ul className="space-y-1 pl-2">
                   <li>
                     • <strong>yy → p</strong> = duplicate a line below
@@ -907,7 +907,7 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
                   </li>
                 </ul>
               </div>
-              <div className="text-xs text-zinc-400 mt-2">
+              <div className="text-xs text-text-muted mt-2">
                 <p className="italic">
                   Tip: Unlike most editors, Vim's delete commands also copy to the clipboard. So dd followed by p effectively "moves" a line!
                 </p>
@@ -924,7 +924,7 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
 
   return (
     <motion.div
-      className="w-72 h-full bg-zinc-800 p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-600 scrollbar-track-zinc-800"
+      className="w-72 h-full bg-bg-secondary p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-bg-hover scrollbar-track-bg-secondary"
       initial="hidden"
       animate="visible"
       variants={sidebarVariants}
@@ -938,7 +938,7 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
         </h2>
         <motion.button
           onClick={onClose}
-          className="p-2 hover:bg-zinc-700 rounded-lg transition-colors"
+          className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
           whileHover={{ scale: 1.1, rotate: -90 }}
           whileTap={{ scale: 0.9 }}
           transition={{ duration: 0.2 }}
@@ -955,14 +955,14 @@ const DocumentationSidebar: React.FC<DocumentationSidebarProps> = ({
       </motion.div>
 
       <motion.div
-        className="mt-8 pt-4 border-t border-zinc-700"
+        className="mt-8 pt-4 border-t border-border-primary"
         variants={itemVariants}
       >
         <a
           href="https://vimhelp.org/"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-2 w-full rounded-lg hover:bg-zinc-700/70 transition-colors text-sm text-zinc-300"
+          className="flex items-center gap-2 px-3 py-2 w-full rounded-lg hover:bg-bg-tertiary/70 transition-colors text-sm text-text-secondary"
         >
           Official Vim Documentation
           <ExternalLink size={14} className="text-emerald-400" />

@@ -35,7 +35,7 @@ export function TextArea({
     <div className="flex relative">
       {/* Line number column - fixed position */}
       {showLineNumbers ? (
-        <div className="pr-3 text-right text-zinc-500 select-none border-r border-zinc-700 mr-3 min-w-[2.5rem] sticky left-0 z-10 bg-zinc-800">
+        <div className="pr-3 text-right text-text-subtle select-none border-r border-border-primary mr-3 min-w-[2.5rem] sticky left-0 z-10 bg-bg-secondary">
           {lines.map((_, lineIdx) => (
             <div key={lineIdx} className={`font-mono`} style={{ fontSize }}>
               {lineIdx + 1}

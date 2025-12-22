@@ -20,26 +20,26 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
   const getColorClasses = (color: string, isActive: boolean) => {
     const colorMap: Record<string, { bg: string; border: string; text: string }> = {
       emerald: {
-        bg: isActive ? 'bg-emerald-500/20' : 'bg-zinc-800',
-        border: isActive ? 'border-emerald-500' : 'border-zinc-700',
-        text: isActive ? 'text-emerald-400' : 'text-zinc-400',
+        bg: isActive ? 'bg-emerald-500/20' : 'bg-bg-secondary',
+        border: isActive ? 'border-emerald-500' : 'border-border-primary',
+        text: isActive ? 'text-emerald-400' : 'text-text-muted',
       },
       blue: {
-        bg: isActive ? 'bg-blue-500/20' : 'bg-zinc-800',
-        border: isActive ? 'border-blue-500' : 'border-zinc-700',
-        text: isActive ? 'text-blue-400' : 'text-zinc-400',
+        bg: isActive ? 'bg-blue-500/20' : 'bg-bg-secondary',
+        border: isActive ? 'border-blue-500' : 'border-border-primary',
+        text: isActive ? 'text-blue-400' : 'text-text-muted',
       },
       purple: {
-        bg: isActive ? 'bg-purple-500/20' : 'bg-zinc-800',
-        border: isActive ? 'border-purple-500' : 'border-zinc-700',
-        text: isActive ? 'text-purple-400' : 'text-zinc-400',
+        bg: isActive ? 'bg-purple-500/20' : 'bg-bg-secondary',
+        border: isActive ? 'border-purple-500' : 'border-border-primary',
+        text: isActive ? 'text-purple-400' : 'text-text-muted',
       },
     }
     return colorMap[color] || colorMap.emerald
   }
 
   return (
-    <div className="flex gap-2 p-2 bg-zinc-900/50 rounded-xl border border-zinc-700/50 backdrop-blur-sm">
+    <div className="flex gap-2 p-2 bg-bg-primary/50 rounded-xl border border-border-primary/50 backdrop-blur-sm">
       {modes.map((mode) => {
         const isActive = currentMode === mode.mode
         const colors = getColorClasses(mode.color, isActive)

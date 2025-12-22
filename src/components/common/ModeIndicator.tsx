@@ -10,7 +10,7 @@ const ModeIndicator: React.FC<ModeIndicatorProps> = ({
   insertCommand,
 }) => {
   return (
-    <div className="text-center px-4 py-2 rounded-lg bg-zinc-800 ">
+    <div className="text-center px-4 py-2 rounded-lg bg-bg-secondary ">
       <span
         className={`font-mono uppercase ${
           isInsertMode ? 'text-orange-400' : 'text-emerald-400'
