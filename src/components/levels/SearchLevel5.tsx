@@ -7,7 +7,7 @@ import { processTextForVim } from '../../utils/textUtils'
 import ExplosionEffect from './ExplosionEffect'
 import ConfettiBurst from './ConfettiBurst'
 import LevelTimer from '../common/LevelTimer'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCw, Zap } from 'lucide-react'
 import Scoreboard from '../common/Scoreboard'
 import { KeysAllowed } from '../common/KeysAllowed'
 
