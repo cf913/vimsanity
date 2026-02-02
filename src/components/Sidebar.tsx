@@ -60,6 +60,20 @@ const levels = {
       wip: false,
       locked: false,
     },
+    {
+      id: 16,
+      title: 'Count Prefixes (5j, 3w, etc.)',
+      description: 'Use numbers for efficient navigation',
+      wip: false,
+      locked: false,
+    },
+    {
+      id: 17,
+      title: 'File Navigation (gg, G)',
+      description: 'Jump to any line in a file instantly',
+      wip: false,
+      locked: false,
+    },
   ],
   insert: [
     {
@@ -77,15 +91,6 @@ const levels = {
       locked: false,
     },
   ],
-  // recap: [
-  //   {
-  //     id: 8,
-  //     title: 'A Quick Recap',
-  //     description: 'All the motions seen so far',
-  //     wip: true,
-  //     locked: false,
-  //   },
-  // ],
   history: [
     {
       id: 9,
@@ -141,7 +146,7 @@ const levels = {
       id: 13,
       title: 'Dev Playground',
       description: 'Practice all Vim motions in a free environment',
-      wip: true,
+      wip: false,
       locked: false,
     },
   ],

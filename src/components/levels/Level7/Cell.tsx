@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from 'react'
 import { VIM_MODES, VimMode } from '../../../utils/constants'
-import { TextEditor, TextEditorProps } from '../Level8/TextEditor'
+import { TextEditor, TextEditorProps } from '../../common/TextEditor'
 
 export interface Cell {
   id: string

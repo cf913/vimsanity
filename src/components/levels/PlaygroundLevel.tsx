@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useVimMotionsV2 } from '../../hooks/useVimMotionsV2'
 import { VimMode } from '../../utils/constants'
-import WarningSplash from '../common/WarningSplash'
-import { TextEditor } from './Level8/TextEditor'
+import { TextEditor } from '../common/TextEditor'
+import { KeysAllowed } from '../common/KeysAllowed'
 
 interface PlaygroundLevelProps {
   isMuted: boolean
@@ -120,95 +120,14 @@ const PlaygroundLevel: React.FC<PlaygroundLevelProps> = () => {
         </div>
       </div>
 
-      <div className="flex gap-4 text-text-muted mt-4 justify-center">
-        {mode === 'normal' ? (
-          <>
-            <kbd
-              className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
-                lastKeyPressed === 'h'
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
-                  : ''
-              }`}
-            >
-              h
-            </kbd>
-            <kbd
-              className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
-                lastKeyPressed === 'j'
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
-                  : ''
-              }`}
-            >
-              j
-            </kbd>
-            <kbd
-              className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
-                lastKeyPressed === 'k'
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
-                  : ''
-              }`}
-            >
-              k
-            </kbd>
-            <kbd
-              className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
-                lastKeyPressed === 'l'
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
-                  : ''
-              }`}
-            >
-              l
-            </kbd>
-            <kbd
-              className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
-                lastKeyPressed === 'i'
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
-                  : ''
-              }`}
-            >
-              i
-            </kbd>
-            <kbd
-              className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
-                lastKeyPressed === 'x'
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
-                  : ''
-              }`}
-            >
-              x
-            </kbd>
-            <kbd
-              className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
-                lastKeyPressed === 'd'
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
-                  : ''
-              }`}
-            >
-              d
-            </kbd>
-            <kbd
-              className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
-                lastKeyPressed === 'd'
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
-                  : ''
-              }`}
-            >
-              d
-            </kbd>
-          </>
-        ) : (
-          <kbd
-            className={`px-3 py-1 bg-bg-secondary rounded-lg transition-all duration-150 ${
-              lastKeyPressed === 'Escape'
-                ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-110'
-                : ''
-            }`}
-          >
-            Esc
-          </kbd>
-        )}
-      </div>
-      <WarningSplash />
+      {mode === 'normal' ? (
+        <KeysAllowed
+          keys={['h', 'j', 'k', 'l', 'w', 'e', 'b', '0', '$', 'i', 'a', 'x']}
+          lastKeyPressed={lastKeyPressed}
+        />
+      ) : (
+        <KeysAllowed keys={['Escape']} lastKeyPressed={lastKeyPressed} />
+      )}
     </div>
   )
 }

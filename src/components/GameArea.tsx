@@ -7,13 +7,14 @@ import FindChars4 from './levels/FindChars4'
 import SearchLevel5 from './levels/SearchLevel5'
 import BasicInsertLevel6 from './levels/BasicInsertLevel6'
 import LineInsertLevel7 from './levels/LineInsertLevel7'
-import Recap8 from './levels/Level8/Recap8'
 import UndoRedoLevel9 from './levels/Level9/UndoRedoLevel9'
 import BasicDeleteLevel10 from './levels/BasicDeleteLevel10'
 import AdvancedDeleteLevel11 from './levels/AdvancedDeleteLevel11'
 import RecapLevel12 from './levels/RecapLevel12'
 import TextObjectLevel14 from './levels/TextObjectLevel14'
 import YankPutLevel15 from './levels/YankPutLevel15'
+import CountPrefixLevel16 from './levels/CountPrefixLevel16'
+import FileNavLevel17 from './levels/FileNavLevel17'
 import PlaygroundLevel from './levels/PlaygroundLevel'
 
 interface GameAreaProps {
@@ -78,8 +79,6 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
         return <BasicInsertLevel6 isMuted={isMuted} />
       case 7:
         return <LineInsertLevel7 isMuted={isMuted} />
-      case 8:
-        return <Recap8 />
       case 9:
         return <UndoRedoLevel9 />
       case 10:
@@ -94,6 +93,10 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
         return <TextObjectLevel14 />
       case 15:
         return <YankPutLevel15 />
+      case 16:
+        return <CountPrefixLevel16 />
+      case 17:
+        return <FileNavLevel17 />
       default:
         return <KeyboardVisualizerLevel0 isMuted={isMuted} />
     }

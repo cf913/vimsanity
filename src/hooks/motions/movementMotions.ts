@@ -206,4 +206,46 @@ export const movementMotions: VimMotion[] = [
     },
     condition: (context: MotionContext) => context.mode === VIM_MODES.NORMAL,
   },
+
+  {
+    key: 'gg',
+    description: 'Go to first line',
+    category: 'movement',
+    execute: (context: MotionContext) => {
+      context.setCursorIndex(0)
+      context.setVirtualColumn(0)
+    },
+    condition: (context: MotionContext) => context.mode === VIM_MODES.NORMAL,
+  },
+
+  {
+    key: 'G',
+    description: 'Go to last line (or line N with count)',
+    category: 'movement',
+    execute: (context: MotionContext, count?: unknown) => {
+      const lines = context.text.split('\n')
+
+      if (typeof count === 'number' && count > 0) {
+        // Go to line N (1-indexed)
+        const targetLine = Math.min(count, lines.length)
+        let pos = 0
+        for (let i = 0; i < targetLine - 1; i++) {
+          pos += lines[i].length + 1 // +1 for newline
+        }
+        context.setCursorIndex(pos)
+        context.setVirtualColumn(0)
+      } else {
+        // Go to last line
+        const lastNewline = context.text.lastIndexOf('\n')
+        if (lastNewline === -1) {
+          // Only one line
+          context.setCursorIndex(0)
+        } else {
+          context.setCursorIndex(lastNewline + 1)
+        }
+        context.setVirtualColumn(0)
+      }
+    },
+    condition: (context: MotionContext) => context.mode === VIM_MODES.NORMAL,
+  },
 ]

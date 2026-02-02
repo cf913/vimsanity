@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { VIM_MODES, VimMode } from '../../../utils/constants'
-import { useVimMotionsV2 } from '../../../hooks/useVimMotionsV2'
+import { VIM_MODES, VimMode } from '../../utils/constants'
+import { useVimMotionsV2 } from '../../hooks/useVimMotionsV2'
 import {
   KeyActionMap,
   useKeyboardHandler,
-} from '../../../hooks/useKeyboardHandler'
-import { EditorProps, TextArea } from '../../common/TextArea'
+} from '../../hooks/useKeyboardHandler'
+import { EditorProps, TextArea } from './TextArea'
 
 export interface TextEditorProps {
   initialText: string
