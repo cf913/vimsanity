@@ -3,20 +3,17 @@ import {
   useKeyboardHandler,
   KeyActionMap,
 } from '../../hooks/useKeyboardHandler'
+import { useVimLevel } from '../../hooks/useVimLevel'
 import { processTextForVim } from '../../utils/textUtils'
 import ExplosionEffect from './ExplosionEffect'
-import ConfettiBurst from './ConfettiBurst'
-import LevelTimer from '../common/LevelTimer'
-import { RefreshCw, Zap } from 'lucide-react'
-import Scoreboard from '../common/Scoreboard'
 import { KeysAllowed } from '../common/KeysAllowed'
+import { LevelShell, LevelHeader } from '../level-blocks'
 
 interface LevelProps {
   isMuted: boolean
 }
 
 const FindChars4: React.FC<LevelProps> = () => {
-  // Array of 5 different lines of text
   const sampleTexts = [
     'Vim file navigations',
     'Open splits with :sp',
@@ -28,10 +25,8 @@ const FindChars4: React.FC<LevelProps> = () => {
     'Substitution rocks!!',
   ]
 
-  // Process each line of text separately
   const processedLines = sampleTexts.map((text) => processTextForVim(text))
 
-  // Create squares for each line
   const linesOfSquares = processedLines.map((characters) =>
     characters.map((char, idx) => ({
       isSpace: char === ' ',
@@ -40,42 +35,34 @@ const FindChars4: React.FC<LevelProps> = () => {
     })),
   )
 
-  // Group characters into words for each line
   const linesOfWords = linesOfSquares.map(
     (squares) =>
       squares
         .reduce((acc: Array<Array<(typeof squares)[0]>>, square) => {
           if (square.isSpace) {
-            // Add space as its own "word"
             acc.push([square])
-            // Start a new word
             acc.push([])
           } else {
-            // If we have no words yet or the last word is a space, start a new word
             if (acc.length === 0 || acc[acc.length - 1][0]?.isSpace) {
               acc.push([square])
             } else {
-              // Add to the current word
               acc[acc.length - 1].push(square)
             }
           }
           return acc
         }, [])
-        .filter((word) => word.length > 0), // Remove any empty words
+        .filter((word) => word.length > 0),
   )
 
-  // Track current line and position within that line
+  // Level-specific state
   const [currentLineIndex, setCurrentLineIndex] = useState<number>(0)
   const [cursor, setCursor] = useState<number>(0)
   const [target, setTarget] = useState<number>(5)
   const [targetLineIndex, setTargetLineIndex] = useState<number>(0)
-  const [score, setScore] = useState(0)
-  const [showConfetti, setShowConfetti] = useState(false)
   const [showExplosion, setShowExplosion] = useState(false)
   const [explosionIdx, setExplosionIdx] = useState<number | null>(null)
   const [explosionLineIdx, setExplosionLineIdx] = useState<number | null>(null)
-  const [revealedLetters, setRevealedLetters] = useState<Set<string>>(new Set()) // Using "lineIdx-charIdx" format
-  const [levelCompleted, setLevelCompleted] = useState(false)
+  const [revealedLetters, setRevealedLetters] = useState<Set<string>>(new Set())
   const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
 
   // States for f and t commands
@@ -88,7 +75,24 @@ const FindChars4: React.FC<LevelProps> = () => {
   const [lastSearchCommand, setLastSearchCommand] = useState<
     'f' | 'F' | 't' | 'T' | null
   >(null)
-  const [timerActive, setTimerActive] = useState<boolean>(false)
+
+  const level = useVimLevel({
+    levelId: '4-find-chars',
+    maxScore: 100,
+    onReset: () => {
+      setCursor(0)
+      setCurrentLineIndex(0)
+      setRevealedLetters(new Set())
+      setAwaitingCharacter(false)
+      setPendingCommand(null)
+      setLastSearchChar(null)
+      setLastSearchCommand(null)
+      setShowExplosion(false)
+      setExplosionIdx(null)
+      setExplosionLineIdx(null)
+      setNewTarget()
+    },
+  })
 
   // Refs for scrolling
   const containerRef = useRef<HTMLDivElement>(null)
@@ -106,46 +110,32 @@ const FindChars4: React.FC<LevelProps> = () => {
 
   // Set a new target randomly
   const setNewTarget = () => {
-    // Choose a random line
     const randomLineIndex = Math.floor(Math.random() * linesOfSquares.length)
 
-    // Find a non-space character to use as the target
     const nonSpaceIndices = linesOfSquares[randomLineIndex]
       .map((square, idx) => (!square.isSpace ? idx : -1))
       .filter((idx) => idx !== -1)
 
     if (nonSpaceIndices.length === 0) {
-      // If no non-space characters, try another line
       setNewTarget()
       return
     }
 
-    // Choose a random non-space character
     const randomPos =
       nonSpaceIndices[Math.floor(Math.random() * nonSpaceIndices.length)]
 
-    // Set the target character for display
     setTargetChar(linesOfSquares[randomLineIndex][randomPos].char)
     setTarget(randomPos)
     setTargetLineIndex(randomLineIndex)
   }
 
-  // Initialize the game with a random target
   useEffect(() => {
     setNewTarget()
   }, [])
 
-  // Start timer on first key press
-  const activateTimer = () => {
-    if (!timerActive) {
-      setTimerActive(true)
-    }
-  }
-
-  // Function to handle 'f' command
+  // Character find/till commands
   const handleFCommand = (char: string) => {
-    activateTimer()
-    // Find the next occurrence of the character on the current line
+    level.activateTimer()
     const currentLine = linesOfSquares[currentLineIndex]
     for (let i = cursor + 1; i < currentLine.length; i++) {
       if (currentLine[i].char.toLowerCase() === char.toLowerCase()) {
@@ -154,13 +144,11 @@ const FindChars4: React.FC<LevelProps> = () => {
         return true
       }
     }
-    return false // Character not found
+    return false
   }
 
-  // Function to handle 'F' command (reverse search)
   const handleFReverseCommand = (char: string) => {
-    activateTimer()
-    // Find the previous occurrence of the character on the current line
+    level.activateTimer()
     const currentLine = linesOfSquares[currentLineIndex]
     for (let i = cursor - 1; i >= 0; i--) {
       if (currentLine[i].char.toLowerCase() === char.toLowerCase()) {
@@ -169,13 +157,11 @@ const FindChars4: React.FC<LevelProps> = () => {
         return true
       }
     }
-    return false // Character not found
+    return false
   }
 
-  // Function to handle 't' command
   const handleTCommand = (char: string) => {
-    activateTimer()
-    // Move to just before the next occurrence of the character
+    level.activateTimer()
     const currentLine = linesOfSquares[currentLineIndex]
     for (let i = cursor + 1; i < currentLine.length; i++) {
       if (currentLine[i].char.toLowerCase() === char.toLowerCase()) {
@@ -184,13 +170,11 @@ const FindChars4: React.FC<LevelProps> = () => {
         return true
       }
     }
-    return false // Character not found
+    return false
   }
 
-  // Function to handle 'T' command (reverse search)
   const handleTReverseCommand = (char: string) => {
-    activateTimer()
-    // Move to just after the previous occurrence of the character
+    level.activateTimer()
     const currentLine = linesOfSquares[currentLineIndex]
     for (let i = cursor - 1; i >= 0; i--) {
       if (currentLine[i].char.toLowerCase() === char.toLowerCase()) {
@@ -199,79 +183,53 @@ const FindChars4: React.FC<LevelProps> = () => {
         return true
       }
     }
-    return false // Character not found
+    return false
   }
 
-  // Handle character input after f or t command
   const handleCharacterInput = (char: string) => {
     if (!awaitingCharacter) return false
 
     setLastKeyPressed(pendingCommand + char)
     setAwaitingCharacter(false)
 
-    // Save the last search character and command for ; and , keys
     setLastSearchChar(char)
     setLastSearchCommand(pendingCommand)
 
     let success = false
-    if (pendingCommand === 'f') {
-      success = handleFCommand(char)
-    } else if (pendingCommand === 'F') {
-      success = handleFReverseCommand(char)
-    } else if (pendingCommand === 't') {
-      success = handleTCommand(char)
-    } else if (pendingCommand === 'T') {
-      success = handleTReverseCommand(char)
-    }
+    if (pendingCommand === 'f') success = handleFCommand(char)
+    else if (pendingCommand === 'F') success = handleFReverseCommand(char)
+    else if (pendingCommand === 't') success = handleTCommand(char)
+    else if (pendingCommand === 'T') success = handleTReverseCommand(char)
 
     setPendingCommand(null)
     return success
   }
 
-  // Repeat last search in same direction (;)
   const repeatLastSearch = () => {
-    activateTimer()
+    level.activateTimer()
     if (!lastSearchChar || !lastSearchCommand) return false
-
     setLastKeyPressed(';')
 
-    let success = false
-    if (lastSearchCommand === 'f') {
-      success = handleFCommand(lastSearchChar)
-    } else if (lastSearchCommand === 'F') {
-      success = handleFReverseCommand(lastSearchChar)
-    } else if (lastSearchCommand === 't') {
-      success = handleTCommand(lastSearchChar)
-    } else if (lastSearchCommand === 'T') {
-      success = handleTReverseCommand(lastSearchChar)
-    }
-
-    return success
+    if (lastSearchCommand === 'f') return handleFCommand(lastSearchChar)
+    if (lastSearchCommand === 'F') return handleFReverseCommand(lastSearchChar)
+    if (lastSearchCommand === 't') return handleTCommand(lastSearchChar)
+    if (lastSearchCommand === 'T') return handleTReverseCommand(lastSearchChar)
+    return false
   }
 
-  // Repeat last search in opposite direction (,)
   const repeatLastSearchReverse = () => {
-    activateTimer()
+    level.activateTimer()
     if (!lastSearchChar || !lastSearchCommand) return false
-
     setLastKeyPressed(',')
 
-    let success = false
-    // Use the opposite command
-    if (lastSearchCommand === 'f') {
-      success = handleFReverseCommand(lastSearchChar)
-    } else if (lastSearchCommand === 'F') {
-      success = handleFCommand(lastSearchChar)
-    } else if (lastSearchCommand === 't') {
-      success = handleTReverseCommand(lastSearchChar)
-    } else if (lastSearchCommand === 'T') {
-      success = handleTCommand(lastSearchChar)
-    }
-
-    return success
+    if (lastSearchCommand === 'f') return handleFReverseCommand(lastSearchChar)
+    if (lastSearchCommand === 'F') return handleFCommand(lastSearchChar)
+    if (lastSearchCommand === 't') return handleTReverseCommand(lastSearchChar)
+    if (lastSearchCommand === 'T') return handleTCommand(lastSearchChar)
+    return false
   }
 
-  // Key actions for movement
+  // Key actions
   const keyActions: KeyActionMap = {
     f: () => {
       if (awaitingCharacter) return handleCharacterInput('f')
@@ -314,25 +272,20 @@ const FindChars4: React.FC<LevelProps> = () => {
       if (awaitingCharacter) return handleCharacterInput(';')
       return repeatLastSearch()
     },
-
     ',': () => {
       if (awaitingCharacter) return handleCharacterInput(',')
       return repeatLastSearchReverse()
     },
     j: () => {
       if (awaitingCharacter) return handleCharacterInput('j')
-
-      activateTimer()
+      level.activateTimer()
       setLastKeyPressed('j')
       if (currentLineIndex < linesOfSquares.length - 1) {
-        // Move to next line
         const nextLineIndex = currentLineIndex + 1
-        // Ensure cursor doesn't go beyond the end of the next line
         const nextLineCursor = Math.min(
           cursor,
           linesOfSquares[nextLineIndex].length - 1,
         )
-
         setCurrentLineIndex(nextLineIndex)
         setCursor(nextLineCursor)
         checkTarget(nextLineCursor, nextLineIndex)
@@ -341,18 +294,14 @@ const FindChars4: React.FC<LevelProps> = () => {
     },
     k: () => {
       if (awaitingCharacter) return handleCharacterInput('k')
-
-      activateTimer()
+      level.activateTimer()
       setLastKeyPressed('k')
       if (currentLineIndex > 0) {
-        // Move to previous line
         const prevLineIndex = currentLineIndex - 1
-        // Ensure cursor doesn't go beyond the end of the previous line
         const prevLineCursor = Math.min(
           cursor,
           linesOfSquares[prevLineIndex].length - 1,
         )
-
         setCurrentLineIndex(prevLineIndex)
         setCursor(prevLineCursor)
         checkTarget(prevLineCursor, prevLineIndex)
@@ -372,7 +321,6 @@ const FindChars4: React.FC<LevelProps> = () => {
     }
   }
 
-  // Register keyboard handler
   const { lastKeyPressed: keyboardLastKey } = useKeyboardHandler({
     keyActionMap: keyActions,
     dependencies: [
@@ -382,9 +330,9 @@ const FindChars4: React.FC<LevelProps> = () => {
       awaitingCharacter,
       pendingCommand,
     ],
+    disabled: level.levelCompleted,
   })
 
-  // Update lastKeyPressed state when keyboard events happen
   useEffect(() => {
     if (keyboardLastKey && !awaitingCharacter) {
       setLastKeyPressed(keyboardLastKey)
@@ -394,58 +342,32 @@ const FindChars4: React.FC<LevelProps> = () => {
   // Check if the player has reached the target
   const checkTarget = (newPos: number, lineIndex: number) => {
     if (newPos === target && lineIndex === targetLineIndex) {
-      // Play explosion effect
       setExplosionIdx(newPos)
       setExplosionLineIdx(lineIndex)
       setShowExplosion(true)
 
-      // Reveal the letter
       setRevealedLetters((prev) => {
         const newSet = new Set(prev)
         newSet.add(`${lineIndex}-${newPos}`)
         return newSet
       })
 
-      // Increment score
-      setScore((prevScore) => prevScore + 1)
+      level.incrementScore()
 
-      // Set a timeout to hide the explosion and set a new target
       setTimeout(() => {
         setShowExplosion(false)
         setExplosionIdx(null)
         setExplosionLineIdx(null)
-
-        // Set a new target
         setNewTarget()
-
-        // Check if level is completed (100 targets hit)
-        if (score + 1 >= 100) {
-          setLevelCompleted(true)
-          setShowConfetti(true)
-          setTimeout(() => {
-            setShowConfetti(false)
-          }, 3000)
-        }
       }, 200)
     }
   }
 
-  // Reset the level
-  const resetLevel = () => {
-    setCursor(0)
-    setCurrentLineIndex(0)
-    setScore(0)
-    setLevelCompleted(false)
-    setRevealedLetters(new Set())
-    setAwaitingCharacter(false)
-    setPendingCommand(null)
-    setLastSearchChar(null)
-    setLastSearchCommand(null)
-    setNewTarget()
-  }
-
   return (
-    <div className="flex flex-col items-center justify-center bg-bg-primary text-white">
+    <LevelShell
+      level={level}
+      className="flex flex-col items-center justify-center bg-bg-primary text-white"
+    >
       <div className="w-full max-w-4xl">
         <div className="flex flex-col items-center mb-2">
           <p className="text-text-muted text-center max-w-lg mb-4">
@@ -457,20 +379,12 @@ const FindChars4: React.FC<LevelProps> = () => {
           </p>
 
           <div className="flex items-center gap-4 mb-2">
-            <Scoreboard score={score} maxScore={100} />
-            <button
-              onClick={resetLevel}
-              className="bg-bg-secondary p-2 rounded-lg hover:bg-bg-tertiary transition-colors"
-              aria-label="Reset Level"
-            >
-              <RefreshCw size={18} className="text-text-muted" />
-            </button>
-            {levelCompleted && (
-              <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
-                <Zap size={18} className="text-yellow-300" />
-                <span>Level Complete!</span>
-              </div>
-            )}
+            <LevelHeader
+              title=""
+              score={level.score}
+              maxScore={level.maxScore}
+              onReset={level.resetLevel}
+            />
             {targetChar && (
               <div className="bg-purple-600 px-4 py-2 rounded-lg text-white flex items-center gap-2 shadow-md">
                 <span>Target: </span>
@@ -495,9 +409,6 @@ const FindChars4: React.FC<LevelProps> = () => {
           </div>
         </div>
         <div className="relative flex  flex-col w-full max-w-4xl bg-bg-secondary p-6 py-8 rounded-lg mx-auto">
-          {/* Global Confetti Burst over the game area */}
-          {showConfetti && <ConfettiBurst />}
-
           {/* Container for all lines */}
           <div className="flex-1">
             <div className="flex flex-col max-w-[calc(100vw-5rem)] overflow-x-scroll py-4 overflow-y-visible">
@@ -520,21 +431,17 @@ const FindChars4: React.FC<LevelProps> = () => {
                         const isPlayer =
                           square.idx === cursor && lineIdx === currentLineIndex
 
-                        const isTarget =
+                        const isTarget2 =
                           square.idx === target && lineIdx === targetLineIndex
 
                         const isRevealed = revealedLetters.has(
                           `${lineIdx}-${square.idx}`,
                         )
 
-                        // Highlight characters that match the target character on the current line
                         const isMatchingChar =
                           lineIdx === currentLineIndex &&
                           targetChar &&
                           square.char.toLowerCase() === targetChar.toLowerCase()
-                        {
-                          /* square.idx > cursor */
-                        }
 
                         let base =
                           'inline-flex items-center justify-center mx-0.5 my-0.5 min-w-8 h-8 transition-all duration-150 rounded-md '
@@ -542,7 +449,7 @@ const FindChars4: React.FC<LevelProps> = () => {
                         if (isPlayer)
                           base +=
                             'bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-500/50 '
-                        else if (isTarget)
+                        else if (isTarget2)
                           base +=
                             'bg-purple-500 text-white scale-105 shadow-lg shadow-purple-500/60 animate-pulse '
                         else if (isMatchingChar)
@@ -572,11 +479,10 @@ const FindChars4: React.FC<LevelProps> = () => {
                             className={base}
                             style={{ position: 'relative' }}
                           >
-                            {isTarget && (
+                            {isTarget2 && (
                               <span className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30 z-0"></span>
                             )}
 
-                            {/* Show the character if it's been revealed or is a matching character */}
                             {(isRevealed || isMatchingChar) &&
                               square.char !== ' ' && (
                                 <span className="z-10 text-lg font-medium font-mono">
@@ -584,7 +490,6 @@ const FindChars4: React.FC<LevelProps> = () => {
                                 </span>
                               )}
 
-                            {/* Explosion effect */}
                             {showExplosion &&
                               explosionIdx === square.idx &&
                               explosionLineIdx === lineIdx && (
@@ -642,10 +547,7 @@ const FindChars4: React.FC<LevelProps> = () => {
           )}
         </KeysAllowed>
       </div>
-      {/* Level Timer */}
-      <LevelTimer levelId="4-find-chars" isActive={timerActive} />
 
-      {/* Rolling banner at the bottom */}
       <style>
         {`
           @keyframes marquee {
@@ -654,7 +556,7 @@ const FindChars4: React.FC<LevelProps> = () => {
           }
         `}
       </style>
-    </div>
+    </LevelShell>
   )
 }
 

@@ -7,15 +7,17 @@ interface LevelShellProps {
   level: UseVimLevelReturn
   children: React.ReactNode
   completionContent?: React.ReactNode
+  className?: string
 }
 
 export default function LevelShell({
   level,
   children,
   completionContent,
+  className = 'w-full h-full flex flex-col items-center gap-6',
 }: LevelShellProps) {
   return (
-    <div className="w-full h-full flex flex-col items-center gap-6">
+    <div className={className}>
       {level.showConfetti && <ConfettiBurst />}
 
       {level.levelCompleted && completionContent ? completionContent : children}

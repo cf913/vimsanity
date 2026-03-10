@@ -3,13 +3,11 @@ import {
   useKeyboardHandler,
   KeyActionMap,
 } from '../../hooks/useKeyboardHandler'
+import { useVimLevel } from '../../hooks/useVimLevel'
 import { processTextForVim } from '../../utils/textUtils'
 import ExplosionEffect from './ExplosionEffect'
-import ConfettiBurst from './ConfettiBurst'
-import LevelTimer from '../common/LevelTimer'
-import { RefreshCw, Zap } from 'lucide-react'
-import Scoreboard from '../common/Scoreboard'
 import { KeysAllowed } from '../common/KeysAllowed'
+import { LevelShell, LevelHeader } from '../level-blocks'
 
 interface LevelProps {
   isMuted: boolean
@@ -46,38 +44,43 @@ const LineOperations3: React.FC<LevelProps> = () => {
       squares
         .reduce((acc: Array<Array<(typeof squares)[0]>>, square) => {
           if (square.isSpace) {
-            // Add space as its own "word"
             acc.push([square])
-            // Start a new word
             acc.push([])
           } else {
-            // If we have no words yet or the last word is a space, start a new word
             if (acc.length === 0 || acc[acc.length - 1][0]?.isSpace) {
               acc.push([square])
             } else {
-              // Add to the current word
               acc[acc.length - 1].push(square)
             }
           }
           return acc
         }, [])
-        .filter((word) => word.length > 0), // Remove any empty words
+        .filter((word) => word.length > 0),
   )
 
-  // Track current line and position within that line
+  // Level-specific state
   const [currentLineIndex, setCurrentLineIndex] = useState<number>(0)
   const [cursor, setCursor] = useState<number>(0)
   const [target, setTarget] = useState<number>(5)
   const [targetLineIndex, setTargetLineIndex] = useState<number>(0)
-  const [score, setScore] = useState(0)
-  const [showConfetti, setShowConfetti] = useState(false)
   const [showExplosion, setShowExplosion] = useState(false)
   const [explosionIdx, setExplosionIdx] = useState<number | null>(null)
   const [explosionLineIdx, setExplosionLineIdx] = useState<number | null>(null)
-  const [revealedLetters, setRevealedLetters] = useState<Set<string>>(new Set()) // Using "lineIdx-charIdx" format
-  const [levelCompleted, setLevelCompleted] = useState(false)
-  const [timerActive, setTimerActive] = useState<boolean>(false)
-  const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
+  const [revealedLetters, setRevealedLetters] = useState<Set<string>>(new Set())
+
+  const level = useVimLevel({
+    levelId: '3-line-operations',
+    maxScore: 16,
+    onReset: () => {
+      setCursor(0)
+      setCurrentLineIndex(0)
+      setRevealedLetters(new Set())
+      setShowExplosion(false)
+      setExplosionIdx(null)
+      setExplosionLineIdx(null)
+      setNewTarget()
+    },
+  })
 
   // Refs for scrolling
   const containerRef = useRef<HTMLDivElement>(null)
@@ -95,23 +98,17 @@ const LineOperations3: React.FC<LevelProps> = () => {
 
   // Set a new target randomly - only select unrevealed squares
   const setNewTarget = () => {
-    // Determine if we should target start or end of line based on previous target
     const prevWasAtStart =
       target ===
       linesOfSquares[targetLineIndex].findIndex((square) => !square.isSpace)
 
-    // Collect all available unrevealed positions that match our constraint
     const availablePositions: { lineIndex: number; position: number }[] = []
 
     linesOfSquares.forEach((line, lineIdx) => {
-      // Get the position based on our alternating pattern
       const startPos = line.findIndex((square) => !square.isSpace)
       const endPos = line.length - 1
-
-      // Choose position based on alternating pattern
       const posToCheck = prevWasAtStart ? endPos : startPos
 
-      // Check if this position is unrevealed
       if (
         !revealedLetters.has(`${lineIdx}-${posToCheck}`) &&
         !line[posToCheck].isSpace
@@ -120,26 +117,19 @@ const LineOperations3: React.FC<LevelProps> = () => {
       }
     })
 
-    // If we have available positions, choose one randomly
     if (availablePositions.length > 0) {
       const randomIndex = Math.floor(Math.random() * availablePositions.length)
       const { lineIndex, position } = availablePositions[randomIndex]
-
       setTarget(position)
       setTargetLineIndex(lineIndex)
     } else {
-      // If no unrevealed positions match our constraint, try the opposite constraint
       const secondaryPositions: { lineIndex: number; position: number }[] = []
 
       linesOfSquares.forEach((line, lineIdx) => {
-        // Get the opposite position from our alternating pattern
         const startPos = line.findIndex((square) => !square.isSpace)
         const endPos = line.length - 1
-
-        // Choose the opposite position
         const posToCheck = prevWasAtStart ? startPos : endPos
 
-        // Check if this position is unrevealed
         if (
           !revealedLetters.has(`${lineIdx}-${posToCheck}`) &&
           !line[posToCheck].isSpace
@@ -153,11 +143,9 @@ const LineOperations3: React.FC<LevelProps> = () => {
           Math.random() * secondaryPositions.length,
         )
         const { lineIndex, position } = secondaryPositions[randomIndex]
-
         setTarget(position)
         setTargetLineIndex(lineIndex)
       } else {
-        // If still no unrevealed positions, check for any unrevealed position
         const anyPositions: { lineIndex: number; position: number }[] = []
 
         linesOfSquares.forEach((line, lineIdx) => {
@@ -174,13 +162,10 @@ const LineOperations3: React.FC<LevelProps> = () => {
         if (anyPositions.length > 0) {
           const randomIndex = Math.floor(Math.random() * anyPositions.length)
           const { lineIndex, position } = anyPositions[randomIndex]
-
           setTarget(position)
           setTargetLineIndex(lineIndex)
         } else {
-          // All squares have been revealed - level complete!
-          setLevelCompleted(true)
-          setShowConfetti(true)
+          level.completeLevel()
         }
       }
     }
@@ -191,24 +176,42 @@ const LineOperations3: React.FC<LevelProps> = () => {
     setNewTarget()
   }, [])
 
-  // Start timer on first key press
-  const activateTimer = () => {
-    if (!timerActive) {
-      setTimerActive(true)
+  // Check if the player has reached the target
+  const checkTarget = (newPos: number, lineIndex: number) => {
+    if (newPos === target && lineIndex === targetLineIndex) {
+      setExplosionIdx(newPos)
+      setExplosionLineIdx(lineIndex)
+      setShowExplosion(true)
+
+      setRevealedLetters((prev) => {
+        const newSet = new Set(prev)
+        newSet.add(`${lineIndex}-${newPos}`)
+        if (newSet.size >= 16) {
+          level.completeLevel()
+        }
+        return newSet
+      })
+
+      level.setScore((prev) => prev + 1)
+
+      setTimeout(() => {
+        setShowExplosion(false)
+        setExplosionIdx(null)
+        setExplosionLineIdx(null)
+        setNewTarget()
+      }, 200)
     }
   }
 
   // Key actions for movement
   const keyActions: KeyActionMap = {
     0: () => {
-      activateTimer()
-      // move cursor to start of line
+      level.activateTimer()
       setCursor(0)
       checkTarget(0, currentLineIndex)
     },
     _: () => {
-      activateTimer()
-      // Find the first non-space character in the line
+      level.activateTimer()
       const firstNonSpace = linesOfSquares[currentLineIndex].findIndex(
         (square) => !square.isSpace,
       )
@@ -218,40 +221,29 @@ const LineOperations3: React.FC<LevelProps> = () => {
       }
     },
     $: () => {
-      // move cursor to end of current line
       setCursor(linesOfSquares[currentLineIndex].length - 1)
       checkTarget(linesOfSquares[currentLineIndex].length - 1, currentLineIndex)
     },
     j: () => {
-      activateTimer()
-      // Move down a line
+      level.activateTimer()
       if (currentLineIndex < linesOfSquares.length - 1) {
         const nextLineIndex = currentLineIndex + 1
         setCurrentLineIndex(nextLineIndex)
-
-        // Adjust cursor if needed (if the new line is shorter)
         const newLineCursorPos = Math.min(
           cursor,
           linesOfSquares[nextLineIndex].length - 1,
         )
         setCursor(newLineCursorPos)
-
-        // Check if we hit a target
         checkTarget(newLineCursorPos, nextLineIndex)
       }
     },
     k: () => {
-      setLastKeyPressed('k')
       if (currentLineIndex > 0) {
-        // Move up a line
-        // Move to previous line
         const prevLineIndex = currentLineIndex - 1
-        // Ensure cursor doesn't go beyond the end of the previous line
         const prevLineCursor = Math.min(
           cursor,
           linesOfSquares[prevLineIndex].length - 1,
         )
-
         setCurrentLineIndex(prevLineIndex)
         setCursor(prevLineCursor)
         checkTarget(prevLineCursor, prevLineIndex)
@@ -259,72 +251,19 @@ const LineOperations3: React.FC<LevelProps> = () => {
     },
   }
 
-  // Register keyboard handler
-  const { lastKeyPressed: keyboardLastKey } = useKeyboardHandler({
+  const { lastKeyPressed } = useKeyboardHandler({
     keyActionMap: keyActions,
     dependencies: [cursor, currentLineIndex, linesOfSquares],
+    disabled: level.levelCompleted,
   })
 
-  // Update lastKeyPressed state when keyboard events happen
-  useEffect(() => {
-    if (keyboardLastKey) {
-      setLastKeyPressed(keyboardLastKey)
-    }
-  }, [keyboardLastKey])
-
-  // Check if the player has reached the target
-  const checkTarget = (newPos: number, lineIndex: number) => {
-    if (newPos === target && lineIndex === targetLineIndex) {
-      // Play explosion effect
-      setExplosionIdx(newPos)
-      setExplosionLineIdx(lineIndex)
-      setShowExplosion(true)
-
-      // Reveal the letter
-      setRevealedLetters((prev) => {
-        const newSet = new Set(prev)
-        newSet.add(`${lineIndex}-${newPos}`)
-        if (newSet.size === 16) {
-          setLevelCompleted(true)
-          setShowConfetti(true)
-        }
-        return newSet
-      })
-
-      // Increment score
-      setScore((prevScore) => prevScore + 1)
-
-      // Set a timeout to hide the explosion and set a new target
-      setTimeout(() => {
-        setShowExplosion(false)
-        setExplosionIdx(null)
-        setExplosionLineIdx(null)
-
-        // Set a new target
-        setNewTarget()
-
-        // Level completion is now handled in setNewTarget when no unrevealed squares remain
-      }, 200)
-    }
-  }
-
-  // Reset the level
-  const resetLevel = () => {
-    setCursor(0)
-    setCurrentLineIndex(0)
-    setScore(0)
-    setLevelCompleted(false)
-    setRevealedLetters(new Set())
-    setNewTarget()
-  }
-
   return (
-    <div className="flex flex-col items-center justify-center bg-bg-primary text-white">
+    <LevelShell
+      level={level}
+      className="flex flex-col items-center justify-center bg-bg-primary text-white"
+    >
       <div className="w-full max-w-4xl">
         <div className="flex flex-col items-center mb-2">
-          {/* <h1 className="text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">
-            Line Navigation
-          </h1> */}
           <p className="text-text-muted text-center max-w-lg mb-4">
             Use <kbd className="px-2 py-1 bg-bg-secondary rounded">0</kbd>,{' '}
             <kbd className="px-2 py-1 bg-bg-secondary rounded">_</kbd> and{' '}
@@ -333,26 +272,15 @@ const LineOperations3: React.FC<LevelProps> = () => {
           </p>
 
           <div className="flex items-center gap-4 mb-2">
-            <Scoreboard score={score} maxScore={16} />
-            <button
-              onClick={resetLevel}
-              className="bg-bg-secondary p-2 rounded-lg hover:bg-bg-tertiary transition-colors"
-              aria-label="Reset Level"
-            >
-              <RefreshCw size={18} className="text-text-muted" />
-            </button>
-            {levelCompleted && (
-              <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
-                <Zap size={18} className="text-yellow-300" />
-                <span>Level Complete!</span>
-              </div>
-            )}
+            <LevelHeader
+              title=""
+              score={level.score}
+              maxScore={level.maxScore}
+              onReset={level.resetLevel}
+            />
           </div>
         </div>
         <div className="relative w-full max-w-4xl bg-bg-secondary p-6 py-8 rounded-lg mx-auto overflow-y-scroll">
-          {/* Global Confetti Burst over the game area */}
-          {showConfetti && <ConfettiBurst />}
-
           {/* Container for all lines */}
           <div className="flex flex-col">
             {linesOfWords.map((words, lineIdx) => (
@@ -419,14 +347,12 @@ const LineOperations3: React.FC<LevelProps> = () => {
                             <span className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30 z-0"></span>
                           )}
 
-                          {/* Show the character if it's been revealed */}
                           {isRevealed && square.char !== ' ' && (
                             <span className="z-10 text-lg font-medium font-mono">
                               {square.char}
                             </span>
                           )}
 
-                          {/* Explosion effect */}
                           {showExplosion &&
                             explosionIdx === square.idx &&
                             explosionLineIdx === lineIdx && (
@@ -447,15 +373,8 @@ const LineOperations3: React.FC<LevelProps> = () => {
           keys={['0', '_', '$', 'j', 'k']}
           lastKeyPressed={lastKeyPressed}
         />
-
-        {/* Level Timer */}
-        <LevelTimer
-          levelId="3-line-operations"
-          isActive={timerActive}
-          isCompleted={levelCompleted}
-        />
       </div>
-    </div>
+    </LevelShell>
   )
 }
 

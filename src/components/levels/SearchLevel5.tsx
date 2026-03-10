@@ -3,13 +3,11 @@ import {
   useKeyboardHandler,
   KeyActionMap,
 } from '../../hooks/useKeyboardHandler'
+import { useVimLevel } from '../../hooks/useVimLevel'
 import { processTextForVim } from '../../utils/textUtils'
 import ExplosionEffect from './ExplosionEffect'
-import ConfettiBurst from './ConfettiBurst'
-import LevelTimer from '../common/LevelTimer'
-import { RefreshCw, Zap } from 'lucide-react'
-import Scoreboard from '../common/Scoreboard'
 import { KeysAllowed } from '../common/KeysAllowed'
+import { LevelShell, LevelHeader } from '../level-blocks'
 
 interface LevelProps {
   isMuted: boolean
@@ -30,10 +28,8 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     'Or find the word "tools" to practice.',
   ]
 
-  // Process each line of text separately
   const processedLines = sampleTexts.map((text) => processTextForVim(text))
 
-  // Create squares for each line
   const linesOfSquares = processedLines.map((characters) =>
     characters.map((char, idx) => ({
       isSpace: char === ' ',
@@ -42,42 +38,34 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     })),
   )
 
-  // Group characters into words for each line
   const linesOfWords = linesOfSquares.map(
     (squares) =>
       squares
         .reduce((acc: Array<Array<(typeof squares)[0]>>, square) => {
           if (square.isSpace) {
-            // Add space as its own "word"
             acc.push([square])
-            // Start a new word
             acc.push([])
           } else {
-            // If we have no words yet or the last word is a space, start a new word
             if (acc.length === 0 || acc[acc.length - 1][0]?.isSpace) {
               acc.push([square])
             } else {
-              // Add to the current word
               acc[acc.length - 1].push(square)
             }
           }
           return acc
         }, [])
-        .filter((word) => word.length > 0), // Remove any empty words
+        .filter((word) => word.length > 0),
   )
 
-  // Track current line and position within that line
+  // Level-specific state
   const [currentLineIndex, setCurrentLineIndex] = useState<number>(0)
   const [cursor, setCursor] = useState<number>(0)
   const [target, setTarget] = useState<number>(5)
   const [targetLineIndex, setTargetLineIndex] = useState<number>(0)
-  const [score, setScore] = useState(0)
-  const [showConfetti, setShowConfetti] = useState(false)
   const [showExplosion, setShowExplosion] = useState(false)
   const [explosionIdx, setExplosionIdx] = useState<number | null>(null)
   const [explosionLineIdx, setExplosionLineIdx] = useState<number | null>(null)
-  const [revealedLetters, setRevealedLetters] = useState<Set<string>>(new Set()) // Using "lineIdx-charIdx" format
-  const [levelCompleted, setLevelCompleted] = useState(false)
+  const [revealedLetters, setRevealedLetters] = useState<Set<string>>(new Set())
   const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
 
   // Search functionality states
@@ -92,7 +80,23 @@ const SearchLevel5: React.FC<LevelProps> = () => {
   const [currentMatchIndex, setCurrentMatchIndex] = useState<number>(-1)
   const [searchHistory, setSearchHistory] = useState<string[]>([])
   const [historyIndex, setHistoryIndex] = useState<number>(-1)
-  const [timerActive, setTimerActive] = useState<boolean>(false)
+
+  const level = useVimLevel({
+    levelId: '5-search-level',
+    maxScore: 10,
+    onReset: () => {
+      setCursor(0)
+      setCurrentLineIndex(0)
+      setRevealedLetters(new Set())
+      clearSearch()
+      setSearchHistory([])
+      setHistoryIndex(-1)
+      setShowExplosion(false)
+      setExplosionIdx(null)
+      setExplosionLineIdx(null)
+      setNewTarget()
+    },
+  })
 
   // Refs for scrolling
   const containerRef = useRef<HTMLDivElement>(null)
@@ -111,7 +115,6 @@ const SearchLevel5: React.FC<LevelProps> = () => {
 
   // Set a new target randomly
   const setNewTarget = () => {
-    // First, find all potential targets that have special patterns (like "search" or "tools")
     const targetPatterns = [
       'search',
       'vim',
@@ -140,7 +143,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
         while (startIdx !== -1) {
           potentialTargets.push({
             lineIdx,
-            charIdx: startIdx + Math.floor(pattern.length / 2), // Target middle of word
+            charIdx: startIdx + Math.floor(pattern.length / 2),
             pattern,
           })
           startIdx = lineText.indexOf(pattern, startIdx + 1)
@@ -149,7 +152,6 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     })
 
     if (potentialTargets.length === 0) {
-      // Fallback to random position if no patterns found
       const randomLineIndex = Math.floor(Math.random() * linesOfSquares.length)
       const randomPos = Math.floor(
         Math.random() * linesOfSquares[randomLineIndex].length,
@@ -157,7 +159,6 @@ const SearchLevel5: React.FC<LevelProps> = () => {
       setTarget(randomPos)
       setTargetLineIndex(randomLineIndex)
     } else {
-      // Choose a random target from the potential targets
       const randomTarget =
         potentialTargets[Math.floor(Math.random() * potentialTargets.length)]
       setTarget(randomTarget.charIdx)
@@ -165,22 +166,14 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     }
   }
 
-  // Initialize the game with a random target
   useEffect(() => {
     setNewTarget()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Start timer on first interaction
-  const activateTimer = () => {
-    if (!timerActive) {
-      setTimerActive(true)
-    }
-  }
-
   // Perform search across all lines
   const performSearch = (term: string) => {
-    activateTimer()
+    level.activateTimer()
     if (!term) {
       setSearchMatches([])
       setCurrentMatchIndex(-1)
@@ -213,10 +206,8 @@ const SearchLevel5: React.FC<LevelProps> = () => {
 
     setSearchMatches(matches)
 
-    // Set current match index based on search direction and current cursor position
     if (matches.length > 0) {
       if (searchDirection === 'forward') {
-        // Find the next match after current position
         const nextMatch = matches.findIndex(
           (match) =>
             match.lineIdx > currentLineIndex ||
@@ -224,7 +215,6 @@ const SearchLevel5: React.FC<LevelProps> = () => {
         )
         setCurrentMatchIndex(nextMatch !== -1 ? nextMatch : 0)
       } else {
-        // Find the previous match before current position
         const prevMatchIndex = matches.findIndex(
           (match) =>
             match.lineIdx < currentLineIndex ||
@@ -239,9 +229,8 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     }
   }
 
-  // Navigate to the next search match
   const navigateToNextMatch = () => {
-    activateTimer()
+    level.activateTimer()
     if (searchMatches.length === 0) return
 
     let newMatchIndex
@@ -259,9 +248,8 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     checkTarget(match.startIdx, match.lineIdx)
   }
 
-  // Navigate to the previous search match
   const navigateToPrevMatch = () => {
-    activateTimer()
+    level.activateTimer()
     if (searchMatches.length === 0) return
 
     let newMatchIndex
@@ -279,17 +267,12 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     checkTarget(match.startIdx, match.lineIdx)
   }
 
-  // Clear search state
   const clearSearch = () => {
     setIsSearching(false)
     setSearchTerm('')
     setHistoryIndex(-1)
-    // Keep search matches and currentMatchIndex to allow further navigation
-
-    // Remove searching class from body
     document.body.classList.remove('searching')
 
-    // Return focus to container
     if (containerRef.current) {
       setTimeout(() => {
         containerRef.current?.focus()
@@ -297,31 +280,25 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     }
   }
 
-  // Start searching
   const startSearch = (direction: 'forward' | 'backward') => {
-    activateTimer()
+    level.activateTimer()
     setIsSearching(true)
     setSearchDirection(direction)
     setSearchTerm('')
     setSearchMatches([])
     setCurrentMatchIndex(-1)
 
-    // Immediately add a class to the body to help with styling/handling
     document.body.classList.add('searching')
 
-    // We need to wait for the input to be rendered before focusing
     setTimeout(() => {
       if (searchInputRef.current) {
         try {
-          // Try multiple focus methods
           searchInputRef.current.focus()
           searchInputRef.current.click()
 
-          // Create a temporary input event to trigger browser focus behavior
           const event = new Event('input', { bubbles: true })
           searchInputRef.current.dispatchEvent(event)
 
-          // Place cursor at end of text
           const length = searchInputRef.current.value.length
           searchInputRef.current.setSelectionRange(length, length)
         } catch (e) {
@@ -331,13 +308,11 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     }, 100)
   }
 
-  // Handle search input change
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    activateTimer()
-    e.stopPropagation() // Prevent event bubbling
+    level.activateTimer()
+    e.stopPropagation()
     const value = e.target.value
     setSearchTerm(value)
-    // Don't search on every keystroke to avoid performance issues
     if (value.length >= 1) {
       performSearch(value)
     } else if (value.length === 0) {
@@ -346,17 +321,14 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     }
   }
 
-  // Handle search input submission
   const handleSearchSubmit = (e: React.FormEvent) => {
-    activateTimer()
+    level.activateTimer()
     e.preventDefault()
     e.stopPropagation()
 
     if (searchTerm) {
-      // Ensure we have the most up-to-date search results
       performSearch(searchTerm)
 
-      // If matches found, go to the first one
       if (searchMatches.length > 0 && currentMatchIndex !== -1) {
         const match = searchMatches[currentMatchIndex]
         setCurrentLineIndex(match.lineIdx)
@@ -364,9 +336,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
         checkTarget(match.startIdx, match.lineIdx)
       }
 
-      // Add to search history if not already the most recent entry
       setSearchHistory((prev) => {
-        // Don't add duplicates in a row
         if (prev.length === 0 || prev[0] !== searchTerm) {
           return [searchTerm, ...prev]
         }
@@ -375,23 +345,20 @@ const SearchLevel5: React.FC<LevelProps> = () => {
       setHistoryIndex(-1)
     }
 
-    // End search mode
     clearSearch()
   }
 
   // Key actions map
   const keyActions: KeyActionMap = {
-    // Search operations are now handled by the global event handler
-    // to prevent conflicts with input field
     n: () => {
-      activateTimer()
+      level.activateTimer()
       if (searchMatches.length > 0) {
         navigateToNextMatch()
         setLastKeyPressed('n')
       }
     },
     N: () => {
-      activateTimer()
+      level.activateTimer()
       if (searchMatches.length > 0) {
         navigateToPrevMatch()
         setLastKeyPressed('N')
@@ -403,7 +370,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
       }
     },
     h: () => {
-      activateTimer()
+      level.activateTimer()
       if (!isSearching) {
         setLastKeyPressed('h')
         if (cursor > 0) {
@@ -414,7 +381,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
       }
     },
     l: () => {
-      activateTimer()
+      level.activateTimer()
       if (!isSearching) {
         setLastKeyPressed('l')
         if (cursor < linesOfSquares[currentLineIndex].length - 1) {
@@ -425,7 +392,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
       }
     },
     j: () => {
-      activateTimer()
+      level.activateTimer()
       if (!isSearching) {
         setLastKeyPressed('j')
         if (currentLineIndex < linesOfSquares.length - 1) {
@@ -441,7 +408,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
       }
     },
     k: () => {
-      activateTimer()
+      level.activateTimer()
       if (!isSearching) {
         setLastKeyPressed('k')
         if (currentLineIndex > 0) {
@@ -458,11 +425,9 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     },
   }
 
-  // Setup global event handler for the search input
+  // Setup global event handler for search keys
   useEffect(() => {
-    // Create a global handler for keyboard events
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      // Don't interfere with input typing
       if (
         document.activeElement instanceof HTMLInputElement ||
         document.activeElement instanceof HTMLTextAreaElement
@@ -474,8 +439,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
         return
       }
 
-      // Handle search keys when not in search mode
-      if (!isSearching) {
+      if (!isSearching && !level.levelCompleted) {
         if (e.key === '/' || e.key === '?') {
           e.preventDefault()
           startSearch(e.key === '/' ? 'forward' : 'backward')
@@ -487,9 +451,8 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     return () => {
       window.removeEventListener('keydown', handleGlobalKeyDown)
     }
-  }, [isSearching])
+  }, [isSearching, level.levelCompleted])
 
-  // Register keyboard handler
   const { lastKeyPressed: keyboardLastKey } = useKeyboardHandler({
     keyActionMap: keyActions,
     dependencies: [
@@ -499,9 +462,8 @@ const SearchLevel5: React.FC<LevelProps> = () => {
       searchMatches,
       currentMatchIndex,
     ],
-    disabled: isSearching,
+    disabled: isSearching || level.levelCompleted,
     onAnyKey: () => {
-      // Always check if we're searching and refocus the input if needed
       if (
         isSearching &&
         searchInputRef.current &&
@@ -512,21 +474,19 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     },
   })
 
-  // Update lastKeyPressed state when keyboard events happen
   useEffect(() => {
     if (keyboardLastKey) {
       setLastKeyPressed(keyboardLastKey)
     }
   }, [keyboardLastKey])
 
-  // Add a global click handler to help manage search state
+  // Global click handler for search dismissal
   useEffect(() => {
     const handleGlobalClick = (e: MouseEvent) => {
-      // If we're searching and click outside the search form, end search
       if (isSearching) {
-        const target = e.target as HTMLElement
+        const clickTarget = e.target as HTMLElement
         const searchForm = document.querySelector('form')
-        if (searchForm && !searchForm.contains(target)) {
+        if (searchForm && !searchForm.contains(clickTarget)) {
           clearSearch()
         }
       }
@@ -541,59 +501,29 @@ const SearchLevel5: React.FC<LevelProps> = () => {
   // Check if the player has reached the target
   const checkTarget = (newPos: number, lineIndex: number) => {
     if (newPos === target && lineIndex === targetLineIndex) {
-      // Play explosion effect
       setExplosionIdx(newPos)
       setExplosionLineIdx(lineIndex)
       setShowExplosion(true)
 
-      // Reveal the letter
       setRevealedLetters((prev) => {
         const newSet = new Set(prev)
         newSet.add(`${lineIndex}-${newPos}`)
         return newSet
       })
 
-      // Increment score
-      setScore((prevScore) => prevScore + 1)
+      level.incrementScore()
 
-      // Set a timeout to hide the explosion and set a new target
       setTimeout(() => {
         setShowExplosion(false)
         setExplosionIdx(null)
         setExplosionLineIdx(null)
-
-        // Set a new target
         setNewTarget()
-
-        // Check if level is completed (10 targets hit)
-        if (score + 1 >= 10) {
-          setLevelCompleted(true)
-          setShowConfetti(true)
-          setTimeout(() => {
-            setShowConfetti(false)
-          }, 3000)
-        }
       }, 200)
     }
   }
 
-  // Reset the level
-  const resetLevel = () => {
-    setCursor(0)
-    setCurrentLineIndex(0)
-    setScore(0)
-    setLevelCompleted(false)
-    setRevealedLetters(new Set())
-    clearSearch()
-    setSearchHistory([])
-    setHistoryIndex(-1)
-    setNewTarget()
-  }
-
-  // Determine if a character is part of a search match
   const isInSearchMatch = (lineIdx: number, charIdx: number) => {
     if (searchMatches.length === 0) return false
-
     return searchMatches.some(
       (match) =>
         match.lineIdx === lineIdx &&
@@ -602,10 +532,8 @@ const SearchLevel5: React.FC<LevelProps> = () => {
     )
   }
 
-  // Determine if a character is part of the current search match
   const isInCurrentMatch = (lineIdx: number, charIdx: number) => {
     if (searchMatches.length === 0 || currentMatchIndex === -1) return false
-
     const currentMatch = searchMatches[currentMatchIndex]
     return (
       currentMatch.lineIdx === lineIdx &&
@@ -615,9 +543,9 @@ const SearchLevel5: React.FC<LevelProps> = () => {
   }
 
   return (
-    <div
+    <LevelShell
+      level={level}
       className={`flex flex-col items-center justify-center bg-bg-primary text-white ${isSearching ? 'searching' : ''}`}
-      tabIndex={-1}
     >
       <div className="w-full max-w-6xl px-4">
         <div className="flex flex-col items-center mb-2">
@@ -632,20 +560,12 @@ const SearchLevel5: React.FC<LevelProps> = () => {
           </p>
 
           <div className="flex items-center gap-4 mb-2">
-            <Scoreboard score={score} maxScore={10} />
-            <button
-              onClick={resetLevel}
-              className="bg-bg-secondary p-2 rounded-lg hover:bg-bg-tertiary transition-colors"
-              aria-label="Reset Level"
-            >
-              <RefreshCw size={18} className="text-text-muted" />
-            </button>
-            {levelCompleted && (
-              <div className="bg-emerald-600 px-4 py-2 rounded-lg text-white animate-pulse flex items-center gap-2 shadow-md">
-                <Zap size={18} className="text-yellow-300" />
-                <span>Level Complete!</span>
-              </div>
-            )}
+            <LevelHeader
+              title=""
+              score={level.score}
+              maxScore={level.maxScore}
+              onReset={level.resetLevel}
+            />
           </div>
         </div>
         <div
@@ -676,7 +596,6 @@ const SearchLevel5: React.FC<LevelProps> = () => {
                     e.stopPropagation()
                   }}
                   onKeyDown={(e) => {
-                    // Prevent propagation to avoid triggering other keyboard handlers
                     e.stopPropagation()
                     if (e.key === 'Escape') {
                       e.preventDefault()
@@ -721,9 +640,6 @@ const SearchLevel5: React.FC<LevelProps> = () => {
             </div>
           )}
 
-          {/* Global Confetti Burst over the game area */}
-          {showConfetti && <ConfettiBurst />}
-
           {/* Container for all lines */}
           <div className="flex flex-col">
             {linesOfWords.map((words, lineIdx) => (
@@ -745,10 +661,9 @@ const SearchLevel5: React.FC<LevelProps> = () => {
                       const isPlayer =
                         square.idx === cursor && lineIdx === currentLineIndex
 
-                      const isTarget =
+                      const isTarget2 =
                         square.idx === target && lineIdx === targetLineIndex
 
-                      // Track revealed letters for game state
                       revealedLetters.has(`${lineIdx}-${square.idx}`)
 
                       const isSearchHighlight = isInSearchMatch(
@@ -766,7 +681,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
                       if (isPlayer)
                         base +=
                           'bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-500/50 '
-                      else if (isTarget)
+                      else if (isTarget2)
                         base +=
                           'bg-purple-500 text-white scale-105 shadow-lg shadow-purple-500/60 animate-pulse '
                       else if (isCurrentMatchHighlight)
@@ -799,16 +714,14 @@ const SearchLevel5: React.FC<LevelProps> = () => {
                           className={base}
                           style={{ position: 'relative' }}
                         >
-                          {isTarget && (
+                          {isTarget2 && (
                             <span className="absolute inset-0 rounded-md animate-ping bg-purple-500 opacity-30 z-0"></span>
                           )}
 
-                          {/* Show the character always */}
                           <span className="z-10 text-lg font-medium font-mono">
                             {square.char}
                           </span>
 
-                          {/* Explosion effect */}
                           {showExplosion &&
                             explosionIdx === square.idx &&
                             explosionLineIdx === lineIdx && (
@@ -838,11 +751,7 @@ const SearchLevel5: React.FC<LevelProps> = () => {
           lastKeyPressed={lastKeyPressed}
         />
       </div>
-
-      {/* Level Timer */}
-      <LevelTimer levelId="5-search-level" isActive={timerActive} />
-      {/* <WarningSplash /> */}
-    </div>
+    </LevelShell>
   )
 }
 
