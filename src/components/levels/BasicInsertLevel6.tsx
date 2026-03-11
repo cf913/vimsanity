@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react'
-import ConfettiBurst from './ConfettiBurst'
-import LevelTimer from '../common/LevelTimer'
-import Scoreboard from '../common/Scoreboard'
-import ModeIndicator from '../common/ModeIndicator'
+import React, { useEffect, useState } from 'react'
+import { VIM_MODES, VimMode } from '../../utils/constants'
+import { useVimLevel } from '../../hooks/useVimLevel'
 import { KeysAllowed } from '../common/KeysAllowed'
-import { VimMode, VIM_MODES } from '../../utils/constants'
+import ModeIndicator from '../common/ModeIndicator'
 import { Cell } from './Level6/Cell'
-import { RefreshCw } from 'lucide-react'
+import { LevelShell, LevelHeader } from '../level-blocks'
 
 interface BasicInsertLevel6Props {
   isMuted: boolean
@@ -28,41 +26,42 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = () => {
     },
     { id: '8', content: 'Mood', expected: 'Mode Normal', completed: false },
   ]
+
   const [cells, setCells] = useState<Cell[]>(initialCells)
   const [activeCell, setActiveCell] = useState<number | null>(0)
-  const [score, setScore] = useState(0)
-  const [showConfetti, setShowConfetti] = useState(false)
-  const [allCompleted, setAllCompleted] = useState(false)
   const [lastKeyPressed, setLastKeyPressed] = useState<string | null>(null)
   const [mode, setMode] = useState<VimMode>(VIM_MODES.NORMAL)
   const [resetCount, setResetCount] = useState(0)
 
-  const isInsertMode = mode === VIM_MODES.INSERT
+  const level = useVimLevel({
+    levelId: '6-basic-insert',
+    maxScore: initialCells.length * 10,
+    onReset: () => {
+      setActiveCell(0)
+      setCells(initialCells)
+      setResetCount((prev) => prev + 1)
+      setMode(VIM_MODES.NORMAL)
+    },
+  })
+
+  // Start timer immediately (this level doesn't wait for first keypress)
+  useEffect(() => { level.activateTimer() }, [])
 
   // Check if all cells are completed
   useEffect(() => {
     if (cells.length > 0 && cells.every((cell) => cell.completed)) {
-      setAllCompleted(true)
-      setShowConfetti(true)
-
-      // Reset after celebration
-      setTimeout(() => {
-        setShowConfetti(false)
-      }, 3000)
+      level.completeLevel()
     }
-  }, [cells])
+  }, [cells, level.completeLevel])
 
-  const resetLevel = () => {
-    setActiveCell(0)
-    setScore(0)
-    setCells(initialCells)
-    setResetCount((prev) => prev + 1)
-  }
+  const isInsertMode = mode === VIM_MODES.INSERT
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <LevelShell
+      level={level}
+      className="flex flex-col items-center gap-4"
+    >
       <div className="text-center">
-        {/* <h3 className="text-xl font-bold mb-2">Basic Insert Mode</h3> */}
         <p className="text-text-muted">
           Use <kbd className="px-2 py-1 bg-bg-secondary rounded">i</kbd> to enter
           insert mode before cursor,{' '}
@@ -76,22 +75,15 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = () => {
           <kbd className="px-2 py-1 bg-bg-secondary rounded">Ctrl+r</kbd> to redo
           changes.
         </p>
-        {/* <p className="text-text-muted text-sm"> */}
-        {/*   Edit each cell to match the expected text shown below it. */}
-        {/* </p> */}
       </div>
 
       <div className="flex items-center gap-4 mb-2">
-        {/* Score display */}
-        <Scoreboard score={score} maxScore={cells.length * 10} />
-        <button
-          onClick={resetLevel}
-          className="bg-bg-secondary p-2 rounded-lg hover:bg-bg-tertiary transition-colors"
-          aria-label="Reset Level"
-        >
-          <RefreshCw size={18} className="text-text-muted" />
-        </button>
-        {/* Mode indicator */}
+        <LevelHeader
+          title=""
+          score={level.score}
+          maxScore={level.maxScore}
+          onReset={level.resetLevel}
+        />
         <ModeIndicator isInsertMode={isInsertMode} />
       </div>
 
@@ -111,7 +103,7 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = () => {
                   const updatedCells = [...cells]
                   updatedCells[index].completed = true
                   setCells(updatedCells)
-                  setScore((prev) => prev + 10)
+                  level.setScore((prev) => prev + 10)
                   const nextCellIndex = index + 1
                   setActiveCell(nextCellIndex)
                 },
@@ -130,14 +122,8 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = () => {
         lastKeyPressed={lastKeyPressed}
       />
 
-      {/* Level Timer */}
-      <LevelTimer levelId="6-basic-insert" isActive={true} />
-
-      {/* Confetti for completion */}
-      {showConfetti && <ConfettiBurst />}
-
       {/* Completion message */}
-      {allCompleted && (
+      {level.levelCompleted && (
         <div className="mt-6 p-4 bg-emerald-500/20 border border-emerald-500 rounded-lg text-center">
           <h3 className="text-xl font-bold text-emerald-400">
             Level Complete!
@@ -147,7 +133,7 @@ const BasicInsertLevel6: React.FC<BasicInsertLevel6Props> = () => {
           </p>
         </div>
       )}
-    </div>
+    </LevelShell>
   )
 }
 

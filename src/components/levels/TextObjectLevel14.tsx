@@ -1,17 +1,14 @@
 import { motion } from 'framer-motion'
-import { HelpCircleIcon, RefreshCw } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
   KeyActionMap,
   useKeyboardHandler,
 } from '../../hooks/useKeyboardHandler'
+import { useVimLevel } from '../../hooks/useVimLevel'
 import { VIM_MODES, VimMode } from '../../utils/constants'
 import { KBD } from '../common/KBD'
-import LevelTimer from '../common/LevelTimer'
-import ModeIndicator from '../common/ModeIndicator'
-import Scoreboard from '../common/Scoreboard'
 import { TextWithCursor } from '../common/TextWithCursor'
-import ConfettiBurst from './ConfettiBurst'
+import { LevelShell, LevelHeader, CommandBuffer } from '../level-blocks'
 import ExplosionEffect from './ExplosionEffect'
 
 type CharSquare = {
@@ -94,9 +91,6 @@ export default function TextObjectLevel14() {
   const [lines, setLines] = useState<Line[]>(createInitialLines())
   const [cursorPosition, setCursorPosition] = useState({ line: 0, charIdx: 0 })
   const [mode, setMode] = useState<VimMode>(VIM_MODES.NORMAL)
-  const [score, setScore] = useState(0)
-  const [showConfetti, setShowConfetti] = useState(false)
-  const [levelCompleted, setLevelCompleted] = useState(false)
   const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
   const [pendingCommand, setPendingCommand] = useState<string>('')
   const [showExplosion, setShowExplosion] = useState(false)
@@ -123,14 +117,30 @@ export default function TextObjectLevel14() {
   const totalTargets = countTotalTargets(createInitialLines())
   const currentTargets = countTotalTargets(lines)
 
+  const level = useVimLevel({
+    levelId: 'level-14-text-objects',
+    maxScore: totalTargets,
+    onReset: () => {
+      setLines(createInitialLines())
+      setCursorPosition({ line: 0, charIdx: 0 })
+      setLastKeyPressed('')
+      setPendingCommand('')
+      setMode(VIM_MODES.NORMAL)
+      setVirtualColumn(0)
+      setShowExplosion(false)
+      setExplosionPos(null)
+    },
+  })
+
+  // Timer starts immediately
+  useEffect(() => { level.activateTimer() }, [])
+
   // Check if level is completed (when all red squares are deleted)
   useEffect(() => {
-    if (currentTargets === 0 && !levelCompleted && lines.length > 0) {
-      setLevelCompleted(true)
-      setShowConfetti(true)
-      setTimeout(() => setShowConfetti(false), 3000)
+    if (currentTargets === 0 && !level.levelCompleted && lines.length > 0) {
+      level.completeLevel()
     }
-  }, [currentTargets, levelCompleted, lines])
+  }, [currentTargets, level.levelCompleted, lines.length, level.completeLevel])
 
   // Scroll to cursor
   useEffect(() => {
@@ -143,54 +153,10 @@ export default function TextObjectLevel14() {
     }
   }, [cursorPosition])
 
-  // Handle ESC key for level completion reset
-  useEffect(() => {
-    if (levelCompleted) {
-      const handleEscKey = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          handleRestart()
-        }
-      }
-      window.addEventListener('keydown', handleEscKey)
-      return () => window.removeEventListener('keydown', handleEscKey)
-    }
-  }, [levelCompleted])
-
-  const handleRestart = () => {
-    setLines(createInitialLines())
-    setCursorPosition({ line: 0, charIdx: 0 })
-    setScore(0)
-    setLevelCompleted(false)
-    setShowConfetti(false)
-    setLastKeyPressed('')
-    setPendingCommand('')
-    setMode(VIM_MODES.NORMAL)
-    setVirtualColumn(0)
-    setShowExplosion(false)
-    setExplosionPos(null)
-  }
-
   // Helper: Get all squares as flat array for current line
   const getLineSquares = (lineIdx: number): CharSquare[] => {
     if (lineIdx < 0 || lineIdx >= lines.length) return []
     return lines[lineIdx].words.flat()
-  }
-
-  // Helper: Find which word contains a character index
-  const findWordIndexAtChar = (lineIdx: number, charIdx: number): number => {
-    const line = lines[lineIdx]
-    if (!line) return -1
-
-    let currentCharIdx = 0
-    for (let wordIdx = 0; wordIdx < line.words.length; wordIdx++) {
-      const word = line.words[wordIdx]
-      const wordLength = word.length
-      if (charIdx >= currentCharIdx && charIdx < currentCharIdx + wordLength) {
-        return wordIdx
-      }
-      currentCharIdx += wordLength
-    }
-    return -1
   }
 
   // Helper: Get word boundaries for current cursor position
@@ -231,7 +197,7 @@ export default function TextObjectLevel14() {
     if (deletedTargetCount > 0) {
       setExplosionPos({ line: lineIdx, charIdx })
       setShowExplosion(true)
-      setScore((s) => s + deletedTargetCount)
+      level.setScore((s) => s + deletedTargetCount)
       setTimeout(() => {
         setShowExplosion(false)
         setExplosionPos(null)
@@ -336,7 +302,7 @@ export default function TextObjectLevel14() {
     const boundaries = getCurrentWordBoundaries()
     if (!boundaries) return
 
-    const { line, charIdx } = cursorPosition
+    const { line } = cursorPosition
     const { start, end, wordIdx } = boundaries
 
     // Count targets in this word
@@ -387,8 +353,8 @@ export default function TextObjectLevel14() {
 
     // Find if there's a space before or after to include
     let deleteStart = start
-    let deleteEnd = end + 1
-    let wordsToDelete = [wordIdx]
+    const deleteEnd = end + 1
+    const wordsToDelete = [wordIdx]
 
     // Check for space after
     if (wordIdx + 1 < lines[line].words.length) {
@@ -545,7 +511,7 @@ export default function TextObjectLevel14() {
     const lineSquares = getLineSquares(line)
 
     // Find the start of the next word
-    let nextIdx = charIdx + 1
+    const nextIdx = charIdx + 1
     let inSpace = lineSquares[charIdx]?.isSpace || false
 
     for (let i = nextIdx; i < lineSquares.length; i++) {
@@ -755,22 +721,16 @@ export default function TextObjectLevel14() {
   })
 
   return (
-    <div className="flex flex-col items-center justify-center gap-8 p-8 w-full max-w-6xl mx-auto">
-      {showConfetti && <ConfettiBurst />}
-
+    <LevelShell level={level} className="flex flex-col items-center justify-center gap-8 p-8 w-full max-w-6xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <h2 className="text-2xl font-bold text-slate-200">
-          Text Objects: Delete Inner & Around Word
-        </h2>
-        <button
-          onClick={handleRestart}
-          className="p-2 rounded-lg bg-bg-secondary hover:bg-bg-tertiary transition-colors border border-border-primary"
-          title="Restart Level"
-        >
-          <RefreshCw className="w-5 h-5 text-slate-400" />
-        </button>
-      </div>
+      <LevelHeader
+        title="Text Objects: Delete Inner & Around Word"
+        titleColor="text-slate-200"
+        score={level.score}
+        maxScore={level.maxScore}
+        onReset={level.resetLevel}
+        mode={mode}
+      />
 
       {/* Instructions */}
       <div className="text-center space-y-2 max-w-3xl">
@@ -779,12 +739,6 @@ export default function TextObjectLevel14() {
           <span className="text-red-400 font-bold">red target words</span> using
           text object commands
         </p>
-      </div>
-
-      {/* Mode and Score */}
-      <div className="flex gap-6 items-center">
-        <ModeIndicator isInsertMode={mode === VIM_MODES.INSERT} />
-        <Scoreboard score={score} maxScore={totalTargets} />
       </div>
 
       {/* Character Grid Display */}
@@ -868,15 +822,10 @@ export default function TextObjectLevel14() {
       </div>
 
       {/* Pending Command Indicator */}
-      {pendingCommand && (
-        <div className="text-emerald-400 font-mono text-lg">
-          Command: <KBD>{pendingCommand}</KBD>_
-        </div>
-      )}
+      <CommandBuffer buffer={pendingCommand} color="emerald" />
 
       {/* Help Section */}
       <div className="flex gap-4 items-center">
-        <HelpCircleIcon className="w-5 h-5 text-slate-500" />
         <div className="text-slate-500 text-sm space-y-1 max-w-3xl">
           <p>
             Navigate: <KBD>h</KBD> <KBD>j</KBD> <KBD>k</KBD> <KBD>l</KBD>{' '}
@@ -1078,7 +1027,7 @@ export default function TextObjectLevel14() {
       </div>
 
       {/* Level Completion Message */}
-      {levelCompleted && (
+      {level.levelCompleted && (
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -1094,12 +1043,9 @@ export default function TextObjectLevel14() {
             <p className="text-slate-400">
               Press <KBD>Esc</KBD> to restart
             </p>
-            <LevelTimer levelId={14} isActive={false} />
           </div>
         </motion.div>
       )}
-
-      {!levelCompleted && <LevelTimer levelId={14} isActive={true} />}
-    </div>
+    </LevelShell>
   )
 }

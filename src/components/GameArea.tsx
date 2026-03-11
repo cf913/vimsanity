@@ -1,21 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import KeyboardVisualizerLevel0 from './levels/KeyboardVisualizerLevel0'
-import GridMovementLevel from './levels/GridMovementLevel'
-import WordMovementLevel from './levels/WordMovementLevel'
-import LineOperations3 from './levels/LineOperations3'
-import FindChars4 from './levels/FindChars4'
-import SearchLevel5 from './levels/SearchLevel5'
-import BasicInsertLevel6 from './levels/BasicInsertLevel6'
-import LineInsertLevel7 from './levels/LineInsertLevel7'
-import UndoRedoLevel9 from './levels/Level9/UndoRedoLevel9'
-import BasicDeleteLevel10 from './levels/BasicDeleteLevel10'
-import AdvancedDeleteLevel11 from './levels/AdvancedDeleteLevel11'
-import RecapLevel12 from './levels/RecapLevel12'
-import TextObjectLevel14 from './levels/TextObjectLevel14'
-import YankPutLevel15 from './levels/YankPutLevel15'
-import CountPrefixLevel16 from './levels/CountPrefixLevel16'
-import FileNavLevel17 from './levels/FileNavLevel17'
-import PlaygroundLevel from './levels/PlaygroundLevel'
+import { getLevelById } from '../levels/registry'
 
 interface GameAreaProps {
   level: number
@@ -34,7 +18,7 @@ Thanks for playing!
 
 // const CHANGELOG_MESSAGE = `
 // <b>What's New in ${GAME_VERSION}</b><br/><br/>
-// - Changelog 🍾 <br/>
+// - Changelog <br/>
 // - Session history for level 1 and 2<br/>
 // and coming soon for level 3-7<br/>
 // - Level 7 is now complete!<br/>
@@ -60,46 +44,12 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
     setShowChangelog(false)
   }
 
-  // Render the appropriate level component based on the current level
+  // Render the appropriate level component from the registry
   const renderLevel = () => {
-    switch (level) {
-      case 0:
-        return <KeyboardVisualizerLevel0 isMuted={isMuted} />
-      case 1:
-        return <GridMovementLevel isMuted={isMuted} />
-      case 2:
-        return <WordMovementLevel isMuted={isMuted} />
-      case 3:
-        return <LineOperations3 isMuted={isMuted} />
-      case 4:
-        return <FindChars4 isMuted={isMuted} />
-      case 5:
-        return <SearchLevel5 isMuted={isMuted} />
-      case 6:
-        return <BasicInsertLevel6 isMuted={isMuted} />
-      case 7:
-        return <LineInsertLevel7 isMuted={isMuted} />
-      case 9:
-        return <UndoRedoLevel9 />
-      case 10:
-        return <BasicDeleteLevel10 />
-      case 11:
-        return <AdvancedDeleteLevel11 />
-      case 12:
-        return <RecapLevel12 />
-      case 13:
-        return <PlaygroundLevel isMuted={isMuted} />
-      case 14:
-        return <TextObjectLevel14 />
-      case 15:
-        return <YankPutLevel15 />
-      case 16:
-        return <CountPrefixLevel16 />
-      case 17:
-        return <FileNavLevel17 />
-      default:
-        return <KeyboardVisualizerLevel0 isMuted={isMuted} />
-    }
+    const entry = getLevelById(level) ?? getLevelById(0)
+    if (!entry) return null
+    const Component = entry.component
+    return <Component isMuted={isMuted} />
   }
 
   return (
@@ -165,9 +115,6 @@ const GameArea: React.FC<GameAreaProps> = ({ level, isMuted }) => {
 
       {/* Only render the level if the changelog is not open */}
       {!showChangelog && renderLevel()}
-      {/* <div> */}
-      {/*   <LevelTimer levelId={level} isActive={true} /> */}
-      {/* </div> */}
     </div>
   )
 }

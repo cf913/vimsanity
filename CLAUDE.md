@@ -23,12 +23,7 @@ Website: https://www.vimsanity.com
 
 ### Core Vim Motion System
 
-The application implements a sophisticated Vim motion engine with two implementations:
-
-1. **Legacy System** (`useVimMotions.tsx`): Original implementation with monolithic key action map
-2. **V2 System** (`useVimMotionsV2.tsx`): Modular registry-based system (recommended for new levels)
-
-The V2 system uses a **Motion Registry** pattern (`src/hooks/motions/`):
+The V2 motion system (`useVimMotionsV2.tsx`) uses a **Motion Registry** pattern (`src/hooks/motions/`):
 - `motionRegistry.ts` - Central registry that combines all motions
 - `movementMotions.ts` - Movement commands (h, j, k, l, w, b, e, etc.)
 - `editingMotions.ts` - Editing commands (x, d, c, etc.)
@@ -37,23 +32,39 @@ The V2 system uses a **Motion Registry** pattern (`src/hooks/motions/`):
 
 **Key Architectural Benefit**: The registry system allows levels to enable/disable specific motions via the `enabledMotions` prop, making it easy to progressively introduce commands.
 
+### Level Infrastructure
+
+#### `useVimLevel` Hook (The Brain)
+
+`src/hooks/useVimLevel.ts` is the centralized level state management hook used by all game levels. It provides:
+
+- **Core state**: `score`, `maxScore`, `levelCompleted`, `showConfetti`, `isActive`
+- **Actions**: `incrementScore()`, `setScore()`, `completeLevel()`, `resetLevel()`, `activateTimer()`
+- **Auto-behaviors**: ESC-to-restart when level is complete, confetti auto-dismiss
+- **Optional V2 integration**: Pass `enabledMotions` or `initialText` to get built-in vim state (`cursorIndex`, `mode`, `text`, `keyActionMap`)
+
+Levels call `useKeyboardHandler` directly for keyboard wiring (avoids stale closure issues).
+
+#### Level Block Components (`src/components/level-blocks/`)
+
+Composable UI building blocks for levels:
+- `LevelShell` - Outer wrapper handling ConfettiBurst + LevelTimer rendering
+- `LevelHeader` - Title, Scoreboard, reset button, ModeIndicator
+- `LevelCompletion` - Standard completion screen with SessionHistory
+- `CommandBuffer` - Pending command/count display (4 color themes)
+
+#### Level Registry (`src/levels/registry.ts`)
+
+Single source of truth for all level metadata. Used by both `Sidebar.tsx` (navigation) and `GameArea.tsx` (rendering). When adding a new level, only update `registry.ts`.
+
 ### Level System
 
-Levels are React components in `src/components/levels/` that implement the `LevelProps` interface:
-```typescript
-interface LevelProps {
-  isMuted: boolean;
-}
-```
-
-Each level component:
-- Manages its own text content and cursor state
-- Uses either `useVimMotions` or `useVimMotionsV2` for motion handling
-- Uses `useKeyboardHandler` to connect keyboard events to motions
-- Renders a `<TextArea>` component with visual feedback
-- Often includes level-specific UI like `<KeysAllowed>`, `<SessionHistory>`, `<Scoreboard>`
-
-Level routing is handled in `GameArea.tsx` via a switch statement based on the current level number.
+Levels are React components in `src/components/levels/`. Each level:
+- Uses `useVimLevel` for core state management (score, completion, timer, confetti, ESC-to-restart)
+- Uses `useKeyboardHandler` to connect keyboard events to custom key action maps
+- Wraps its UI in `<LevelShell>` for consistent ConfettiBurst and LevelTimer rendering
+- Uses `<LevelHeader>` for scoreboard, reset button, and mode indicator
+- Manages only level-specific state (grid, position, challenges, etc.)
 
 ### State Management
 
@@ -76,14 +87,6 @@ Critical for vertical movement (j/k):
 - `moveToNextWordBoundary`, `moveToPrevWordBoundary` - Word navigation
 - `findLineStartNonBlank` - First non-whitespace character
 - These are used by motion implementations to calculate cursor positions
-
-### Level Metadata
-
-Level information is duplicated in two places (this is intentional):
-1. `Sidebar.tsx` - Contains level metadata organized by category (navigate, insert, delete, etc.)
-2. `GameArea.tsx` - Switch statement that renders the actual level component
-
-When adding a new level, update both locations.
 
 ### Changelog System
 
@@ -111,7 +114,7 @@ When adding a new level, update both locations.
 ## Data Flow for Vim Motions
 
 1. User presses key → `useKeyboardHandler` captures event
-2. Handler looks up key in `keyActionMap` (from vim motions hook)
+2. Handler looks up key in `keyActionMap` (from vim motions hook or custom)
 3. Motion executes, updating cursor/text state via context
 4. React re-renders TextArea with new cursor position
 5. Optional: History hook records state for undo/redo
@@ -119,10 +122,10 @@ When adding a new level, update both locations.
 ## Adding a New Level
 
 1. Create level component in `src/components/levels/YourLevel.tsx`
-2. Import in `GameArea.tsx` and add case to switch statement
-3. Add level metadata to `Sidebar.tsx` levels object
-4. Use `useVimMotionsV2` with `enabledMotions` array to control available commands
-5. Implement level-specific logic (challenges, scoring, etc.)
+2. Use `useVimLevel` hook for core state (score, completion, timer)
+3. Wrap UI in `<LevelShell>` and use `<LevelHeader>` for consistent layout
+4. Use `useKeyboardHandler` for keyboard event handling
+5. Add entry to `src/levels/registry.ts` (metadata + component reference)
 6. Update `GAME_VERSION` and `CHANGELOG_MESSAGE` if releasing
 
 ## Key Technologies
@@ -137,13 +140,12 @@ When adding a new level, update both locations.
 ## Important Notes
 
 - The app is desktop-only (mobile users see `MobileWarning.tsx`)
-- Levels 0-15 are currently implemented
+- Levels 0-17 are currently implemented (no Level 8)
 - Level 0 is an interactive keyboard visualizer (intro/exploration tool)
 - Level 13 is a playground for development/testing
 - Level 14 covers text objects (diw, daw, ciw, caw)
 - Level 15 covers yank and put (yy, yw, p, P)
 - Some levels have subdirectories (Level0/, Level6/, Level7/, Level8/, Level9/) for complex implementations
-- The app uses a WIP banner to indicate in-development features
 
 ## Level 0: Keyboard Visualizer Architecture
 

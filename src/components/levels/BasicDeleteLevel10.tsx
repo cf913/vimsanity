@@ -1,16 +1,13 @@
 import { motion } from 'framer-motion'
-import { HelpCircleIcon, RefreshCw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   KeyActionMap,
   useKeyboardHandler,
 } from '../../hooks/useKeyboardHandler'
+import { useVimLevel } from '../../hooks/useVimLevel'
 import { VIM_MODES, VimMode } from '../../utils/constants'
 import { KBD } from '../common/KBD'
-import LevelTimer from '../common/LevelTimer'
-import ModeIndicator from '../common/ModeIndicator'
-import Scoreboard from '../common/Scoreboard'
-import ConfettiBurst from './ConfettiBurst'
+import { LevelShell, LevelHeader } from '../level-blocks'
 
 export default function BasicDeleteLevel10() {
   // Multiple grid variations with different target positions for muscle memory
@@ -113,11 +110,7 @@ export default function BasicDeleteLevel10() {
 
   const [grid, setGrid] = useState(initialGrid)
   const [position, setPosition] = useState({ row: 0, col: 0 })
-  const [score, setScore] = useState(0)
   const [deletedTargets, setDeletedTargets] = useState<Set<string>>(new Set())
-  const [showConfetti, setShowConfetti] = useState(false)
-  const [levelCompleted, setLevelCompleted] = useState(false)
-  const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
   const [recentlyDeleted, setRecentlyDeleted] = useState<{
     row: number
     col: number
@@ -130,7 +123,29 @@ export default function BasicDeleteLevel10() {
   const [insertModeWarning, setInsertModeWarning] = useState<string>('')
   const [pendingFindCommand, setPendingFindCommand] = useState<string>('')
 
-  const MAX_SCORE = deleteTargets.length
+  const level = useVimLevel({
+    levelId: 'level-10-basic-delete',
+    maxScore: deleteTargets.length,
+    onReset: () => {
+      const newVariation = getRandomGridVariation()
+      const newGrid = newVariation.grid.map((row) => [...row])
+      setCurrentVariation(newVariation)
+      setInitialGrid(newGrid)
+      setDeleteTargets(newVariation.targets)
+      setGrid(newGrid)
+      setDeletedTargets(new Set())
+      setPosition({ row: 0, col: 0 })
+      setRecentlyDeleted(null)
+      setWrongMoveMessage('')
+      setGridHistory([newGrid])
+      setMode(VIM_MODES.NORMAL)
+      setInsertModeWarning('')
+      setPendingFindCommand('')
+    },
+  })
+
+  // Timer starts immediately
+  useEffect(() => { level.activateTimer() }, [])
 
   // Reset recently deleted animation
   useEffect(() => {
@@ -162,28 +177,6 @@ export default function BasicDeleteLevel10() {
     }
   }, [insertModeWarning])
 
-  // Check if level is completed
-  useEffect(() => {
-    if (score === MAX_SCORE && !levelCompleted) {
-      setLevelCompleted(true)
-      setShowConfetti(true)
-      setTimeout(() => setShowConfetti(false), 3000)
-    }
-  }, [score, MAX_SCORE, levelCompleted])
-
-  // Handle ESC key for level completion reset
-  useEffect(() => {
-    if (levelCompleted) {
-      const handleEscKey = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          handleRestart()
-        }
-      }
-      window.addEventListener('keydown', handleEscKey)
-      return () => window.removeEventListener('keydown', handleEscKey)
-    }
-  }, [levelCompleted])
-
   // Handle find character input
   useEffect(() => {
     if (pendingFindCommand && mode === VIM_MODES.NORMAL) {
@@ -209,37 +202,12 @@ export default function BasicDeleteLevel10() {
         }
 
         setPendingFindCommand('')
-        setLastKeyPressed(`${pendingFindCommand}${char}`)
       }
 
       window.addEventListener('keydown', handleFindCharacter)
       return () => window.removeEventListener('keydown', handleFindCharacter)
     }
   }, [pendingFindCommand, mode, position, grid])
-
-  const handleRestart = () => {
-    // Get a new random variation with different target positions
-    const newVariation = getRandomGridVariation()
-    const newGrid = newVariation.grid.map((row) => [...row])
-
-    // Update both grid and targets for the new variation
-    setCurrentVariation(newVariation)
-    setInitialGrid(newGrid)
-    setDeleteTargets(newVariation.targets)
-    setGrid(newGrid)
-    setDeletedTargets(new Set())
-    setPosition({ row: 0, col: 0 })
-    setScore(0)
-    setLevelCompleted(false)
-    setShowConfetti(false)
-    setLastKeyPressed('')
-    setRecentlyDeleted(null)
-    setWrongMoveMessage('')
-    setGridHistory([newGrid])
-    setMode(VIM_MODES.NORMAL)
-    setInsertModeWarning('')
-    setPendingFindCommand('')
-  }
 
   const undoLastAction = () => {
     if (gridHistory.length > 1) {
@@ -314,7 +282,7 @@ export default function BasicDeleteLevel10() {
     if (target && targetKey && !deletedTargets.has(targetKey)) {
       // Correct! Mark as completed
       setDeletedTargets((prev) => new Set([...prev, targetKey]))
-      setScore((prev) => prev + 1)
+      level.incrementScore()
       setWrongMoveMessage('')
     } else {
       // Wrong position or wrong command - show undo message
@@ -492,7 +460,6 @@ export default function BasicDeleteLevel10() {
         ...prev,
         col: Math.max(0, prev.col - 1),
       }))
-      setLastKeyPressed('h')
     },
     j: () => {
       if (mode === VIM_MODES.INSERT) {
@@ -503,7 +470,6 @@ export default function BasicDeleteLevel10() {
         ...prev,
         row: Math.min(grid.length - 1, prev.row + 1),
       }))
-      setLastKeyPressed('j')
     },
     k: () => {
       if (mode === VIM_MODES.INSERT) {
@@ -514,7 +480,6 @@ export default function BasicDeleteLevel10() {
         ...prev,
         row: Math.max(0, prev.row - 1),
       }))
-      setLastKeyPressed('k')
     },
     l: () => {
       if (mode === VIM_MODES.INSERT) {
@@ -525,7 +490,6 @@ export default function BasicDeleteLevel10() {
         ...prev,
         col: Math.min(grid[0].length - 1, prev.col + 1),
       }))
-      setLastKeyPressed('l')
     },
     w: () => {
       if (mode === VIM_MODES.INSERT) {
@@ -533,7 +497,6 @@ export default function BasicDeleteLevel10() {
         return
       }
       moveToNextWord()
-      setLastKeyPressed('w')
     },
     b: () => {
       if (mode === VIM_MODES.INSERT) {
@@ -541,7 +504,6 @@ export default function BasicDeleteLevel10() {
         return
       }
       moveToPrevWord()
-      setLastKeyPressed('b')
     },
     e: () => {
       if (mode === VIM_MODES.INSERT) {
@@ -549,7 +511,6 @@ export default function BasicDeleteLevel10() {
         return
       }
       moveToWordEnd()
-      setLastKeyPressed('e')
     },
     '0': () => {
       if (mode === VIM_MODES.INSERT) {
@@ -560,7 +521,6 @@ export default function BasicDeleteLevel10() {
         ...prev,
         col: 0,
       }))
-      setLastKeyPressed('0')
     },
     $: () => {
       if (mode === VIM_MODES.INSERT) {
@@ -571,7 +531,6 @@ export default function BasicDeleteLevel10() {
         ...prev,
         col: grid[prev.row].length - 1,
       }))
-      setLastKeyPressed('$')
     },
     f: () => {
       if (mode === VIM_MODES.INSERT) {
@@ -579,7 +538,6 @@ export default function BasicDeleteLevel10() {
         return
       }
       setPendingFindCommand('f')
-      setLastKeyPressed('f')
     },
     t: () => {
       if (mode === VIM_MODES.INSERT) {
@@ -587,7 +545,6 @@ export default function BasicDeleteLevel10() {
         return
       }
       setPendingFindCommand('t')
-      setLastKeyPressed('t')
     },
     F: () => {
       if (mode === VIM_MODES.INSERT) {
@@ -595,7 +552,6 @@ export default function BasicDeleteLevel10() {
         return
       }
       setPendingFindCommand('F')
-      setLastKeyPressed('F')
     },
     T: () => {
       if (mode === VIM_MODES.INSERT) {
@@ -603,7 +559,6 @@ export default function BasicDeleteLevel10() {
         return
       }
       setPendingFindCommand('T')
-      setLastKeyPressed('T')
     },
     x: () => {
       if (mode === VIM_MODES.INSERT) {
@@ -611,7 +566,6 @@ export default function BasicDeleteLevel10() {
         return
       }
       executeDeleteCommand('x')
-      setLastKeyPressed('x')
     },
     D: () => {
       if (mode === VIM_MODES.INSERT) {
@@ -619,7 +573,6 @@ export default function BasicDeleteLevel10() {
         return
       }
       executeDeleteCommand('D')
-      setLastKeyPressed('D')
     },
     C: () => {
       if (mode === VIM_MODES.INSERT) {
@@ -627,7 +580,6 @@ export default function BasicDeleteLevel10() {
         return
       }
       executeDeleteCommand('C')
-      setLastKeyPressed('C')
     },
     S: () => {
       if (mode === VIM_MODES.INSERT) {
@@ -635,7 +587,6 @@ export default function BasicDeleteLevel10() {
         return
       }
       executeDeleteCommand('S')
-      setLastKeyPressed('S')
     },
     u: () => {
       if (mode === VIM_MODES.INSERT) {
@@ -643,11 +594,9 @@ export default function BasicDeleteLevel10() {
         return
       }
       undoLastAction()
-      setLastKeyPressed('u')
     },
     Escape: () => {
       setMode(VIM_MODES.NORMAL)
-      setLastKeyPressed('Escape')
     },
   }
 
@@ -691,36 +640,23 @@ export default function BasicDeleteLevel10() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-6">
-      {showConfetti && <ConfettiBurst />}
+    <LevelShell level={level} className="flex flex-col items-center gap-6">
+      <LevelHeader
+        title="Basic Delete Operations"
+        titleColor="text-red-400"
+        description={<>Use <KBD>x</KBD>, <KBD>D</KBD>, <KBD>C</KBD>, and <KBD>S</KBD> to delete different targets. Practice all movement motions!</>}
+        score={level.score}
+        maxScore={level.maxScore}
+        onReset={level.resetLevel}
+        mode={mode}
+      />
 
-      <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2 text-red-400">
-          Basic Delete Operations
-        </h2>
-        <p className="text-text-muted px-2">
-          Use <KBD>x</KBD>, <KBD>D</KBD>, <KBD>C</KBD>, and <KBD>S</KBD> to
-          delete different targets. Practice all movement motions!
-        </p>
-        {pendingFindCommand && (
-          <div className="mt-2 text-yellow-400 text-sm">
-            Command pending: <KBD>{pendingFindCommand}</KBD> (type a character
-            to find)
-          </div>
-        )}
-      </div>
-
-      <div className="flex justify-center items-center gap-4 mb-4">
-        <Scoreboard score={score} maxScore={MAX_SCORE} />
-        <button
-          onClick={handleRestart}
-          className="bg-bg-secondary p-3 rounded-lg hover:bg-bg-hover transition-colors"
-          aria-label="Reset Level"
-        >
-          <RefreshCw size={18} className="text-text-muted" />
-        </button>
-        <ModeIndicator isInsertMode={mode === VIM_MODES.INSERT} />
-      </div>
+      {pendingFindCommand && (
+        <div className="mt-2 text-yellow-400 text-sm">
+          Command pending: <KBD>{pendingFindCommand}</KBD> (type a character
+          to find)
+        </div>
+      )}
 
       {/* Grid */}
       <div className="grid gap-1 p-6 bg-bg-secondary rounded-lg border-2 border-border-secondary">
@@ -816,7 +752,7 @@ export default function BasicDeleteLevel10() {
       {/* </div> */}
 
       {/* Level completion */}
-      {levelCompleted && (
+      {level.levelCompleted && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-bg-secondary rounded-lg p-8 text-center max-w-md">
             <h2 className="text-3xl font-bold mb-4 text-red-400">
@@ -828,7 +764,7 @@ export default function BasicDeleteLevel10() {
               Vim commands for efficient editing!
             </p>
             <div className="text-2xl font-bold text-green-400 mb-4">
-              Score: {score}/{MAX_SCORE}
+              Score: {level.score}/{level.maxScore}
             </div>
             <p className="text-text-muted text-sm">
               Press <KBD>Esc</KBD> to play again
@@ -836,14 +772,6 @@ export default function BasicDeleteLevel10() {
           </div>
         </div>
       )}
-
-      <div className="mt-6">
-        <LevelTimer
-          levelId="level-10-basic-delete"
-          isActive={!levelCompleted}
-          isCompleted={levelCompleted}
-        />
-      </div>
 
       {/* Floating Warning Message */}
       {wrongMoveMessage && (
@@ -874,6 +802,6 @@ export default function BasicDeleteLevel10() {
           </p>
         </motion.div>
       )}
-    </div>
+    </LevelShell>
   )
 }

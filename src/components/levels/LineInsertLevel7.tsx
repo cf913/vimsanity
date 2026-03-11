@@ -1,12 +1,10 @@
-import { RefreshCw } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { VIM_MODES, VimMode } from '../../utils/constants'
+import { useVimLevel } from '../../hooks/useVimLevel'
 import { KeysAllowed } from '../common/KeysAllowed'
-import LevelTimer from '../common/LevelTimer'
 import ModeIndicator from '../common/ModeIndicator'
-import Scoreboard from '../common/Scoreboard'
-import ConfettiBurst from './ConfettiBurst'
 import { Cell7 } from './Level7/Cell'
+import { LevelShell, LevelHeader } from '../level-blocks'
 
 interface LineInsertLevel7Props {
   isMuted: boolean
@@ -59,39 +57,41 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = () => {
       completed: false,
     },
   ]
+
   const [cells, setCells] = useState<TextLine[]>(initialCells)
   const [mode, setMode] = useState<VimMode>(VIM_MODES.NORMAL)
   const [activeCell, setActiveCell] = useState<number | null>(0)
-  const [score, setScore] = useState(0)
   const [lastKeyPressed, setLastKeyPressed] = useState<string | null>(null)
-  const [showConfetti, setShowConfetti] = useState(false)
-  const [allCompleted, setAllCompleted] = useState(false)
   const [resetCount, setResetCount] = useState(0)
 
-  const isInsertMode = mode === VIM_MODES.INSERT
+  const level = useVimLevel({
+    levelId: '7-line-insert',
+    maxScore: initialCells.length * 10,
+    onReset: () => {
+      setActiveCell(0)
+      setCells(initialCells)
+      setResetCount((prev) => prev + 1)
+      setMode(VIM_MODES.NORMAL)
+    },
+  })
+
+  // Start timer immediately
+  useEffect(() => { level.activateTimer() }, [])
 
   // Check if all cells are completed
   useEffect(() => {
     if (cells.length > 0 && cells.every((line) => line.completed)) {
-      setAllCompleted(true)
-      setShowConfetti(true)
-
-      // Reset after celebration
-      setTimeout(() => {
-        setShowConfetti(false)
-      }, 3000)
+      level.completeLevel()
     }
-  }, [cells])
+  }, [cells, level.completeLevel])
 
-  const resetLevel = () => {
-    setActiveCell(0)
-    setScore(0)
-    setCells(initialCells)
-    setResetCount((prev) => prev + 1)
-  }
+  const isInsertMode = mode === VIM_MODES.INSERT
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <LevelShell
+      level={level}
+      className="flex flex-col items-center gap-4"
+    >
       <div className="text-center">
         <p className="text-text-muted">
           Use <kbd className="px-2 py-1 bg-bg-secondary rounded">I</kbd> to insert
@@ -104,17 +104,12 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = () => {
       </div>
 
       <div className="flex items-center gap-4 mb-2">
-        {/* Score display */}
-        <Scoreboard score={score} maxScore={cells.length * 10} />
-
-        <button
-          onClick={resetLevel}
-          className="bg-bg-secondary p-2 rounded-lg hover:bg-bg-tertiary transition-colors"
-          aria-label="Reset Level"
-        >
-          <RefreshCw size={18} className="text-text-muted" />
-        </button>
-        {/* Mode indicator */}
+        <LevelHeader
+          title=""
+          score={level.score}
+          maxScore={level.maxScore}
+          onReset={level.resetLevel}
+        />
         <ModeIndicator isInsertMode={isInsertMode} />
       </div>
 
@@ -131,7 +126,7 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = () => {
                   const updatedCells = [...cells]
                   updatedCells[index].completed = true
                   setCells(updatedCells)
-                  setScore((prev) => prev + 10)
+                  level.setScore((prev) => prev + 10)
                   const nextCellIndex = index + 1
                   setActiveCell(nextCellIndex)
                 },
@@ -150,14 +145,8 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = () => {
         lastKeyPressed={lastKeyPressed}
       />
 
-      {/* Level Timer */}
-      <LevelTimer levelId="7-line-insert" isActive={true} />
-
-      {/* Confetti for completion */}
-      {showConfetti && <ConfettiBurst />}
-
       {/* Completion message */}
-      {allCompleted && (
+      {level.levelCompleted && (
         <div className="mt-6 p-4 bg-emerald-500/20 border border-emerald-500 rounded-lg text-center">
           <h3 className="text-xl font-bold text-emerald-400">
             Level Complete!
@@ -167,7 +156,7 @@ const LineInsertLevel7: React.FC<LineInsertLevel7Props> = () => {
           </p>
         </div>
       )}
-    </div>
+    </LevelShell>
   )
 }
 

@@ -1,16 +1,14 @@
 import { motion } from 'framer-motion'
-import { Clipboard, RefreshCw } from 'lucide-react'
+import { Clipboard } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   KeyActionMap,
   useKeyboardHandler,
 } from '../../hooks/useKeyboardHandler'
+import { useVimLevel } from '../../hooks/useVimLevel'
 import { VIM_MODES, VimMode } from '../../utils/constants'
 import { KBD } from '../common/KBD'
-import LevelTimer from '../common/LevelTimer'
-import ModeIndicator from '../common/ModeIndicator'
-import Scoreboard from '../common/Scoreboard'
-import ConfettiBurst from './ConfettiBurst'
+import { LevelShell, LevelHeader } from '../level-blocks'
 
 export default function YankPutLevel15() {
   // Grid with lines to yank and targets to paste into
@@ -57,15 +55,12 @@ export default function YankPutLevel15() {
       description: 'Paste "world" second',
     },
   ]
+
   const [grid, setGrid] = useState(initialGrid.map((row) => [...row]))
   const [position, setPosition] = useState({ row: 0, col: 0 })
-  const [score, setScore] = useState(0)
   const [completedTargets, setCompletedTargets] = useState<Set<string>>(
     new Set(),
   )
-  const [showConfetti, setShowConfetti] = useState(false)
-  const [levelCompleted, setLevelCompleted] = useState(false)
-  const [, setLastKeyPressed] = useState<string>('')
   const [mode, setMode] = useState<VimMode>(VIM_MODES.NORMAL)
   const [pendingCommand, setPendingCommand] = useState<string>('')
 
@@ -97,7 +92,34 @@ export default function YankPutLevel15() {
 
   const [feedbackMessage, setFeedbackMessage] = useState<string>('')
 
-  const MAX_SCORE = targets.length
+  const level = useVimLevel({
+    levelId: 'level-15-yank-put',
+    maxScore: targets.length,
+    onReset: () => {
+      setGrid(initialGrid.map((row) => [...row]))
+      setPosition({ row: 0, col: 0 })
+      setCompletedTargets(new Set())
+      setMode(VIM_MODES.NORMAL)
+      setPendingCommand('')
+      setYankBuffer(null)
+      setYankType(null)
+      setShowYankAnimation(false)
+      setShowPasteAnimation(null)
+      setFeedbackMessage('')
+      setGridHistory([
+        {
+          grid: initialGrid.map((row) => [...row]),
+          completedTargets: new Set(),
+          score: 0,
+        },
+      ])
+    },
+  })
+
+  // Timer starts immediately
+  useEffect(() => {
+    level.activateTimer()
+  }, [])
 
   // Reset animations
   useEffect(() => {
@@ -120,52 +142,6 @@ export default function YankPutLevel15() {
       return () => clearTimeout(timer)
     }
   }, [feedbackMessage])
-
-  // Check if level is completed
-  useEffect(() => {
-    if (score === MAX_SCORE && !levelCompleted) {
-      setLevelCompleted(true)
-      setShowConfetti(true)
-      setTimeout(() => setShowConfetti(false), 3000)
-    }
-  }, [score, MAX_SCORE, levelCompleted])
-
-  // Handle ESC key for level completion reset
-  useEffect(() => {
-    if (levelCompleted) {
-      const handleEscKey = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          handleRestart()
-        }
-      }
-      window.addEventListener('keydown', handleEscKey)
-      return () => window.removeEventListener('keydown', handleEscKey)
-    }
-  }, [levelCompleted])
-
-  const handleRestart = () => {
-    setGrid(initialGrid.map((row) => [...row]))
-    setPosition({ row: 0, col: 0 })
-    setScore(0)
-    setCompletedTargets(new Set())
-    setLevelCompleted(false)
-    setShowConfetti(false)
-    setLastKeyPressed('')
-    setMode(VIM_MODES.NORMAL)
-    setPendingCommand('')
-    setYankBuffer(null)
-    setYankType(null)
-    setShowYankAnimation(false)
-    setShowPasteAnimation(null)
-    setFeedbackMessage('')
-    setGridHistory([
-      {
-        grid: initialGrid.map((row) => [...row]),
-        completedTargets: new Set(),
-        score: 0,
-      },
-    ])
-  }
 
   // Yank entire line
   const yankLine = () => {
@@ -219,7 +195,7 @@ export default function YankPutLevel15() {
       {
         grid: grid.map((row) => [...row]),
         completedTargets: new Set(completedTargets),
-        score: score,
+        score: level.score,
       },
     ])
 
@@ -273,7 +249,7 @@ export default function YankPutLevel15() {
       {
         grid: grid.map((row) => [...row]),
         completedTargets: new Set(completedTargets),
-        score: score,
+        score: level.score,
       },
     ])
 
@@ -337,7 +313,7 @@ export default function YankPutLevel15() {
 
       if (matches) {
         setCompletedTargets((prev) => new Set([...prev, target.id]))
-        setScore((prev) => prev + 1)
+        level.incrementScore()
         setFeedbackMessage('Correct paste!')
       } else {
         setFeedbackMessage(
@@ -354,7 +330,7 @@ export default function YankPutLevel15() {
 
       setGrid(previousState.grid.map((row) => [...row]))
       setCompletedTargets(new Set(previousState.completedTargets))
-      setScore(previousState.score)
+      level.setScore(previousState.score)
       setGridHistory(newHistory)
       setFeedbackMessage('Undone!')
     }
@@ -425,12 +401,10 @@ export default function YankPutLevel15() {
     if (pendingCommand === 'y') {
       if (key === 'y') {
         yankLine()
-        setLastKeyPressed('yy')
         setPendingCommand('')
         return
       } else if (key === 'w') {
         yankWord()
-        setLastKeyPressed('yw')
         setPendingCommand('')
         return
       } else {
@@ -441,19 +415,16 @@ export default function YankPutLevel15() {
     // Single character commands
     if (key === 'y') {
       setPendingCommand('y')
-      setLastKeyPressed('y')
       return
     }
 
     if (key === 'p') {
       pasteAfter()
-      setLastKeyPressed('p')
       return
     }
 
     if (key === 'P') {
       pasteBefore()
-      setLastKeyPressed('P')
       return
     }
 
@@ -463,58 +434,48 @@ export default function YankPutLevel15() {
         ...prev,
         col: Math.max(0, prev.col - 1),
       }))
-      setLastKeyPressed('h')
       setPendingCommand('')
     } else if (key === 'j') {
       setPosition((prev) => ({
         ...prev,
         row: Math.min(grid.length - 1, prev.row + 1),
       }))
-      setLastKeyPressed('j')
       setPendingCommand('')
     } else if (key === 'k') {
       setPosition((prev) => ({
         ...prev,
         row: Math.max(0, prev.row - 1),
       }))
-      setLastKeyPressed('k')
       setPendingCommand('')
     } else if (key === 'l') {
       setPosition((prev) => ({
         ...prev,
         col: Math.min(grid[0].length - 1, prev.col + 1),
       }))
-      setLastKeyPressed('l')
       setPendingCommand('')
     } else if (key === 'w') {
       moveToNextWord()
-      setLastKeyPressed('w')
       setPendingCommand('')
     } else if (key === 'b') {
       moveToPrevWord()
-      setLastKeyPressed('b')
       setPendingCommand('')
     } else if (key === 'e') {
       moveToWordEnd()
-      setLastKeyPressed('e')
       setPendingCommand('')
     } else if (key === '0') {
       setPosition((prev) => ({
         ...prev,
         col: 0,
       }))
-      setLastKeyPressed('0')
       setPendingCommand('')
     } else if (key === '$') {
       setPosition((prev) => ({
         ...prev,
         col: grid[prev.row].length - 1,
       }))
-      setLastKeyPressed('$')
       setPendingCommand('')
     } else if (key === 'u') {
       undoLastAction()
-      setLastKeyPressed('u')
       setPendingCommand('')
     }
   }
@@ -536,7 +497,6 @@ export default function YankPutLevel15() {
     Escape: () => {
       setPendingCommand('')
       setMode(VIM_MODES.NORMAL)
-      setLastKeyPressed('Escape')
     },
   }
 
@@ -578,30 +538,21 @@ export default function YankPutLevel15() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-6">
-      {showConfetti && <ConfettiBurst />}
-
-      <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2 text-amber-400">
-          Yank & Put (Copy & Paste)
-        </h2>
-        <p className="text-text-muted px-2">
-          Use <KBD>yy</KBD> to yank a line, <KBD>yw</KBD> to yank a word,{' '}
-          <KBD>p</KBD> to paste after, <KBD>P</KBD> to paste before
-        </p>
-      </div>
-
-      <div className="flex justify-center items-center gap-4 mb-4">
-        <Scoreboard score={score} maxScore={MAX_SCORE} />
-        <button
-          onClick={handleRestart}
-          className="bg-bg-secondary p-3 rounded-lg hover:bg-bg-tertiary transition-colors"
-          aria-label="Reset Level"
-        >
-          <RefreshCw size={18} className="text-text-muted" />
-        </button>
-        <ModeIndicator isInsertMode={mode === VIM_MODES.INSERT} />
-      </div>
+    <LevelShell level={level} className="flex flex-col items-center gap-6">
+      <LevelHeader
+        title="Yank & Put (Copy & Paste)"
+        titleColor="text-amber-400"
+        description={
+          <>
+            Use <KBD>yy</KBD> to yank a line, <KBD>yw</KBD> to yank a word,{' '}
+            <KBD>p</KBD> to paste after, <KBD>P</KBD> to paste before
+          </>
+        }
+        score={level.score}
+        maxScore={level.maxScore}
+        onReset={level.resetLevel}
+        mode={mode}
+      />
 
       {/* Clipboard Indicator */}
       <motion.div
@@ -769,7 +720,7 @@ export default function YankPutLevel15() {
       </div>
 
       {/* Level completion */}
-      {levelCompleted && (
+      {level.levelCompleted && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-bg-secondary rounded-lg p-8 text-center max-w-md">
             <h2 className="text-3xl font-bold mb-4 text-amber-400">
@@ -780,7 +731,7 @@ export default function YankPutLevel15() {
               paste text like a pro.
             </p>
             <div className="text-2xl font-bold text-green-400 mb-4">
-              Score: {score}/{MAX_SCORE}
+              Score: {level.score}/{level.maxScore}
             </div>
             <p className="text-text-muted text-sm">
               Press <KBD>Esc</KBD> to play again
@@ -788,14 +739,6 @@ export default function YankPutLevel15() {
           </div>
         </div>
       )}
-
-      <div className="mt-6">
-        <LevelTimer
-          levelId="level-15-yank-put"
-          isActive={!levelCompleted}
-          isCompleted={levelCompleted}
-        />
-      </div>
 
       {/* Feedback Message */}
       {feedbackMessage && (
@@ -811,6 +754,6 @@ export default function YankPutLevel15() {
           </p>
         </motion.div>
       )}
-    </div>
+    </LevelShell>
   )
 }

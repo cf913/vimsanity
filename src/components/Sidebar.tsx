@@ -2,6 +2,7 @@ import React from 'react'
 import { BookOpen, X, ChevronRight, Construction } from 'lucide-react'
 import { motion } from 'framer-motion'
 import ThemeToggle from './common/ThemeToggle'
+import { getLevelsByCategory, LevelEntry } from '../levels/registry'
 
 interface SidebarProps {
   currentLevel: number
@@ -14,143 +15,7 @@ interface SidebarProps {
   onReturnToLanding: () => void
 }
 
-const levels = {
-  intro: [
-    {
-      id: 0,
-      title: 'Vim Command Explorer',
-      description: 'Interactive 3D keyboard to discover what every key does',
-      wip: false,
-      locked: false,
-    },
-  ],
-  navigate: [
-    {
-      id: 1,
-      title: 'Basic Movement (h, j, k, l)',
-      description: 'Learn the fundamental vim motions',
-      wip: false,
-      locked: false,
-    },
-    {
-      id: 2,
-      title: 'Word Movement (w, b, e)',
-      description: 'Navigate through words efficiently',
-      wip: false,
-      locked: false,
-    },
-    {
-      id: 3,
-      title: 'Line Operations (0, $)',
-      description: 'Move to start and end of lines',
-      wip: false,
-      locked: false,
-    },
-    {
-      id: 4,
-      title: 'Find Characters (f, t)',
-      description: 'Jump to specific characters',
-      wip: false,
-      locked: false,
-    },
-    {
-      id: 5,
-      title: 'Search Operations (/, ?, n, N)',
-      description: 'Search text and navigate matches',
-      wip: false,
-      locked: false,
-    },
-    {
-      id: 16,
-      title: 'Count Prefixes (5j, 3w, etc.)',
-      description: 'Use numbers for efficient navigation',
-      wip: false,
-      locked: false,
-    },
-    {
-      id: 17,
-      title: 'File Navigation (gg, G)',
-      description: 'Jump to any line in a file instantly',
-      wip: false,
-      locked: false,
-    },
-  ],
-  insert: [
-    {
-      id: 6,
-      title: 'Basic Insert Mode (i, a, Esc)',
-      description: 'Enter insert mode and make text changes',
-      wip: false,
-      locked: false,
-    },
-    {
-      id: 7,
-      title: 'Line Insert Commands (I, A, o, O)',
-      description: 'Insert at line positions and create new lines',
-      wip: false,
-      locked: false,
-    },
-  ],
-  history: [
-    {
-      id: 9,
-      title: 'Undo & Redo (u, Ctrl+r)',
-      description: 'Navigate through your editing history',
-      wip: false,
-      locked: false,
-    },
-  ],
-  delete: [
-    {
-      id: 10,
-      title: 'Basic Delete (x, D, C, S)',
-      description: 'Master single-key delete and change commands',
-      wip: false,
-      locked: false,
-    },
-    {
-      id: 11,
-      title: 'Advanced Delete (dw, dd, D)',
-      description: 'Master word, line, and partial line deletion',
-      wip: false,
-      locked: false,
-    },
-    {
-      id: 14,
-      title: 'Text Objects (diw, daw, ciw, caw)',
-      description: 'Delete and change inner/around word text objects',
-      wip: false,
-      locked: false,
-    },
-  ],
-  yank: [
-    {
-      id: 15,
-      title: 'Yank & Put (y, p)',
-      description: 'Copy and paste text with yank and put commands',
-      wip: false,
-      locked: false,
-    },
-  ],
-  recap: [
-    {
-      id: 12,
-      title: 'Quick Recap',
-      description: 'Review and practice all vim motions learned so far',
-      wip: false,
-      locked: false,
-    },
-  ],
-  playground: [
-    {
-      id: 13,
-      title: 'Dev Playground',
-      description: 'Practice all Vim motions in a free environment',
-      wip: false,
-      locked: false,
-    },
-  ],
-}
+const levels = getLevelsByCategory()
 
 const Sidebar: React.FC<SidebarProps> = ({
   currentLevel,
@@ -208,13 +73,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     },
   }
 
-  const renderLevel = (level: {
-    id: number
-    title: string
-    description: string
-    wip: boolean
-    locked: boolean
-  }) => {
+  const renderLevel = (level: LevelEntry) => {
     return (
       <motion.button
         key={level.id}

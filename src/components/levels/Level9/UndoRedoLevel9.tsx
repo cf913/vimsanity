@@ -1,13 +1,13 @@
 import { RefreshCw } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { VIM_MODES, VimMode } from '../../../utils/constants'
+import { useVimLevel } from '../../../hooks/useVimLevel'
 import ModeIndicator from '../../common/ModeIndicator'
-import Scoreboard from '../../common/Scoreboard'
 import { TextEditorWithHistory } from './TextEditorWithHistory'
 import { KeysAllowed } from '../../common/KeysAllowed'
-import LevelTimer from '../../common/LevelTimer'
 import ConfettiBurst from '../ConfettiBurst'
 import { KBD } from '../../common/KBD'
+import { LevelShell } from '../../level-blocks'
 
 interface Challenge {
   id: string
@@ -106,18 +106,31 @@ const challenges: Challenge[] = [
 
 export default function UndoRedoLevel9() {
   const [currentChallenge, setCurrentChallenge] = useState(0)
-  const [score, setScore] = useState(0)
   const [mode, setMode] = useState<VimMode>(VIM_MODES.NORMAL)
   const [, setLastKeyPressed] = useState<string | null>(null)
-  const [showConfetti, setShowConfetti] = useState(false)
+  const [challengeConfetti, setChallengeConfetti] = useState(false)
   const [challengeCompleted, setChallengeCompleted] = useState(false)
   const [currentUndoCount, setCurrentUndoCount] = useState(0)
   const [currentRedoCount, setCurrentRedoCount] = useState(0)
 
+  const level = useVimLevel({
+    levelId: 'level-9-undo-redo',
+    maxScore: challenges.length,
+    onReset: () => {
+      setCurrentChallenge(0)
+      setChallengeCompleted(false)
+      setChallengeConfetti(false)
+      setMode(VIM_MODES.NORMAL)
+      setCurrentUndoCount(0)
+      setCurrentRedoCount(0)
+    },
+  })
+
+  // Start timer immediately
+  useEffect(() => { level.activateTimer() }, [])
+
   const challenge = challenges[currentChallenge]
-  const MAX_SCORE = challenges.length
   const isInsertMode = mode === VIM_MODES.INSERT
-  const isLevelCompleted = score === MAX_SCORE
 
   const handleChallengeCompleted = ({
     newText,
@@ -128,7 +141,6 @@ export default function UndoRedoLevel9() {
     undoCount: number
     redoCount: number
   }) => {
-    // Update current counts for display
     setCurrentUndoCount(undoCount)
     setCurrentRedoCount(redoCount)
 
@@ -144,9 +156,9 @@ export default function UndoRedoLevel9() {
       !challengeCompleted
     ) {
       setChallengeCompleted(true)
-      setScore(score + 1)
-      setShowConfetti(true)
-      setTimeout(() => setShowConfetti(false), 2000)
+      level.incrementScore()
+      setChallengeConfetti(true)
+      setTimeout(() => setChallengeConfetti(false), 2000)
     }
   }
 
@@ -167,18 +179,12 @@ export default function UndoRedoLevel9() {
     setCurrentRedoCount(0)
   }
 
-  const resetLevel = () => {
-    setCurrentChallenge(0)
-    setScore(0)
-    setChallengeCompleted(false)
-    setMode(VIM_MODES.NORMAL)
-    setCurrentUndoCount(0)
-    setCurrentRedoCount(0)
-  }
-
   return (
-    <div className="flex flex-col items-center gap-4">
-      {showConfetti && <ConfettiBurst />}
+    <LevelShell
+      level={level}
+      className="flex flex-col items-center gap-4"
+    >
+      {challengeConfetti && <ConfettiBurst />}
 
       <div className="w-full max-w-4xl flex flex-col gap-4">
         {/* Header */}
@@ -191,7 +197,11 @@ export default function UndoRedoLevel9() {
 
         {/* Progress */}
         <div className="flex justify-center items-center mb-2 gap-4">
-          <Scoreboard score={score} maxScore={MAX_SCORE} />
+          <div className="bg-bg-secondary px-4 py-2 rounded-lg font-mono">
+            <span className="text-text-muted mr-2">Score:</span>
+            <span className="text-emerald-400 font-bold">{level.score}</span>
+            <span className="text-text-subtle"> / {level.maxScore}</span>
+          </div>
           <div className="text-sm text-text-muted">
             Challenge {currentChallenge + 1} of {challenges.length}
           </div>
@@ -253,7 +263,7 @@ export default function UndoRedoLevel9() {
           {challengeCompleted && (
             <div className="bg-green-800 rounded-lg p-4 mb-4">
               <p className="text-green-200 font-semibold">
-                ✅ {challenge.completedMessage}
+                {challenge.completedMessage}
               </p>
             </div>
           )}
@@ -336,7 +346,7 @@ export default function UndoRedoLevel9() {
 
           <div className="flex gap-2">
             <button
-              onClick={resetLevel}
+              onClick={level.resetLevel}
               className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
             >
               <RefreshCw size={16} />
@@ -346,21 +356,21 @@ export default function UndoRedoLevel9() {
         </div>
 
         {/* Level Completion */}
-        {isLevelCompleted && (
+        {level.levelCompleted && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-bg-secondary rounded-lg p-8 text-center max-w-md">
               <h2 className="text-3xl font-bold mb-4 text-purple-400">
-                🎉 Level Complete!
+                Level Complete!
               </h2>
               <p className="text-text-secondary mb-6">
                 Congratulations! You've mastered undo and redo operations. You
                 can now navigate through your editing history like a pro!
               </p>
               <div className="text-2xl font-bold text-green-400 mb-4">
-                Score: {score}/{MAX_SCORE}
+                Score: {level.score}/{level.maxScore}
               </div>
               <button
-                onClick={resetLevel}
+                onClick={level.resetLevel}
                 className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors font-semibold"
               >
                 Play Again
@@ -368,16 +378,7 @@ export default function UndoRedoLevel9() {
             </div>
           </div>
         )}
-
-        {/* Timer */}
-        <div className="mt-6">
-          <LevelTimer
-            levelId="level-9-undo-redo"
-            isActive={!isLevelCompleted}
-            isCompleted={isLevelCompleted}
-          />
-        </div>
       </div>
-    </div>
+    </LevelShell>
   )
 }

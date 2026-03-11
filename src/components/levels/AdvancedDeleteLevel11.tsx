@@ -1,16 +1,13 @@
 import { motion } from 'framer-motion'
-import { HelpCircleIcon, RefreshCw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   KeyActionMap,
   useKeyboardHandler,
 } from '../../hooks/useKeyboardHandler'
+import { useVimLevel } from '../../hooks/useVimLevel'
 import { VIM_MODES, VimMode } from '../../utils/constants'
 import { KBD } from '../common/KBD'
-import LevelTimer from '../common/LevelTimer'
-import ModeIndicator from '../common/ModeIndicator'
-import Scoreboard from '../common/Scoreboard'
-import ConfettiBurst from './ConfettiBurst'
+import { LevelShell, LevelHeader } from '../level-blocks'
 
 export default function AdvancedDeleteLevel11() {
   // Grid with lines to delete and words to delete
@@ -35,13 +32,9 @@ export default function AdvancedDeleteLevel11() {
 
   const [grid, setGrid] = useState(initialGrid.map((row) => [...row]))
   const [position, setPosition] = useState({ row: 0, col: 0 })
-  const [score, setScore] = useState(0)
   const [completedTargets, setCompletedTargets] = useState<Set<string>>(
     new Set(),
   )
-  const [showConfetti, setShowConfetti] = useState(false)
-  const [levelCompleted, setLevelCompleted] = useState(false)
-  const [lastKeyPressed, setLastKeyPressed] = useState<string>('')
   const [recentlyDeleted, setRecentlyDeleted] = useState<{
     row: number
     col: number
@@ -65,7 +58,29 @@ export default function AdvancedDeleteLevel11() {
     },
   ])
 
-  const MAX_SCORE = deleteTargets.length
+  const level = useVimLevel({
+    levelId: 'level-11-advanced-delete',
+    maxScore: deleteTargets.length,
+    onReset: () => {
+      setGrid(initialGrid.map((row) => [...row]))
+      setPosition({ row: 0, col: 0 })
+      setCompletedTargets(new Set())
+      setRecentlyDeleted(null)
+      setWrongMoveMessage('')
+      setMode(VIM_MODES.NORMAL)
+      setInsertModeWarning('')
+      setPendingCommand('')
+      setPendingFindCommand('')
+      setGridHistory([{
+        grid: initialGrid.map((row) => [...row]),
+        completedTargets: new Set(),
+        score: 0,
+      }])
+    },
+  })
+
+  // Timer starts immediately
+  useEffect(() => { level.activateTimer() }, [])
 
   // Color mapping for different target types
   const getTargetColors = (type: string) => {
@@ -140,58 +155,12 @@ export default function AdvancedDeleteLevel11() {
         }
 
         setPendingFindCommand('')
-        setLastKeyPressed(`${pendingFindCommand}${char}`)
       }
 
       window.addEventListener('keydown', handleFindCharacter)
       return () => window.removeEventListener('keydown', handleFindCharacter)
     }
   }, [pendingFindCommand, mode, position, grid])
-
-  // Check if level is completed
-  useEffect(() => {
-    if (score === MAX_SCORE && !levelCompleted) {
-      setLevelCompleted(true)
-      setShowConfetti(true)
-      setTimeout(() => setShowConfetti(false), 3000)
-    }
-  }, [score, MAX_SCORE, levelCompleted])
-
-  // Handle ESC key for level completion reset
-  useEffect(() => {
-    if (levelCompleted) {
-      const handleEscKey = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          handleRestart()
-        }
-      }
-      window.addEventListener('keydown', handleEscKey)
-      return () => window.removeEventListener('keydown', handleEscKey)
-    }
-  }, [levelCompleted])
-
-  const handleRestart = () => {
-    setGrid(initialGrid.map((row) => [...row]))
-    setPosition({ row: 0, col: 0 })
-    setScore(0)
-    setCompletedTargets(new Set())
-    setLevelCompleted(false)
-    setShowConfetti(false)
-    setLastKeyPressed('')
-    setRecentlyDeleted(null)
-    setWrongMoveMessage('')
-    setMode(VIM_MODES.NORMAL)
-    setInsertModeWarning('')
-    setPendingCommand('')
-    setPendingFindCommand('')
-    setGridHistory([
-      {
-        grid: initialGrid.map((row) => [...row]),
-        completedTargets: new Set(),
-        score: 0,
-      },
-    ])
-  }
 
   const deleteWord = () => {
     // Save current state to history
@@ -200,7 +169,7 @@ export default function AdvancedDeleteLevel11() {
       {
         grid: grid.map((row) => [...row]),
         completedTargets: new Set(completedTargets),
-        score: score,
+        score: level.score,
       },
     ])
 
@@ -254,7 +223,7 @@ export default function AdvancedDeleteLevel11() {
       if (!completedTargets.has(targetKey)) {
         // Correct target - award points
         setCompletedTargets((prev) => new Set([...prev, targetKey]))
-        setScore((prev) => prev + 1)
+        level.incrementScore()
         setRecentlyDeleted({ row: position.row, col: position.col })
         setWrongMoveMessage('')
       } else {
@@ -290,7 +259,7 @@ export default function AdvancedDeleteLevel11() {
       {
         grid: grid.map((row) => [...row]),
         completedTargets: new Set(completedTargets),
-        score: score,
+        score: level.score,
       },
     ])
 
@@ -311,7 +280,7 @@ export default function AdvancedDeleteLevel11() {
     if (target && !completedTargets.has('dd')) {
       // Correct target - award points
       setCompletedTargets((prev) => new Set([...prev, 'dd']))
-      setScore((prev) => prev + 1)
+      level.incrementScore()
       setRecentlyDeleted({ row: position.row, col: 0 })
       setWrongMoveMessage('')
     } else {
@@ -332,7 +301,7 @@ export default function AdvancedDeleteLevel11() {
       {
         grid: grid.map((row) => [...row]),
         completedTargets: new Set(completedTargets),
-        score: score,
+        score: level.score,
       },
     ])
 
@@ -355,7 +324,7 @@ export default function AdvancedDeleteLevel11() {
       if (!completedTargets.has(targetKey)) {
         // Correct target - award points
         setCompletedTargets((prev) => new Set([...prev, targetKey]))
-        setScore((prev) => prev + 1)
+        level.incrementScore()
         setRecentlyDeleted({ row: position.row, col: position.col })
         setWrongMoveMessage('')
       } else {
@@ -377,7 +346,7 @@ export default function AdvancedDeleteLevel11() {
       {
         grid: grid.map((row) => [...row]),
         completedTargets: new Set(completedTargets),
-        score: score,
+        score: level.score,
       },
     ])
 
@@ -406,7 +375,7 @@ export default function AdvancedDeleteLevel11() {
       if (!completedTargets.has(targetKey)) {
         // Correct target - award points
         setCompletedTargets((prev) => new Set([...prev, targetKey]))
-        setScore((prev) => prev + 1)
+        level.incrementScore()
         setRecentlyDeleted({ row: position.row, col: position.col - 1 })
         setWrongMoveMessage('')
       } else {
@@ -435,7 +404,7 @@ export default function AdvancedDeleteLevel11() {
       {
         grid: grid.map((row) => [...row]),
         completedTargets: new Set(completedTargets),
-        score: score,
+        score: level.score,
       },
     ])
 
@@ -464,7 +433,7 @@ export default function AdvancedDeleteLevel11() {
       if (!completedTargets.has(targetKey)) {
         // Correct target - award points
         setCompletedTargets((prev) => new Set([...prev, targetKey]))
-        setScore((prev) => prev + 1)
+        level.incrementScore()
         setRecentlyDeleted({ row: position.row, col: position.col })
         setWrongMoveMessage('')
       } else {
@@ -487,22 +456,18 @@ export default function AdvancedDeleteLevel11() {
       // Handle second character of dd, dw, dh, or dl
       if (key === 'd') {
         deleteLine()
-        setLastKeyPressed('dd')
         setPendingCommand('')
         return
       } else if (key === 'w') {
         deleteWord()
-        setLastKeyPressed('dw')
         setPendingCommand('')
         return
       } else if (key === 'h') {
         deleteLeft()
-        setLastKeyPressed('dh')
         setPendingCommand('')
         return
       } else if (key === 'l') {
         deleteRight()
-        setLastKeyPressed('dl')
         setPendingCommand('')
         return
       } else {
@@ -514,13 +479,11 @@ export default function AdvancedDeleteLevel11() {
     // Handle single character commands
     if (key === 'd') {
       setPendingCommand('d')
-      setLastKeyPressed('d')
       return
     }
 
     if (key === 'D') {
       deleteToEnd()
-      setLastKeyPressed('D')
       return
     }
 
@@ -534,7 +497,6 @@ export default function AdvancedDeleteLevel11() {
         ...prev,
         col: Math.max(0, prev.col - 1),
       }))
-      setLastKeyPressed('h')
       setPendingCommand('')
     } else if (key === 'j') {
       if (mode === VIM_MODES.INSERT) {
@@ -545,7 +507,6 @@ export default function AdvancedDeleteLevel11() {
         ...prev,
         row: Math.min(grid.length - 1, prev.row + 1),
       }))
-      setLastKeyPressed('j')
       setPendingCommand('')
     } else if (key === 'k') {
       if (mode === VIM_MODES.INSERT) {
@@ -556,7 +517,6 @@ export default function AdvancedDeleteLevel11() {
         ...prev,
         row: Math.max(0, prev.row - 1),
       }))
-      setLastKeyPressed('k')
       setPendingCommand('')
     } else if (key === 'l') {
       if (mode === VIM_MODES.INSERT) {
@@ -567,7 +527,6 @@ export default function AdvancedDeleteLevel11() {
         ...prev,
         col: Math.min(grid[0].length - 1, prev.col + 1),
       }))
-      setLastKeyPressed('l')
       setPendingCommand('')
     } else if (key === 'w') {
       if (mode === VIM_MODES.INSERT) {
@@ -575,7 +534,6 @@ export default function AdvancedDeleteLevel11() {
         return
       }
       moveToNextWord()
-      setLastKeyPressed('w')
       setPendingCommand('')
     } else if (key === 'b') {
       if (mode === VIM_MODES.INSERT) {
@@ -583,7 +541,6 @@ export default function AdvancedDeleteLevel11() {
         return
       }
       moveToPrevWord()
-      setLastKeyPressed('b')
       setPendingCommand('')
     } else if (key === 'e') {
       if (mode === VIM_MODES.INSERT) {
@@ -591,7 +548,6 @@ export default function AdvancedDeleteLevel11() {
         return
       }
       moveToWordEnd()
-      setLastKeyPressed('e')
       setPendingCommand('')
     } else if (key === '0') {
       if (mode === VIM_MODES.INSERT) {
@@ -602,7 +558,6 @@ export default function AdvancedDeleteLevel11() {
         ...prev,
         col: 0,
       }))
-      setLastKeyPressed('0')
       setPendingCommand('')
     } else if (key === '$') {
       if (mode === VIM_MODES.INSERT) {
@@ -613,7 +568,6 @@ export default function AdvancedDeleteLevel11() {
         ...prev,
         col: grid[prev.row].length - 1,
       }))
-      setLastKeyPressed('$')
       setPendingCommand('')
     } else if (key === 'f') {
       if (mode === VIM_MODES.INSERT) {
@@ -621,7 +575,6 @@ export default function AdvancedDeleteLevel11() {
         return
       }
       setPendingFindCommand('f')
-      setLastKeyPressed('f')
       setPendingCommand('')
     } else if (key === 'F') {
       if (mode === VIM_MODES.INSERT) {
@@ -629,7 +582,6 @@ export default function AdvancedDeleteLevel11() {
         return
       }
       setPendingFindCommand('F')
-      setLastKeyPressed('F')
       setPendingCommand('')
     } else if (key === 't') {
       if (mode === VIM_MODES.INSERT) {
@@ -637,7 +589,6 @@ export default function AdvancedDeleteLevel11() {
         return
       }
       setPendingFindCommand('t')
-      setLastKeyPressed('t')
       setPendingCommand('')
     } else if (key === 'T') {
       if (mode === VIM_MODES.INSERT) {
@@ -645,7 +596,6 @@ export default function AdvancedDeleteLevel11() {
         return
       }
       setPendingFindCommand('T')
-      setLastKeyPressed('T')
       setPendingCommand('')
     } else if (key === 'u') {
       if (mode === VIM_MODES.INSERT) {
@@ -653,7 +603,6 @@ export default function AdvancedDeleteLevel11() {
         return
       }
       undoLastAction()
-      setLastKeyPressed('u')
       setPendingCommand('')
     }
   }
@@ -794,7 +743,7 @@ export default function AdvancedDeleteLevel11() {
       // Restore all state from history
       setGrid(previousState.grid.map((row) => [...row]))
       setCompletedTargets(new Set(previousState.completedTargets))
-      setScore(previousState.score)
+      level.setScore(previousState.score)
       setGridHistory(newHistory)
       setWrongMoveMessage('')
       setRecentlyDeleted(null)
@@ -820,7 +769,6 @@ export default function AdvancedDeleteLevel11() {
     u: () => handleCommand('u'),
     Escape: () => {
       setMode(VIM_MODES.NORMAL)
-      setLastKeyPressed('Escape')
     },
   }
 
@@ -872,31 +820,18 @@ export default function AdvancedDeleteLevel11() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-6">
-      {showConfetti && <ConfettiBurst />}
-
-      <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2 text-purple-400">
-          Advanced Delete Operations
-        </h2>
-        <p className="text-text-muted px-2">
-          Use <KBD>dw</KBD> to delete words, <KBD>dd</KBD> to delete lines,{' '}
+    <LevelShell level={level} className="flex flex-col items-center gap-6">
+      <LevelHeader
+        title="Advanced Delete Operations"
+        titleColor="text-purple-400"
+        description={<>Use <KBD>dw</KBD> to delete words, <KBD>dd</KBD> to delete lines,{' '}
           <KBD>D</KBD> to delete to end, <KBD>dh</KBD> to delete left, and{' '}
-          <KBD>dl</KBD> to delete under cursor
-        </p>
-      </div>
-
-      <div className="flex justify-center items-center gap-4 mb-4">
-        <Scoreboard score={score} maxScore={MAX_SCORE} />
-        <button
-          onClick={handleRestart}
-          className="bg-bg-secondary p-3 rounded-lg hover:bg-bg-tertiary transition-colors"
-          aria-label="Reset Level"
-        >
-          <RefreshCw size={18} className="text-text-muted" />
-        </button>
-        <ModeIndicator isInsertMode={mode === VIM_MODES.INSERT} />
-      </div>
+          <KBD>dl</KBD> to delete under cursor</>}
+        score={level.score}
+        maxScore={level.maxScore}
+        onReset={level.resetLevel}
+        mode={mode}
+      />
 
       {/* Grid */}
       <div className="bg-bg-secondary rounded-lg border-2 border-border-secondary">
@@ -1002,15 +937,15 @@ export default function AdvancedDeleteLevel11() {
             </div>
           </div>
         </div>
-        
+
         {/* Philosophy Section */}
         <div className="mt-6 bg-bg-tertiary/50 rounded-lg p-4 text-sm">
           <h3 className="text-emerald-400 font-semibold mb-3">Vim's Delete Philosophy: Operators + Motions</h3>
           <p className="text-text-secondary mb-3">
-            In Vim, <span className="text-blue-400 font-mono">d</span> is a <strong>delete operator</strong> that combines with <strong>motions</strong> to create powerful commands. 
+            In Vim, <span className="text-blue-400 font-mono">d</span> is a <strong>delete operator</strong> that combines with <strong>motions</strong> to create powerful commands.
             The pattern is: <span className="text-yellow-300 font-mono">operator + motion = action</span>
           </p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
             <div>
               <p className="text-text-muted font-medium mb-2">More delete combinations:</p>
@@ -1022,7 +957,7 @@ export default function AdvancedDeleteLevel11() {
                 <li><span className="text-purple-400 font-mono">d$</span> - Delete to line end (same as D)</li>
               </ul>
             </div>
-            
+
             <div>
               <p className="text-text-muted font-medium mb-2">Change operator (c):</p>
               <ul className="text-text-secondary space-y-1 text-xs">
@@ -1034,16 +969,16 @@ export default function AdvancedDeleteLevel11() {
               </ul>
             </div>
           </div>
-          
+
           <p className="text-text-muted text-xs italic">
-            💡 The key difference: <span className="text-red-400">d</span> deletes and stays in normal mode, 
+            💡 The key difference: <span className="text-red-400">d</span> deletes and stays in normal mode,
             <span className="text-green-400">c</span> deletes and enters insert mode for immediate editing.
           </p>
         </div>
       </div>
 
       {/* Level completion */}
-      {levelCompleted && (
+      {level.levelCompleted && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-bg-secondary rounded-lg p-8 text-center max-w-md">
             <h2 className="text-3xl font-bold mb-4 text-purple-400">
@@ -1054,7 +989,7 @@ export default function AdvancedDeleteLevel11() {
               delete words, lines, and text to end of line!
             </p>
             <div className="text-2xl font-bold text-green-400 mb-4">
-              Score: {score}/{MAX_SCORE}
+              Score: {level.score}/{level.maxScore}
             </div>
             <p className="text-text-muted text-sm">
               Press <KBD>Esc</KBD> to play again
@@ -1062,14 +997,6 @@ export default function AdvancedDeleteLevel11() {
           </div>
         </div>
       )}
-
-      <div className="mt-6">
-        <LevelTimer
-          levelId="level-11-advanced-delete"
-          isActive={!levelCompleted}
-          isCompleted={levelCompleted}
-        />
-      </div>
 
       {/* Floating Warning Message */}
       {wrongMoveMessage && (
@@ -1100,6 +1027,6 @@ export default function AdvancedDeleteLevel11() {
           </p>
         </motion.div>
       )}
-    </div>
+    </LevelShell>
   )
 }
