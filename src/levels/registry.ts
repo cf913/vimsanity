@@ -16,6 +16,7 @@ import TextObjectLevel14 from '../components/levels/TextObjectLevel14'
 import YankPutLevel15 from '../components/levels/YankPutLevel15'
 import CountPrefixLevel16 from '../components/levels/CountPrefixLevel16'
 import FileNavLevel17 from '../components/levels/FileNavLevel17'
+import DotCommandLevel18 from '../components/levels/DotCommandLevel18'
 
 export type LevelCategory =
   | 'intro'
@@ -24,6 +25,7 @@ export type LevelCategory =
   | 'history'
   | 'delete'
   | 'yank'
+  | 'advanced'
   | 'recap'
   | 'playground'
 
@@ -177,6 +179,16 @@ export const levelRegistry: LevelEntry[] = [
     description: 'Copy and paste text with yank and put commands',
     category: 'yank',
     component: YankPutLevel15,
+    wip: false,
+    locked: false,
+  },
+  // --- advanced ---
+  {
+    id: 18,
+    title: 'The Dot Command (.)',
+    description: 'Repeat your last change with a single keystroke',
+    category: 'advanced',
+    component: DotCommandLevel18,
     wip: false,
     locked: false,
   },

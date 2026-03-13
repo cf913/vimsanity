@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Clipboard } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useHistory } from '../../hooks/useHistory'
 import {
   KeyActionMap,
   useKeyboardHandler,
@@ -75,20 +76,16 @@ export default function YankPutLevel15() {
     col: number
   } | null>(null)
 
-  // History for undo
-  const [gridHistory, setGridHistory] = useState<
-    {
-      grid: string[][]
-      completedTargets: Set<string>
-      score: number
-    }[]
-  >([
-    {
-      grid: initialGrid.map((row) => [...row]),
-      completedTargets: new Set(),
-      score: 0,
-    },
-  ])
+  // History for undo/redo
+  const gridHistory = useHistory<{
+    grid: string[][]
+    completedTargets: Set<string>
+    score: number
+  }>({
+    grid: initialGrid.map((row) => [...row]),
+    completedTargets: new Set(),
+    score: 0,
+  })
 
   const [feedbackMessage, setFeedbackMessage] = useState<string>('')
 
@@ -106,13 +103,11 @@ export default function YankPutLevel15() {
       setShowYankAnimation(false)
       setShowPasteAnimation(null)
       setFeedbackMessage('')
-      setGridHistory([
-        {
-          grid: initialGrid.map((row) => [...row]),
-          completedTargets: new Set(),
-          score: 0,
-        },
-      ])
+      gridHistory.resetHistory({
+        grid: initialGrid.map((row) => [...row]),
+        completedTargets: new Set(),
+        score: 0,
+      })
     },
   })
 
@@ -190,14 +185,11 @@ export default function YankPutLevel15() {
     }
 
     // Save current state to history
-    setGridHistory((prev) => [
-      ...prev,
-      {
-        grid: grid.map((row) => [...row]),
-        completedTargets: new Set(completedTargets),
-        score: level.score,
-      },
-    ])
+    gridHistory.pushToHistory({
+      grid: grid.map((row) => [...row]),
+      completedTargets: new Set(completedTargets),
+      score: level.score,
+    })
 
     if (yankType === 'line') {
       // For line yank, paste on the next line
@@ -244,14 +236,11 @@ export default function YankPutLevel15() {
     }
 
     // Save current state to history
-    setGridHistory((prev) => [
-      ...prev,
-      {
-        grid: grid.map((row) => [...row]),
-        completedTargets: new Set(completedTargets),
-        score: level.score,
-      },
-    ])
+    gridHistory.pushToHistory({
+      grid: grid.map((row) => [...row]),
+      completedTargets: new Set(completedTargets),
+      score: level.score,
+    })
 
     if (yankType === 'line') {
       // For line yank, paste on current line (overwrite)
@@ -324,15 +313,22 @@ export default function YankPutLevel15() {
   }
 
   const undoLastAction = () => {
-    if (gridHistory.length > 1) {
-      const newHistory = gridHistory.slice(0, -1)
-      const previousState = newHistory[newHistory.length - 1]
-
-      setGrid(previousState.grid.map((row) => [...row]))
-      setCompletedTargets(new Set(previousState.completedTargets))
-      level.setScore(previousState.score)
-      setGridHistory(newHistory)
+    const prev = gridHistory.undo()
+    if (prev) {
+      setGrid(prev.grid.map((row) => [...row]))
+      setCompletedTargets(new Set(prev.completedTargets))
+      level.setScore(prev.score)
       setFeedbackMessage('Undone!')
+    }
+  }
+
+  const redoLastAction = () => {
+    const next = gridHistory.redo()
+    if (next) {
+      setGrid(next.grid.map((row) => [...row]))
+      setCompletedTargets(new Set(next.completedTargets))
+      level.setScore(next.score)
+      setFeedbackMessage('Redone!')
     }
   }
 
@@ -494,6 +490,9 @@ export default function YankPutLevel15() {
     p: () => handleCommand('p'),
     P: () => handleCommand('P'),
     u: () => handleCommand('u'),
+    'ctrl+r': () => {
+      redoLastAction()
+    },
     Escape: () => {
       setPendingCommand('')
       setMode(VIM_MODES.NORMAL)

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
+import { useHistory } from '../../hooks/useHistory'
 import {
   KeyActionMap,
   useKeyboardHandler,
@@ -44,19 +45,15 @@ export default function AdvancedDeleteLevel11() {
   const [insertModeWarning, setInsertModeWarning] = useState<string>('')
   const [pendingCommand, setPendingCommand] = useState<string>('')
   const [pendingFindCommand, setPendingFindCommand] = useState<string>('')
-  const [gridHistory, setGridHistory] = useState<
-    {
-      grid: string[][]
-      completedTargets: Set<string>
-      score: number
-    }[]
-  >([
-    {
-      grid: initialGrid.map((row) => [...row]),
-      completedTargets: new Set(),
-      score: 0,
-    },
-  ])
+  const gridHistory = useHistory<{
+    grid: string[][]
+    completedTargets: Set<string>
+    score: number
+  }>({
+    grid: initialGrid.map((row) => [...row]),
+    completedTargets: new Set(),
+    score: 0,
+  })
 
   const level = useVimLevel({
     levelId: 'level-11-advanced-delete',
@@ -71,11 +68,11 @@ export default function AdvancedDeleteLevel11() {
       setInsertModeWarning('')
       setPendingCommand('')
       setPendingFindCommand('')
-      setGridHistory([{
+      gridHistory.resetHistory({
         grid: initialGrid.map((row) => [...row]),
         completedTargets: new Set(),
         score: 0,
-      }])
+      })
     },
   })
 
@@ -164,14 +161,11 @@ export default function AdvancedDeleteLevel11() {
 
   const deleteWord = () => {
     // Save current state to history
-    setGridHistory((prev) => [
-      ...prev,
-      {
-        grid: grid.map((row) => [...row]),
-        completedTargets: new Set(completedTargets),
-        score: level.score,
-      },
-    ])
+    gridHistory.pushToHistory({
+      grid: grid.map((row) => [...row]),
+      completedTargets: new Set(completedTargets),
+      score: level.score,
+    })
 
     setGrid((prev) => {
       const newGrid = prev.map((row) => [...row])
@@ -254,14 +248,11 @@ export default function AdvancedDeleteLevel11() {
 
   const deleteLine = () => {
     // Save current state to history
-    setGridHistory((prev) => [
-      ...prev,
-      {
-        grid: grid.map((row) => [...row]),
-        completedTargets: new Set(completedTargets),
-        score: level.score,
-      },
-    ])
+    gridHistory.pushToHistory({
+      grid: grid.map((row) => [...row]),
+      completedTargets: new Set(completedTargets),
+      score: level.score,
+    })
 
     setGrid((prev) => {
       const newGrid = prev.map((row) => [...row])
@@ -296,14 +287,11 @@ export default function AdvancedDeleteLevel11() {
 
   const deleteToEnd = () => {
     // Save current state to history
-    setGridHistory((prev) => [
-      ...prev,
-      {
-        grid: grid.map((row) => [...row]),
-        completedTargets: new Set(completedTargets),
-        score: level.score,
-      },
-    ])
+    gridHistory.pushToHistory({
+      grid: grid.map((row) => [...row]),
+      completedTargets: new Set(completedTargets),
+      score: level.score,
+    })
 
     setGrid((prev) => {
       const newGrid = prev.map((row) => [...row])
@@ -341,14 +329,11 @@ export default function AdvancedDeleteLevel11() {
 
   const deleteLeft = () => {
     // Save current state to history
-    setGridHistory((prev) => [
-      ...prev,
-      {
-        grid: grid.map((row) => [...row]),
-        completedTargets: new Set(completedTargets),
-        score: level.score,
-      },
-    ])
+    gridHistory.pushToHistory({
+      grid: grid.map((row) => [...row]),
+      completedTargets: new Set(completedTargets),
+      score: level.score,
+    })
 
     setGrid((prev) => {
       const newGrid = prev.map((row) => [...row])
@@ -399,14 +384,11 @@ export default function AdvancedDeleteLevel11() {
 
   const deleteRight = () => {
     // Save current state to history
-    setGridHistory((prev) => [
-      ...prev,
-      {
-        grid: grid.map((row) => [...row]),
-        completedTargets: new Set(completedTargets),
-        score: level.score,
-      },
-    ])
+    gridHistory.pushToHistory({
+      grid: grid.map((row) => [...row]),
+      completedTargets: new Set(completedTargets),
+      score: level.score,
+    })
 
     setGrid((prev) => {
       const newGrid = prev.map((row) => [...row])
@@ -736,15 +718,22 @@ export default function AdvancedDeleteLevel11() {
   }
 
   const undoLastAction = () => {
-    if (gridHistory.length > 1) {
-      const newHistory = gridHistory.slice(0, -1)
-      const previousState = newHistory[newHistory.length - 1]
+    const prev = gridHistory.undo()
+    if (prev) {
+      setGrid(prev.grid.map((row) => [...row]))
+      setCompletedTargets(new Set(prev.completedTargets))
+      level.setScore(prev.score)
+      setWrongMoveMessage('')
+      setRecentlyDeleted(null)
+    }
+  }
 
-      // Restore all state from history
-      setGrid(previousState.grid.map((row) => [...row]))
-      setCompletedTargets(new Set(previousState.completedTargets))
-      level.setScore(previousState.score)
-      setGridHistory(newHistory)
+  const redoLastAction = () => {
+    const next = gridHistory.redo()
+    if (next) {
+      setGrid(next.grid.map((row) => [...row]))
+      setCompletedTargets(new Set(next.completedTargets))
+      level.setScore(next.score)
       setWrongMoveMessage('')
       setRecentlyDeleted(null)
     }
@@ -767,6 +756,10 @@ export default function AdvancedDeleteLevel11() {
     d: () => handleCommand('d'),
     D: () => handleCommand('D'),
     u: () => handleCommand('u'),
+    'ctrl+r': () => {
+      if (mode === VIM_MODES.INSERT) return
+      redoLastAction()
+    },
     Escape: () => {
       setMode(VIM_MODES.NORMAL)
     },

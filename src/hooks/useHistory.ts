@@ -5,28 +5,29 @@ export interface HistoryState {
   cursorIndex: number
 }
 
-export interface UseHistoryReturn {
-  history: HistoryState[]
-  redoHistory: HistoryState[]
-  pushToHistory: (state: HistoryState) => void
-  undo: () => HistoryState | null
-  redo: () => HistoryState | null
+export interface UseHistoryReturn<T = HistoryState> {
+  history: T[]
+  redoHistory: T[]
+  pushToHistory: (state: T) => void
+  undo: () => T | null
+  redo: () => T | null
   clearHistory: () => void
+  resetHistory: (newInitialState: T) => void
   canUndo: boolean
   canRedo: boolean
 }
 
-export const useHistory = (initialState: HistoryState): UseHistoryReturn => {
-  const [history, setHistory] = useState<HistoryState[]>([initialState])
-  const [redoHistory, setRedoHistory] = useState<HistoryState[]>([])
+export const useHistory = <T = HistoryState>(initialState: T): UseHistoryReturn<T> => {
+  const [history, setHistory] = useState<T[]>([initialState])
+  const [redoHistory, setRedoHistory] = useState<T[]>([])
 
-  const pushToHistory = useCallback((state: HistoryState) => {
+  const pushToHistory = useCallback((state: T) => {
     setHistory(prev => [...prev, state])
     // Clear redo history when new state is added
     setRedoHistory([])
   }, [])
 
-  const undo = useCallback((): HistoryState | null => {
+  const undo = useCallback((): T | null => {
     if (history.length <= 1) return null
 
     // Get the current state (last in history) and previous state (second to last)
@@ -35,14 +36,14 @@ export const useHistory = (initialState: HistoryState): UseHistoryReturn => {
 
     // Move current state to redo history
     setRedoHistory(prev => [...prev, currentState])
-    
+
     // Remove current state from history
     setHistory(prev => prev.slice(0, -1))
 
     return previousState
   }, [history])
 
-  const redo = useCallback((): HistoryState | null => {
+  const redo = useCallback((): T | null => {
     if (redoHistory.length === 0) return null
 
     // Get the last state from redo history
@@ -50,7 +51,7 @@ export const useHistory = (initialState: HistoryState): UseHistoryReturn => {
 
     // Add the restored state back to history
     setHistory(prev => [...prev, redoState])
-    
+
     // Remove the restored state from redo history
     setRedoHistory(prev => prev.slice(0, -1))
 
@@ -62,6 +63,11 @@ export const useHistory = (initialState: HistoryState): UseHistoryReturn => {
     setRedoHistory([])
   }, [initialState])
 
+  const resetHistory = useCallback((newInitialState: T) => {
+    setHistory([newInitialState])
+    setRedoHistory([])
+  }, [])
+
   return {
     history,
     redoHistory,
@@ -69,6 +75,7 @@ export const useHistory = (initialState: HistoryState): UseHistoryReturn => {
     undo,
     redo,
     clearHistory,
+    resetHistory,
     canUndo: history.length > 1,
     canRedo: redoHistory.length > 0,
   }

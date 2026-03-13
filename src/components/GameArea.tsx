@@ -7,12 +7,13 @@ interface GameAreaProps {
 }
 
 // Changelog version and message
-const GAME_VERSION = '0.1.6'
-const DATE_VERSION = '2026-01-03'
+const GAME_VERSION = '0.1.8'
+const DATE_VERSION = '2026-03-13'
 
 const CHANGELOG_MESSAGE = `
 <b>What's New in ${GAME_VERSION} (${DATE_VERSION})</b><br/><br/>
-- Fixed crash on level completion<br/><br/>
+- Undo (u) and Redo (Ctrl+r) now available across all text-editing levels<br/>
+- Levels 10, 11, 14, 15, and 18 all support full undo/redo history<br/><br/>
 Thanks for playing!
 `
 

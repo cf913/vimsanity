@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
+import { useHistory } from '../../hooks/useHistory'
 import {
   KeyActionMap,
   useKeyboardHandler,
@@ -116,9 +117,9 @@ export default function BasicDeleteLevel10() {
     col: number
   } | null>(null)
   const [wrongMoveMessage, setWrongMoveMessage] = useState<string>('')
-  const [gridHistory, setGridHistory] = useState<string[][][]>([
-    initialGrid.map((row) => [...row]),
-  ])
+  const gridHistory = useHistory<{ grid: string[][] }>({
+    grid: initialGrid.map((row) => [...row]),
+  })
   const [mode, setMode] = useState<VimMode>(VIM_MODES.NORMAL)
   const [insertModeWarning, setInsertModeWarning] = useState<string>('')
   const [pendingFindCommand, setPendingFindCommand] = useState<string>('')
@@ -137,7 +138,7 @@ export default function BasicDeleteLevel10() {
       setPosition({ row: 0, col: 0 })
       setRecentlyDeleted(null)
       setWrongMoveMessage('')
-      setGridHistory([newGrid])
+      gridHistory.resetHistory({ grid: newGrid })
       setMode(VIM_MODES.NORMAL)
       setInsertModeWarning('')
       setPendingFindCommand('')
@@ -210,11 +211,18 @@ export default function BasicDeleteLevel10() {
   }, [pendingFindCommand, mode, position, grid])
 
   const undoLastAction = () => {
-    if (gridHistory.length > 1) {
-      const newHistory = gridHistory.slice(0, -1)
-      const previousGrid = newHistory[newHistory.length - 1]
-      setGrid(previousGrid.map((row) => [...row]))
-      setGridHistory(newHistory)
+    const prev = gridHistory.undo()
+    if (prev) {
+      setGrid(prev.grid.map((row) => [...row]))
+      setWrongMoveMessage('')
+      setRecentlyDeleted(null)
+    }
+  }
+
+  const redoLastAction = () => {
+    const next = gridHistory.redo()
+    if (next) {
+      setGrid(next.grid.map((row) => [...row]))
       setWrongMoveMessage('')
       setRecentlyDeleted(null)
     }
@@ -225,7 +233,7 @@ export default function BasicDeleteLevel10() {
     const newGrid = grid.map((row) => [...row])
 
     // Save current grid state to history
-    setGridHistory((prev) => [...prev, newGrid])
+    gridHistory.pushToHistory({ grid: grid.map((row) => [...row]) })
 
     // Apply the command based on type
     if (command === 'x') {
@@ -594,6 +602,10 @@ export default function BasicDeleteLevel10() {
         return
       }
       undoLastAction()
+    },
+    'ctrl+r': () => {
+      if (mode === VIM_MODES.INSERT) return
+      redoLastAction()
     },
     Escape: () => {
       setMode(VIM_MODES.NORMAL)

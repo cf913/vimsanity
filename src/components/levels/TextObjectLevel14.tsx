@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
+import { useHistory } from '../../hooks/useHistory'
 import {
   KeyActionMap,
   useKeyboardHandler,
@@ -88,6 +89,13 @@ export default function TextObjectLevel14() {
     })
   }
 
+  // Deep clone lines for history snapshots
+  const cloneLines = (src: Line[]): Line[] =>
+    src.map((line) => ({
+      ...line,
+      words: line.words.map((word) => word.map((sq) => ({ ...sq }))),
+    }))
+
   const [lines, setLines] = useState<Line[]>(createInitialLines())
   const [cursorPosition, setCursorPosition] = useState({ line: 0, charIdx: 0 })
   const [mode, setMode] = useState<VimMode>(VIM_MODES.NORMAL)
@@ -99,6 +107,16 @@ export default function TextObjectLevel14() {
     charIdx: number
   } | null>(null)
   const [virtualColumn, setVirtualColumn] = useState(0)
+
+  const levelHistory = useHistory<{
+    lines: Line[]
+    cursorPosition: { line: number; charIdx: number }
+    score: number
+  }>({
+    lines: cloneLines(createInitialLines()),
+    cursorPosition: { line: 0, charIdx: 0 },
+    score: 0,
+  })
 
   const playerRef = useRef<HTMLSpanElement>(null)
 
@@ -129,6 +147,11 @@ export default function TextObjectLevel14() {
       setVirtualColumn(0)
       setShowExplosion(false)
       setExplosionPos(null)
+      levelHistory.resetHistory({
+        lines: cloneLines(createInitialLines()),
+        cursorPosition: { line: 0, charIdx: 0 },
+        score: 0,
+      })
     },
   })
 
@@ -411,6 +434,15 @@ export default function TextObjectLevel14() {
   }
 
   const handleCommand = (command: string) => {
+    // Push history before any mutation
+    if (['dw', 'diw', 'daw', 'ciw', 'caw'].includes(command)) {
+      levelHistory.pushToHistory({
+        lines: cloneLines(lines),
+        cursorPosition: { ...cursorPosition },
+        score: level.score,
+      })
+    }
+
     switch (command) {
       case 'dw':
         deleteWord()
@@ -702,6 +734,28 @@ export default function TextObjectLevel14() {
         // w for word movement
         moveWordForward()
         setLastKeyPressed('w')
+      }
+    },
+    u: () => {
+      if (mode === VIM_MODES.NORMAL && !pendingCommand) {
+        const prev = levelHistory.undo()
+        if (prev) {
+          setLines(cloneLines(prev.lines))
+          setCursorPosition({ ...prev.cursorPosition })
+          level.setScore(prev.score)
+          setLastKeyPressed('u')
+        }
+      }
+    },
+    'ctrl+r': () => {
+      if (mode === VIM_MODES.NORMAL && !pendingCommand) {
+        const next = levelHistory.redo()
+        if (next) {
+          setLines(cloneLines(next.lines))
+          setCursorPosition({ ...next.cursorPosition })
+          level.setScore(next.score)
+          setLastKeyPressed('ctrl+r')
+        }
       }
     },
     Escape: () => {
