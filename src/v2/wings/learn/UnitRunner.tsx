@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ADrillStage from './stages/ADrillStage'
 import BCheckStage from './stages/BCheckStage'
+import ADrillStageText from './stages/ADrillStageText'
+import BCheckStageText from './stages/BCheckStageText'
 import { units, findUnit } from './units/registry'
 import {
   loadProgress,
@@ -61,8 +63,18 @@ export default function UnitRunner() {
         <h1 className="text-xl font-semibold text-gray-100">{unit.title}</h1>
         <div className="mt-1 font-mono text-sm text-orange-300">{unit.motionLabel}</div>
       </header>
-      {active === 'a' && <ADrillStage def={unit.aStage} onCompleted={handleAComplete} />}
-      {active === 'b' && <BCheckStage def={unit.bStage} onCompleted={handleBComplete} />}
+      {active === 'a' &&
+        (unit.aStage.kind === 'a-drill-grid' ? (
+          <ADrillStage def={unit.aStage} onCompleted={handleAComplete} />
+        ) : (
+          <ADrillStageText def={unit.aStage} onCompleted={handleAComplete} />
+        ))}
+      {active === 'b' &&
+        (unit.bStage.kind === 'b-check-cursor-puzzles' ? (
+          <BCheckStage def={unit.bStage} onCompleted={handleBComplete} />
+        ) : (
+          <BCheckStageText def={unit.bStage} onCompleted={handleBComplete} />
+        ))}
       {active === 'done' && (
         <div className="flex flex-col items-center gap-4 p-12 text-center">
           <div className="text-2xl">✓ Unit complete</div>
