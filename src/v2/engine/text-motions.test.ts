@@ -3,6 +3,7 @@ import {
   applyTextKey,
   w, b, e,
   lineStart, lineEnd, lineStartNonBlank,
+  j, k,
   textMotionRegistry,
 } from './text-motions'
 import type { TextState } from './text-types'
@@ -62,6 +63,28 @@ describe('lineEnd motion ($)', () => {
 describe('lineStartNonBlank motion (^)', () => {
   it('moves past leading spaces', () => {
     const r = lineStartNonBlank.apply(state('   hello', 5), { key: '^' })
+    expect(r.state.cursorIndex).toBe(3)
+  })
+})
+
+describe('j motion (down a line)', () => {
+  it('moves to the same column on the next line', () => {
+    const r = j.apply(state('abc\ndefgh', 1), { key: 'j' })
+    expect(r.state.cursorIndex).toBe(5)
+  })
+  it('stays put on the last line', () => {
+    const r = j.apply(state('only line', 3), { key: 'j' })
+    expect(r.state.cursorIndex).toBe(3)
+  })
+})
+
+describe('k motion (up a line)', () => {
+  it('moves to the same column on the previous line', () => {
+    const r = k.apply(state('abcde\nfg', 7), { key: 'k' })
+    expect(r.state.cursorIndex).toBe(1)
+  })
+  it('stays put on the first line', () => {
+    const r = k.apply(state('only line', 3), { key: 'k' })
     expect(r.state.cursorIndex).toBe(3)
   })
 })

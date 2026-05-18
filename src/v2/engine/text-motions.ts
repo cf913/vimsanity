@@ -7,6 +7,8 @@ import {
   findLineStart,
   findLineEnd,
   findLineStartNonBlank,
+  moveToNextLine,
+  moveToPrevLine,
 } from './text-utils'
 
 const make = (name: string, keys: string[], fn: TextMotionFn): TextMotion => ({
@@ -49,6 +51,16 @@ export const lineStartNonBlank = make('lineStartNonBlank', ['^'], (s, _e) => ({
   consumed: true,
 }))
 
+export const j = make('j', ['j'], (s, _e) => ({
+  state: moveCursor(s, moveToNextLine(s.text, s.cursorIndex)),
+  consumed: true,
+}))
+
+export const k = make('k', ['k'], (s, _e) => ({
+  state: moveCursor(s, moveToPrevLine(s.text, s.cursorIndex)),
+  consumed: true,
+}))
+
 export const textMotionRegistry: TextMotion[] = [
   w,
   b,
@@ -56,6 +68,8 @@ export const textMotionRegistry: TextMotion[] = [
   lineStart,
   lineEnd,
   lineStartNonBlank,
+  j,
+  k,
 ]
 
 export function findTextMotion(

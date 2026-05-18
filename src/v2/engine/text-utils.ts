@@ -65,3 +65,27 @@ export function findLineStartNonBlank(text: string, pos: number): number {
   while (i < text.length && text[i] === ' ') i++
   return i
 }
+
+export function moveToNextLine(text: string, pos: number): number {
+  const currentLineEnd = text.indexOf('\n', pos)
+  if (currentLineEnd === -1) return pos
+  const nextLineStart = currentLineEnd + 1
+  const currentLineStart = text.lastIndexOf('\n', pos - 1) + 1
+  const currentCol = pos - currentLineStart
+  const nextLineEndOrEof = text.indexOf('\n', nextLineStart)
+  const nextLineLength =
+    (nextLineEndOrEof === -1 ? text.length : nextLineEndOrEof) - nextLineStart
+  if (currentCol === 0 && nextLineLength === 0) return nextLineStart
+  return nextLineStart + Math.min(currentCol, Math.max(0, nextLineLength - 1))
+}
+
+export function moveToPrevLine(text: string, pos: number): number {
+  const currentLineStart = text.lastIndexOf('\n', pos - 1) + 1
+  if (currentLineStart === 0) return pos
+  const currentCol = pos - currentLineStart
+  const prevLineStart = text.lastIndexOf('\n', currentLineStart - 2) + 1
+  const prevLineEnd = currentLineStart - 1
+  const prevLineLength = prevLineEnd - prevLineStart
+  if (currentCol === 0 && prevLineLength === 0) return prevLineStart
+  return prevLineStart + Math.min(currentCol, Math.max(0, prevLineLength - 1))
+}
