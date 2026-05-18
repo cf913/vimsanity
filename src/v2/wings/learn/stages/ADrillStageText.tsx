@@ -16,6 +16,7 @@ interface TargetRange {
 
 function pickTargetRange(
   text: string,
+  reachable: Set<number>,
   exclude?: TargetRange,
   excludeIndex?: number,
 ): TargetRange {
@@ -32,13 +33,68 @@ function pickTargetRange(
       i++
     }
   }
-  const filtered = candidates.filter(
+  const reachableCandidates = candidates.filter((r) =>
+    rangeContainsReachableIndex(r, reachable),
+  )
+  // Words that are reachable AND not the previous target / cursor-overlap.
+  const filtered = reachableCandidates.filter(
     (r) =>
       (!exclude || r.start !== exclude.start) &&
       (excludeIndex === undefined || !isCursorInRange(excludeIndex, r)),
   )
-  const pool = filtered.length > 0 ? filtered : candidates
+  // Fallback chain: prefer "filtered" → "reachableCandidates" → "candidates".
+  // The last fallback only matters if the unit author wrote text with zero
+  // reachable words — a bug surface worth a console warning.
+  let pool = filtered
+  if (pool.length === 0) pool = reachableCandidates
+  if (pool.length === 0) {
+    if (typeof console !== 'undefined') {
+      console.warn(
+        '[ADrillStageText] no reachable target words for the allowed keys — falling back to any word',
+      )
+    }
+    pool = candidates
+  }
   return pool[Math.floor(Math.random() * pool.length)]
+}
+
+function rangeContainsReachableIndex(
+  range: TargetRange,
+  reachable: Set<number>,
+): boolean {
+  for (let i = range.start; i <= range.end; i++) {
+    if (reachable.has(i)) return true
+  }
+  return false
+}
+
+// BFS through the allowed keys from the starting cursor index, recording
+// every cursor position the player can land on. Assumes allowedKeys are
+// motion-only (no text-mutating ops); text-mutating keys would explode the
+// state space.
+function computeReachableIndices(
+  text: string,
+  startIndex: number,
+  allowedKeys: readonly string[],
+): Set<number> {
+  const visited = new Set<number>()
+  visited.add(startIndex)
+  const queue: number[] = [startIndex]
+  while (queue.length > 0) {
+    const idx = queue.shift()!
+    for (const key of allowedKeys) {
+      const { state: next } = applyTextKey(
+        { text, cursorIndex: idx, keystrokes: 0 },
+        { key },
+        textMotionRegistry,
+      )
+      if (!visited.has(next.cursorIndex)) {
+        visited.add(next.cursorIndex)
+        queue.push(next.cursorIndex)
+      }
+    }
+  }
+  return visited
 }
 
 function isCursorInRange(index: number, range: TargetRange): boolean {
@@ -46,13 +102,17 @@ function isCursorInRange(index: number, range: TargetRange): boolean {
 }
 
 export default function ADrillStageText({ def, onCompleted }: Props) {
+  const reachable = useMemo(
+    () => computeReachableIndices(def.text, def.startCursorIndex, def.allowedKeys),
+    [def.text, def.startCursorIndex, def.allowedKeys],
+  )
   const [state, setState] = useState<TextState>({
     text: def.text,
     cursorIndex: def.startCursorIndex,
     keystrokes: 0,
   })
   const [target, setTarget] = useState<TargetRange>(() =>
-    pickTargetRange(def.text, undefined, def.startCursorIndex),
+    pickTargetRange(def.text, reachable, undefined, def.startCursorIndex),
   )
   const [hits, setHits] = useState(0)
   const completedRef = useRef(false)
@@ -71,11 +131,11 @@ export default function ADrillStageText({ def, onCompleted }: Props) {
           completedRef.current = true
           queueMicrotask(onCompleted)
         } else {
-          setTarget(pickTargetRange(def.text, target))
+          setTarget(pickTargetRange(def.text, reachable, target))
         }
       }
     },
-    [def.allowedKeys, def.text, def.targetCount, state, hits, target, onCompleted],
+    [def.allowedKeys, def.text, def.targetCount, state, hits, target, reachable, onCompleted],
   )
 
   useEffect(() => {
