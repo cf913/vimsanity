@@ -9,11 +9,11 @@ export const lineEdgesUnit: Unit = {
     text: '  indented line one\nsecond line here\n  third line indented\nfourth',
     startCursorIndex: 0,
     targetCount: 8,
-    allowedKeys: ['0', '$', '^'],
+    allowedKeys: ['0', '$', '^', 'j', 'k'],
   },
   bStage: {
     kind: 'b-check-text-puzzles',
-    allowedKeys: ['0', '$', '^'],
+    allowedKeys: ['0', '$', '^', 'j', 'k'],
     puzzles: [
       {
         id: 'lineEdges-b1',
