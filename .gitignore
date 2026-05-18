@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 .env
+
+# Superpowers brainstorming session files
+.superpowers/
