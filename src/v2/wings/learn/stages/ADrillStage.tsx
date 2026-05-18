@@ -1,13 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { applyKey, motionRegistry } from '../../../engine/motions'
 import { isCursorAt } from '../../../engine/grader'
+import type { Point } from '../../../engine/grader'
 import type { GridState } from '../../../engine/types'
 import type { AStageDef } from '../units/types'
-
-interface Point {
-  x: number
-  y: number
-}
 
 interface Props {
   def: AStageDef
