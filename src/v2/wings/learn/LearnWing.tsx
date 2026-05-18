@@ -5,6 +5,8 @@ import { units } from './units/registry'
 import { loadProgress, getUnitProgress } from '../../state/progress'
 import type { Progress } from '../../state/types'
 
+const UNIT_IDS = units.map((u) => u.id)
+
 function nextReadyUnitId(progress: Progress): string {
   for (const u of units) {
     const up = getUnitProgress(progress, u.id)
@@ -14,13 +16,12 @@ function nextReadyUnitId(progress: Progress): string {
 }
 
 export default function LearnWing() {
-  const unitIds = units.map((u) => u.id)
-  const [progress, setProgress] = useState<Progress>(() => loadProgress(unitIds))
+  const [progress, setProgress] = useState<Progress>(() => loadProgress(UNIT_IDS))
   const location = useLocation()
 
   useEffect(() => {
-    setProgress(loadProgress(unitIds))
-  }, [location.pathname, unitIds])
+    setProgress(loadProgress(UNIT_IDS))
+  }, [location.pathname])
 
   if (location.pathname === '/learn' || location.pathname === '/learn/') {
     return <Navigate to={`/learn/${nextReadyUnitId(progress)}`} replace />

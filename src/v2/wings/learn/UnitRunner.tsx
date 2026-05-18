@@ -10,15 +10,16 @@ import {
   getUnitProgress,
 } from '../../state/progress'
 
+const UNIT_IDS = units.map((u) => u.id)
+
 type ActiveStage = 'a' | 'b' | 'done'
 
 export default function UnitRunner() {
   const { unitId } = useParams<{ unitId: string }>()
   const navigate = useNavigate()
   const unit = unitId ? findUnit(unitId) : undefined
-  const unitIds = units.map((u) => u.id)
 
-  const [progress, setProgress] = useState(() => loadProgress(unitIds))
+  const [progress, setProgress] = useState(() => loadProgress(UNIT_IDS))
   const [active, setActive] = useState<ActiveStage>('a')
 
   useEffect(() => {
@@ -31,17 +32,17 @@ export default function UnitRunner() {
 
   const handleAComplete = useCallback(() => {
     if (!unit) return
-    const next = markStageCompleted(progress, unit.id, 'a', unitIds)
+    const next = markStageCompleted(progress, unit.id, 'a', UNIT_IDS)
     saveProgress(next)
     setProgress(next)
-  }, [progress, unit, unitIds])
+  }, [progress, unit])
 
   const handleBComplete = useCallback(() => {
     if (!unit) return
-    const next = markStageCompleted(progress, unit.id, 'b', unitIds)
+    const next = markStageCompleted(progress, unit.id, 'b', UNIT_IDS)
     saveProgress(next)
     setProgress(next)
-  }, [progress, unit, unitIds])
+  }, [progress, unit])
 
   if (!unit) {
     return (
