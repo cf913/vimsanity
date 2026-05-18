@@ -3,10 +3,10 @@ import { applyKey, motionRegistry } from '../../../engine/motions'
 import { isCursorAt } from '../../../engine/grader'
 import type { Point } from '../../../engine/grader'
 import type { GridState } from '../../../engine/types'
-import type { AStageDef } from '../units/types'
+import type { AGridDrillDef } from '../units/types'
 
 interface Props {
-  def: AStageDef
+  def: AGridDrillDef
   onCompleted: () => void
 }
 

@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { applyKey, motionRegistry } from '../../../engine/motions'
-import { isCursorAt } from '../../../engine/grader'
-import type { GridState } from '../../../engine/types'
-import type { BCheckPuzzle, BGridStageDef } from '../units/types'
+import { applyTextKey, textMotionRegistry } from '../../../engine/text-motions'
+import { isCursorAtIndex } from '../../../engine/text-grader'
+import type { TextState } from '../../../engine/text-types'
+import type { BTextPuzzle, BTextStageDef } from '../units/types'
 
 interface Props {
-  def: BGridStageDef
+  def: BTextStageDef
   onCompleted: () => void
 }
 
@@ -15,18 +15,13 @@ interface PuzzleResult {
   par: number
 }
 
-function freshState(p: BCheckPuzzle): GridState {
-  return {
-    width: p.gridWidth,
-    height: p.gridHeight,
-    cursor: { ...p.start },
-    keystrokes: 0,
-  }
+function freshState(p: BTextPuzzle): TextState {
+  return { text: p.text, cursorIndex: p.startCursorIndex, keystrokes: 0 }
 }
 
-export default function BCheckStage({ def, onCompleted }: Props) {
+export default function BCheckStageText({ def, onCompleted }: Props) {
   const [puzzleIdx, setPuzzleIdx] = useState(0)
-  const [state, setState] = useState<GridState>(() => freshState(def.puzzles[0]))
+  const [state, setState] = useState<TextState>(() => freshState(def.puzzles[0]))
   const [results, setResults] = useState<PuzzleResult[]>([])
   const completedRef = useRef(false)
   const puzzle = def.puzzles[puzzleIdx]
@@ -36,8 +31,8 @@ export default function BCheckStage({ def, onCompleted }: Props) {
       if (completedRef.current) return
       if (!def.allowedKeys.includes(e.key)) return
       e.preventDefault()
-      const { state: next } = applyKey(state, { key: e.key }, motionRegistry)
-      if (isCursorAt(next, puzzle.goal)) {
+      const { state: next } = applyTextKey(state, { key: e.key }, textMotionRegistry)
+      if (isCursorAtIndex(next, puzzle.goalIndex)) {
         const result: PuzzleResult = {
           puzzleId: puzzle.id,
           keystrokes: next.keystrokes,
@@ -65,36 +60,29 @@ export default function BCheckStage({ def, onCompleted }: Props) {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleKeyDown])
 
-  const cells = useMemo(() => {
-    const rows = []
-    for (let y = 0; y < puzzle.gridHeight; y++) {
-      const row = []
-      for (let x = 0; x < puzzle.gridWidth; x++) {
-        const isCursor = state.cursor.x === x && state.cursor.y === y
-        const isGoal = puzzle.goal.x === x && puzzle.goal.y === y
-        row.push(
-          <div
-            key={`${x},${y}`}
-            className={`flex h-10 w-10 items-center justify-center rounded text-xs ${
-              isCursor
-                ? 'bg-orange-500 text-black'
-                : isGoal
-                ? 'bg-green-500 text-black'
-                : 'bg-gray-800 text-gray-700'
-            }`}
-          >
-            {isCursor ? '●' : isGoal ? '★' : ''}
-          </div>,
-        )
-      }
-      rows.push(
-        <div key={y} className="flex gap-1">
-          {row}
-        </div>,
+  const rendered = useMemo(() => {
+    const out: React.ReactNode[] = []
+    for (let i = 0; i < puzzle.text.length; i++) {
+      const ch = puzzle.text[i]
+      const isCursor = state.cursorIndex === i
+      const isGoal = puzzle.goalIndex === i
+      out.push(
+        <span
+          key={i}
+          className={
+            isCursor
+              ? 'bg-orange-500 text-black'
+              : isGoal
+              ? 'bg-green-500 text-black'
+              : 'text-gray-300'
+          }
+        >
+          {ch === '\n' ? <br /> : ch === ' ' ? ' ' : ch}
+        </span>,
       )
     }
-    return rows
-  }, [puzzle, state.cursor.x, state.cursor.y])
+    return out
+  }, [puzzle.text, puzzle.goalIndex, state.cursorIndex])
 
   return (
     <div className="flex flex-col items-center gap-6 p-8">
@@ -102,7 +90,9 @@ export default function BCheckStage({ def, onCompleted }: Props) {
         Puzzle {puzzleIdx + 1} / {def.puzzles.length} · Par{' '}
         <span className="font-mono text-orange-300">{puzzle.par}</span> keystrokes
       </div>
-      <div className="flex flex-col gap-1">{cells}</div>
+      <div className="max-w-3xl whitespace-pre-wrap font-mono text-base leading-relaxed">
+        {rendered}
+      </div>
       <div className="text-sm text-gray-300">
         Strokes:{' '}
         <span
