@@ -14,7 +14,11 @@ interface TargetRange {
   end: number
 }
 
-function pickTargetRange(text: string, exclude?: TargetRange): TargetRange {
+function pickTargetRange(
+  text: string,
+  exclude?: TargetRange,
+  excludeIndex?: number,
+): TargetRange {
   const candidates: TargetRange[] = []
   let i = 0
   while (i < text.length) {
@@ -28,9 +32,11 @@ function pickTargetRange(text: string, exclude?: TargetRange): TargetRange {
       i++
     }
   }
-  const filtered = exclude
-    ? candidates.filter((r) => r.start !== exclude.start)
-    : candidates
+  const filtered = candidates.filter(
+    (r) =>
+      (!exclude || r.start !== exclude.start) &&
+      (excludeIndex === undefined || !isCursorInRange(excludeIndex, r)),
+  )
   const pool = filtered.length > 0 ? filtered : candidates
   return pool[Math.floor(Math.random() * pool.length)]
 }
@@ -45,7 +51,9 @@ export default function ADrillStageText({ def, onCompleted }: Props) {
     cursorIndex: def.startCursorIndex,
     keystrokes: 0,
   })
-  const [target, setTarget] = useState<TargetRange>(() => pickTargetRange(def.text))
+  const [target, setTarget] = useState<TargetRange>(() =>
+    pickTargetRange(def.text, undefined, def.startCursorIndex),
+  )
   const [hits, setHits] = useState(0)
   const completedRef = useRef(false)
 
