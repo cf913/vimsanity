@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
+import AppRouter from './AppRouter.tsx'
 import './index.css'
 import { PostHogErrorBoundary, PostHogProvider } from 'posthog-js/react'
 
@@ -15,7 +15,7 @@ createRoot(document.getElementById('root')!).render(
       }}
     >
       <PostHogErrorBoundary>
-        <App />
+        <AppRouter />
       </PostHogErrorBoundary>
     </PostHogProvider>
   </StrictMode>,
