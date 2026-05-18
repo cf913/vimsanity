@@ -40,22 +40,20 @@ export default function ADrillStage({ def, onCompleted }: Props) {
       if (completedRef.current) return
       if (!def.allowedKeys.includes(e.key)) return
       e.preventDefault()
-      setState((prev) => {
-        const { state: next } = applyKey(prev, { key: e.key }, motionRegistry)
-        if (isCursorAt(next, target)) {
-          const nextHits = hits + 1
-          setHits(nextHits)
-          if (nextHits >= def.targetCount) {
-            completedRef.current = true
-            queueMicrotask(onCompleted)
-          } else {
-            setTarget(randomTarget(def.gridWidth, def.gridHeight, next.cursor))
-          }
+      const { state: next } = applyKey(state, { key: e.key }, motionRegistry)
+      setState(next)
+      if (isCursorAt(next, target)) {
+        const nextHits = hits + 1
+        setHits(nextHits)
+        if (nextHits >= def.targetCount) {
+          completedRef.current = true
+          queueMicrotask(onCompleted)
+        } else {
+          setTarget(randomTarget(def.gridWidth, def.gridHeight, next.cursor))
         }
-        return next
-      })
+      }
     },
-    [def.allowedKeys, def.gridWidth, def.gridHeight, def.targetCount, hits, target, onCompleted],
+    [def.allowedKeys, def.gridWidth, def.gridHeight, def.targetCount, state, hits, target, onCompleted],
   )
 
   useEffect(() => {
