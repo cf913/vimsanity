@@ -2,10 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { applyKey, motionRegistry } from '../../../engine/motions'
 import { isCursorAt } from '../../../engine/grader'
 import type { GridState } from '../../../engine/types'
-import type { BCheckPuzzle, BStageDef } from '../units/types'
+import type { BCheckPuzzle, BGridStageDef } from '../units/types'
 
 interface Props {
-  def: BStageDef
+  def: BGridStageDef
   onCompleted: () => void
 }
 

@@ -1,6 +1,6 @@
 import type { Point } from '../../../engine/grader'
 
-export interface AStageDef {
+export interface AGridDrillDef {
   kind: 'a-drill-grid'
   gridWidth: number
   gridHeight: number
@@ -8,6 +8,16 @@ export interface AStageDef {
   targetCount: number
   allowedKeys: string[]
 }
+
+export interface ATextDrillDef {
+  kind: 'a-drill-text'
+  text: string
+  startCursorIndex: number
+  targetCount: number
+  allowedKeys: string[]
+}
+
+export type AStageDef = AGridDrillDef | ATextDrillDef
 
 export interface BCheckPuzzle {
   id: string
@@ -18,11 +28,27 @@ export interface BCheckPuzzle {
   par: number
 }
 
-export interface BStageDef {
+export interface BGridStageDef {
   kind: 'b-check-cursor-puzzles'
   puzzles: BCheckPuzzle[]
   allowedKeys: string[]
 }
+
+export interface BTextPuzzle {
+  id: string
+  text: string
+  startCursorIndex: number
+  goalIndex: number
+  par: number
+}
+
+export interface BTextStageDef {
+  kind: 'b-check-text-puzzles'
+  puzzles: BTextPuzzle[]
+  allowedKeys: string[]
+}
+
+export type BStageDef = BGridStageDef | BTextStageDef
 
 export interface Unit {
   id: string
