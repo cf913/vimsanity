@@ -4,6 +4,7 @@ import { wbeUnit } from './wbe'
 import { lineEdgesUnit } from './lineEdges'
 import { insertModesUnit } from './insertModes'
 import { changeDeleteUnit } from './changeDelete'
+import { yankPutUnit } from './yankPut'
 
 export const units: Unit[] = [
   hjklUnit,
@@ -11,6 +12,7 @@ export const units: Unit[] = [
   lineEdgesUnit,
   insertModesUnit,
   changeDeleteUnit,
+  yankPutUnit,
 ]
 
 export function findUnit(id: string): Unit | undefined {
