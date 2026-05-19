@@ -61,6 +61,16 @@ export const k = make('k', ['k'], (s, _e) => ({
   consumed: true,
 }))
 
+export const h = make('h', ['h'], (s, _e) => ({
+  state: moveCursor(s, Math.max(findLineStart(s.text, s.cursorIndex), s.cursorIndex - 1)),
+  consumed: true,
+}))
+
+export const l = make('l', ['l'], (s, _e) => ({
+  state: moveCursor(s, Math.min(findLineEnd(s.text, s.cursorIndex), s.cursorIndex + 1)),
+  consumed: true,
+}))
+
 export const textMotionRegistry: TextMotion[] = [
   w,
   b,
@@ -70,6 +80,8 @@ export const textMotionRegistry: TextMotion[] = [
   lineStartNonBlank,
   j,
   k,
+  h,
+  l,
 ]
 
 export function findTextMotion(

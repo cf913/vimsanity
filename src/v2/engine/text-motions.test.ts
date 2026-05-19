@@ -4,6 +4,7 @@ import {
   w, b, e,
   lineStart, lineEnd, lineStartNonBlank,
   j, k,
+  h, l,
   textMotionRegistry,
 } from './text-motions'
 import type { TextState } from './text-types'
@@ -86,6 +87,38 @@ describe('k motion (up a line)', () => {
   it('stays put on the first line', () => {
     const r = k.apply(state('only line', 3), { key: 'k' })
     expect(r.state.cursorIndex).toBe(3)
+  })
+})
+
+describe('h motion (left)', () => {
+  it('moves cursor left within line', () => {
+    const r = h.apply(state('hello', 3), { key: 'h' })
+    expect(r.consumed).toBe(true)
+    expect(r.state.cursorIndex).toBe(2)
+  })
+  it('clamps at line start (does not cross newline)', () => {
+    const r = h.apply(state('foo\nbar', 4), { key: 'h' })
+    expect(r.state.cursorIndex).toBe(4)
+  })
+  it('clamps at index 0', () => {
+    const r = h.apply(state('hello', 0), { key: 'h' })
+    expect(r.state.cursorIndex).toBe(0)
+  })
+})
+
+describe('l motion (right)', () => {
+  it('moves cursor right within line', () => {
+    const r = l.apply(state('hello', 1), { key: 'l' })
+    expect(r.consumed).toBe(true)
+    expect(r.state.cursorIndex).toBe(2)
+  })
+  it('clamps at line end (does not cross newline)', () => {
+    const r = l.apply(state('foo\nbar', 2), { key: 'l' })
+    expect(r.state.cursorIndex).toBe(2)
+  })
+  it('clamps at end of single-line buffer', () => {
+    const r = l.apply(state('hi', 1), { key: 'l' })
+    expect(r.state.cursorIndex).toBe(1)
   })
 })
 
