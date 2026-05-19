@@ -26,6 +26,7 @@ export function freshNormal(text: string, cursorIndex: number): EditableState {
     mode: 'normal',
     pendingOperator: null,
     keystrokes: 0,
+    register: null,
   }
 }
 

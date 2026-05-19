@@ -13,7 +13,7 @@ function state(
   cursorIndex: number,
   mode: 'normal' | 'insert' = 'normal',
 ): EditableState {
-  return { text, cursorIndex, mode, pendingOperator: null, keystrokes: 0 }
+  return { text, cursorIndex, mode, pendingOperator: null, keystrokes: 0, register: null }
 }
 
 describe('enterInsertBefore (i)', () => {
