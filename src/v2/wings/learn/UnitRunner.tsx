@@ -4,6 +4,8 @@ import ADrillStage from './stages/ADrillStage'
 import BCheckStage from './stages/BCheckStage'
 import ADrillStageText from './stages/ADrillStageText'
 import BCheckStageText from './stages/BCheckStageText'
+import ADrillStageEdit from './stages/ADrillStageEdit'
+import BCheckStageEdit from './stages/BCheckStageEdit'
 import { units, findUnit } from './units/registry'
 import {
   loadProgress,
@@ -84,18 +86,26 @@ export default function UnitRunner() {
         <h1 className="text-xl font-semibold text-gray-100">{unit.title}</h1>
         <div className="mt-1 font-mono text-sm text-orange-300">{unit.motionLabel}</div>
       </header>
-      {active === 'a' &&
-        (unit.aStage.kind === 'a-drill-grid' ? (
-          <ADrillStage key={replayKey} def={unit.aStage} onCompleted={handleAComplete} />
-        ) : (
-          <ADrillStageText key={replayKey} def={unit.aStage} onCompleted={handleAComplete} />
-        ))}
-      {active === 'b' &&
-        (unit.bStage.kind === 'b-check-cursor-puzzles' ? (
-          <BCheckStage key={replayKey} def={unit.bStage} onCompleted={handleBComplete} />
-        ) : (
-          <BCheckStageText key={replayKey} def={unit.bStage} onCompleted={handleBComplete} />
-        ))}
+      {active === 'a' && (() => {
+        switch (unit.aStage.kind) {
+          case 'a-drill-grid':
+            return <ADrillStage key={replayKey} def={unit.aStage} onCompleted={handleAComplete} />
+          case 'a-drill-text':
+            return <ADrillStageText key={replayKey} def={unit.aStage} onCompleted={handleAComplete} />
+          case 'a-drill-edit':
+            return <ADrillStageEdit key={replayKey} def={unit.aStage} onCompleted={handleAComplete} />
+        }
+      })()}
+      {active === 'b' && (() => {
+        switch (unit.bStage.kind) {
+          case 'b-check-cursor-puzzles':
+            return <BCheckStage key={replayKey} def={unit.bStage} onCompleted={handleBComplete} />
+          case 'b-check-text-puzzles':
+            return <BCheckStageText key={replayKey} def={unit.bStage} onCompleted={handleBComplete} />
+          case 'b-check-edit-puzzles':
+            return <BCheckStageEdit key={replayKey} def={unit.bStage} onCompleted={handleBComplete} />
+        }
+      })()}
       {active === 'done' && (
         <div className="flex flex-col items-center gap-4 p-12 text-center">
           <div className="text-2xl">✓ Unit complete</div>
