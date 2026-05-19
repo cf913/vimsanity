@@ -5,6 +5,7 @@ import {
   changeToEndOfLine,
   applyOperatorWithMotion,
   deleteLine,
+  yankCurrentLine,
 } from './operators'
 import type { EditableState } from './editable-types'
 
@@ -126,5 +127,46 @@ describe('applyOperatorWithMotion ($)', () => {
     expect(r.text).toBe('keep ')
     // Cursor clamps back to last char on the (now-shorter) line.
     expect(r.cursorIndex).toBe(4)
+  })
+})
+
+describe('yankCurrentLine (yy)', () => {
+  it('stores the current line content linewise in the register', () => {
+    const r = yankCurrentLine(s('alpha\nbeta\ngamma', 7))
+    expect(r.register).toEqual({ text: 'beta', linewise: true })
+    // Yank is non-destructive — text and cursor stay put.
+    expect(r.text).toBe('alpha\nbeta\ngamma')
+    expect(r.cursorIndex).toBe(7)
+  })
+  it('handles a single-line buffer', () => {
+    const r = yankCurrentLine(s('todo', 0))
+    expect(r.register).toEqual({ text: 'todo', linewise: true })
+  })
+  it('handles the last line of a multi-line buffer', () => {
+    const r = yankCurrentLine(s('first\nlast', 7))
+    expect(r.register).toEqual({ text: 'last', linewise: true })
+  })
+})
+
+describe('applyOperatorWithMotion (y + w) — charwise yank', () => {
+  it('populates the register without deleting text or changing mode', () => {
+    const r = applyOperatorWithMotion(s('the quick fox', 0), 'y', 'w')
+    expect(r.text).toBe('the quick fox')
+    expect(r.cursorIndex).toBe(0)
+    expect(r.mode).toBe('normal')
+    expect(r.register).toEqual({ text: 'the ', linewise: false })
+  })
+  it('does not apply the cw→ce quirk to yw — yw includes trailing whitespace', () => {
+    const r = applyOperatorWithMotion(s('red blue', 0), 'y', 'w')
+    expect(r.register).toEqual({ text: 'red ', linewise: false })
+  })
+})
+
+describe('applyOperatorWithMotion (y + $) — inclusive yank', () => {
+  it('yanks through end of line inclusive', () => {
+    const r = applyOperatorWithMotion(s('keep this', 5), 'y', '$')
+    expect(r.register).toEqual({ text: 'this', linewise: false })
+    expect(r.text).toBe('keep this')
+    expect(r.cursorIndex).toBe(5)
   })
 })

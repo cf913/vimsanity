@@ -18,45 +18,47 @@ export function deleteUnderCursor(state: EditableState): EditableState {
   if (state.text.length === 0) return state
   const idx = state.cursorIndex
   if (idx < 0 || idx >= state.text.length) return state
+  const yanked = state.text.slice(idx, idx + 1)
   const text = deleteRange(state.text, idx, idx + 1)
   const cursorIndex = clampToLine(text, idx)
-  return { ...state, text, cursorIndex }
+  return { ...state, text, cursorIndex, register: { text: yanked, linewise: false } }
 }
 
 export function deleteToEndOfLine(state: EditableState): EditableState {
   const end = findLineEnd(state.text, state.cursorIndex)
-  // findLineEnd points at the last char on the line; end-exclusive is end + 1.
+  const yanked = state.text.slice(state.cursorIndex, end + 1)
   const text = deleteRange(state.text, state.cursorIndex, end + 1)
-  if (text.length === 0) return { ...state, text, cursorIndex: 0 }
+  if (text.length === 0) {
+    return { ...state, text, cursorIndex: 0, register: { text: yanked, linewise: false } }
+  }
   const lineStart = findLineStart(text, state.cursorIndex)
-  // After deletion, step the cursor back one within the (now-shorter) line.
   const cursorIndex = Math.max(lineStart, state.cursorIndex - 1)
-  return { ...state, text, cursorIndex }
+  return { ...state, text, cursorIndex, register: { text: yanked, linewise: false } }
 }
 
 export function changeToEndOfLine(state: EditableState): EditableState {
   const end = findLineEnd(state.text, state.cursorIndex)
+  const yanked = state.text.slice(state.cursorIndex, end + 1)
   const text = deleteRange(state.text, state.cursorIndex, end + 1)
-  return { ...state, text, mode: 'insert' }
+  return { ...state, text, mode: 'insert', register: { text: yanked, linewise: false } }
 }
 
 export function deleteLine(state: EditableState): EditableState {
   const lineStart = findLineStart(state.text, state.cursorIndex)
   const nlAhead = state.text.indexOf('\n', state.cursorIndex)
   if (nlAhead !== -1) {
-    // First or middle line — delete content + trailing newline.
+    const lineContent = state.text.slice(lineStart, nlAhead)
     const text = deleteRange(state.text, lineStart, nlAhead + 1)
     const cursorIndex = Math.min(text.length, lineStart)
-    return { ...state, text, cursorIndex }
+    return { ...state, text, cursorIndex, register: { text: lineContent, linewise: true } }
   }
   if (lineStart === 0) {
-    // Only line in the buffer — delete to end of text.
-    return { ...state, text: '', cursorIndex: 0 }
+    return { ...state, text: '', cursorIndex: 0, register: { text: state.text, linewise: true } }
   }
-  // Last line of multi-line — delete leading newline + content.
+  const lineContent = state.text.slice(lineStart)
   const text = state.text.slice(0, lineStart - 1)
   const cursorIndex = findLineStart(text, text.length)
-  return { ...state, text, cursorIndex }
+  return { ...state, text, cursorIndex, register: { text: lineContent, linewise: true } }
 }
 
 // Clear current line's content but KEEP the newline. Used by cc.
@@ -64,8 +66,19 @@ export function clearLine(state: EditableState): EditableState {
   const lineStart = findLineStart(state.text, state.cursorIndex)
   const nl = state.text.indexOf('\n', state.cursorIndex)
   const rangeEnd = nl === -1 ? state.text.length : nl
+  const lineContent = state.text.slice(lineStart, rangeEnd)
   const text = deleteRange(state.text, lineStart, rangeEnd)
-  return { ...state, text, cursorIndex: lineStart }
+  return { ...state, text, cursorIndex: lineStart, register: { text: lineContent, linewise: false } }
+}
+
+// Yank the current line content linewise — non-destructive. Used by yy.
+export function yankCurrentLine(state: EditableState): EditableState {
+  const lineStart = findLineStart(state.text, state.cursorIndex)
+  const nl = state.text.indexOf('\n', state.cursorIndex)
+  const lineContent = nl === -1
+    ? state.text.slice(lineStart)
+    : state.text.slice(lineStart, nl)
+  return { ...state, register: { text: lineContent, linewise: true } }
 }
 
 export function applyOperatorWithMotion(
@@ -73,7 +86,7 @@ export function applyOperatorWithMotion(
   op: OperatorKind,
   motionKey: string,
 ): EditableState {
-  // Vim quirk: `cw` is treated as `ce` so it doesn't eat trailing whitespace.
+  // Vim quirk: `cw` is treated as `ce`. `yw` and `dw` keep their natural range.
   const effectiveMotionKey =
     op === 'c' && motionKey === 'w' ? 'e' : motionKey
   const motion = findTextMotion(textMotionRegistry, effectiveMotionKey)
@@ -82,8 +95,8 @@ export function applyOperatorWithMotion(
     { text: state.text, cursorIndex: state.cursorIndex, keystrokes: 0 },
     { key: effectiveMotionKey },
   ).state.cursorIndex
-  // No-op motion (target === cursor): consume the operator but make no change.
   if (target === state.cursorIndex) {
+    if (op === 'y') return state
     return { ...state, mode: op === 'c' ? 'insert' : 'normal' }
   }
   const start = Math.min(state.cursorIndex, target)
@@ -91,6 +104,12 @@ export function applyOperatorWithMotion(
   const end = INCLUSIVE_MOTIONS.has(effectiveMotionKey)
     ? Math.min(state.text.length, endRaw + 1)
     : endRaw
+  const yanked = state.text.slice(start, end)
+  const register = { text: yanked, linewise: false }
+  if (op === 'y') {
+    // Yank only — no deletion, no mode change, cursor stays put.
+    return { ...state, register }
+  }
   const text = deleteRange(state.text, start, end)
   const cursorIndex = clampToLine(text, start)
   return {
@@ -98,5 +117,6 @@ export function applyOperatorWithMotion(
     text,
     cursorIndex,
     mode: op === 'c' ? 'insert' : 'normal',
+    register,
   }
 }
