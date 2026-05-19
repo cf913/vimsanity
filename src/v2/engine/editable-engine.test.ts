@@ -127,3 +127,47 @@ describe('applyEditableKey — keystroke accounting', () => {
     expect(after.keystrokes).toBe(2)
   })
 })
+
+describe('applyEditableKey — yank/put integration', () => {
+  it('yw followed by P duplicates the word before itself', () => {
+    const after = drive(freshNormal('red blue', 0), ['y', 'w', 'P'])
+    expect(after.text).toBe('red red blue')
+    expect(after.cursorIndex).toBe(3)
+  })
+  it('yy followed by p duplicates the current line below', () => {
+    const after = drive(freshNormal('alpha\nbeta\ngamma', 6), ['y', 'y', 'p'])
+    expect(after.text).toBe('alpha\nbeta\nbeta\ngamma')
+  })
+  it('yy followed by P duplicates the current line above', () => {
+    const after = drive(freshNormal('header\nbody', 0), ['y', 'y', 'P'])
+    expect(after.text).toBe('header\nheader\nbody')
+  })
+  it('y followed by Escape clears the pending state', () => {
+    const after = drive(freshNormal('hello', 0), ['y', 'Escape'])
+    expect(after.pendingOperator).toBe(null)
+  })
+  it('dd populates the register so subsequent p re-inserts the deleted line', () => {
+    const after = drive(freshNormal('alpha\nbeta\ngamma', 6), ['d', 'd', 'p'])
+    expect(after.text).toBe('alpha\ngamma\nbeta')
+  })
+  it('x followed by p swaps adjacent characters (classic vim idiom)', () => {
+    // x removes char at cursor → cursor lands on next char. p pastes the
+    // removed char AFTER the cursor, which is the position of what used
+    // to be the char to the right. Net effect: the two original chars
+    // swap places.
+    const after = drive(freshNormal('abc', 0), ['x', 'p'])
+    expect(after.text).toBe('bac')
+  })
+  it('p with an empty register is a silent no-op (but counts as a keystroke)', () => {
+    const after = drive(freshNormal('hi', 0), ['p'])
+    expect(after.text).toBe('hi')
+    expect(after.cursorIndex).toBe(0)
+    expect(after.keystrokes).toBe(1)
+  })
+  it('y at end of buffer with no motion target consumes the operator without erroring', () => {
+    // 'w' from end of single word with no following word is a no-op motion.
+    const after = drive(freshNormal('end', 2), ['y', 'w'])
+    expect(after.text).toBe('end')
+    expect(after.pendingOperator).toBe(null)
+  })
+})

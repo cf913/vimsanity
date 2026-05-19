@@ -15,7 +15,9 @@ import {
   deleteLine,
   deleteToEndOfLine,
   deleteUnderCursor,
+  yankCurrentLine,
 } from './operators'
+import { putAfter, putBefore } from './put'
 import { deleteRange, insertAt } from './edits'
 import { findLineStart } from './text-utils'
 
@@ -85,11 +87,14 @@ function handlePendingOperator(
       consumed: true,
     }
   }
-  // dd / cc — repeat operator on the current line.
+  // dd / cc / yy — repeat operator on the current line.
   if (key === op) {
     const cleared: EditableState = { ...state, pendingOperator: null }
     if (op === 'd') {
       return { state: inc(deleteLine(cleared)), consumed: true }
+    }
+    if (op === 'y') {
+      return { state: inc(yankCurrentLine(cleared)), consumed: true }
     }
     // cc: clear the line but keep the newline; enter insert mode at line start.
     const lineCleared = clearLine(cleared)
@@ -134,6 +139,12 @@ function handleNormalMode(state: EditableState, key: string): EditableResult {
       return { state: inc({ ...state, pendingOperator: 'd' }), consumed: true }
     case 'c':
       return { state: inc({ ...state, pendingOperator: 'c' }), consumed: true }
+    case 'y':
+      return { state: inc({ ...state, pendingOperator: 'y' }), consumed: true }
+    case 'p':
+      return { state: inc(putAfter(state)), consumed: true }
+    case 'P':
+      return { state: inc(putBefore(state)), consumed: true }
   }
   // Motion: delegate to the text engine for the cursor update, then re-emit.
   const textResult = applyTextKey(
