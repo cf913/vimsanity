@@ -1,4 +1,5 @@
 import type { Point } from '../../../engine/grader'
+import type { EditableGoal } from '../../../engine/editable-grader'
 
 export interface AGridDrillDef {
   kind: 'a-drill-grid'
@@ -17,7 +18,21 @@ export interface ATextDrillDef {
   allowedKeys: string[]
 }
 
-export type AStageDef = AGridDrillDef | ATextDrillDef
+export interface EditChallenge {
+  id: string
+  hint: string
+  startText: string
+  startCursorIndex: number
+  goal: EditableGoal
+}
+
+export interface AEditDrillDef {
+  kind: 'a-drill-edit'
+  challenges: EditChallenge[]
+  allowedKeys: string[]
+}
+
+export type AStageDef = AGridDrillDef | ATextDrillDef | AEditDrillDef
 
 export interface BCheckPuzzle {
   id: string
@@ -48,7 +63,22 @@ export interface BTextStageDef {
   allowedKeys: string[]
 }
 
-export type BStageDef = BGridStageDef | BTextStageDef
+export interface BEditPuzzle {
+  id: string
+  hint: string
+  startText: string
+  startCursorIndex: number
+  goal: EditableGoal
+  par: number
+}
+
+export interface BEditStageDef {
+  kind: 'b-check-edit-puzzles'
+  puzzles: BEditPuzzle[]
+  allowedKeys: string[]
+}
+
+export type BStageDef = BGridStageDef | BTextStageDef | BEditStageDef
 
 export interface Unit {
   id: string
