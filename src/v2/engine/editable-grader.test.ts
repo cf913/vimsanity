@@ -17,4 +17,11 @@ describe('matchesGoal', () => {
     expect(matchesGoal({ ...freshNormal('hi', 0), mode: 'normal' }, { text: 'hi', mode: 'normal' })).toBe(true)
     expect(matchesGoal({ ...freshNormal('hi', 0), mode: 'insert' }, { text: 'hi', mode: 'normal' })).toBe(false)
   })
+  it('defaults to requiring normal mode when goal.mode is omitted', () => {
+    expect(matchesGoal({ ...freshNormal('hi', 0), mode: 'insert' }, { text: 'hi' })).toBe(false)
+    expect(matchesGoal({ ...freshNormal('hi', 0), mode: 'normal' }, { text: 'hi' })).toBe(true)
+  })
+  it('matches insert mode when explicitly requested', () => {
+    expect(matchesGoal({ ...freshNormal('hi', 0), mode: 'insert' }, { text: 'hi', mode: 'insert' })).toBe(true)
+  })
 })
