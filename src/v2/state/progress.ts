@@ -19,10 +19,42 @@ export function loadProgress(unitIds: string[]): Progress {
     if (!parsed || typeof parsed !== 'object' || !parsed.units) {
       return initialProgressFor(unitIds)
     }
-    return parsed
+    return migrate(parsed, unitIds)
   } catch {
     return initialProgressFor(unitIds)
   }
+}
+
+// Reconcile persisted progress with the current curriculum:
+// - drop entries for units that no longer exist
+// - add LOCKED entries for new units the user hasn't seen
+// - unlock any locked unit at or before the deepest one the user has touched
+//   (handles out-of-order play via direct URL) or whose predecessor is bCompleted
+function migrate(persisted: Progress, unitIds: string[]): Progress {
+  const units: Record<string, UnitProgress> = {}
+  unitIds.forEach((id, i) => {
+    const existing = persisted.units[id]
+    units[id] = existing ?? (i === 0
+      ? { aStatus: 'ready', bStatus: 'locked' }
+      : { ...LOCKED })
+  })
+
+  let deepestTouched = -1
+  unitIds.forEach((id, i) => {
+    const u = units[id]
+    if (u.aStatus !== 'locked' || u.bStatus !== 'locked') deepestTouched = i
+  })
+
+  unitIds.forEach((id, i) => {
+    const u = units[id]
+    if (u.aStatus !== 'locked') return
+    const prevBCompleted = i === 0 || units[unitIds[i - 1]].bStatus === 'completed'
+    if (prevBCompleted || i <= deepestTouched) {
+      units[id] = { ...u, aStatus: 'ready' }
+    }
+  })
+
+  return { units }
 }
 
 export function saveProgress(progress: Progress): void {

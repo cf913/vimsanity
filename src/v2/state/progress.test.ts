@@ -42,6 +42,72 @@ describe('save and load round-trip', () => {
   })
 })
 
+describe('loadProgress migration', () => {
+  it('adds entries for new units the persisted state has never seen', () => {
+    saveProgress({ units: { hjkl: { aStatus: 'completed', bStatus: 'completed' } } })
+    const loaded = loadProgress(['hjkl', 'wbe', 'lineEdges'])
+    expect(loaded.units.wbe).toBeDefined()
+    expect(loaded.units.lineEdges).toBeDefined()
+  })
+
+  it('unlocks the unit after the last completed one', () => {
+    saveProgress({ units: { hjkl: { aStatus: 'completed', bStatus: 'completed' } } })
+    const loaded = loadProgress(['hjkl', 'wbe', 'lineEdges'])
+    expect(loaded.units.wbe.aStatus).toBe('ready')
+    expect(loaded.units.lineEdges.aStatus).toBe('locked')
+  })
+
+  it('cascades unlock across a chain of completed units', () => {
+    saveProgress({
+      units: {
+        hjkl: { aStatus: 'completed', bStatus: 'completed' },
+        // wbe missing entirely — represents the bug we hit in playtest:
+        // user finished hjkl in v1 when wbe didn't exist yet, then
+        // jumped forward via direct URL.
+        lineEdges: { aStatus: 'completed', bStatus: 'completed' },
+      },
+    })
+    const loaded = loadProgress(['hjkl', 'wbe', 'lineEdges', 'insertModes'])
+    // wbe sits between two completed units; it should at minimum be ready.
+    expect(loaded.units.wbe.aStatus).toBe('ready')
+    expect(loaded.units.insertModes.aStatus).toBe('ready')
+  })
+
+  it('does not downgrade an already-completed unit', () => {
+    saveProgress({
+      units: {
+        hjkl: { aStatus: 'completed', bStatus: 'completed' },
+        wbe: { aStatus: 'completed', bStatus: 'completed' },
+      },
+    })
+    const loaded = loadProgress(['hjkl', 'wbe'])
+    expect(loaded.units.wbe).toEqual({ aStatus: 'completed', bStatus: 'completed' })
+  })
+
+  it('unlocks earlier locked units when a later unit has been completed (out-of-order play)', () => {
+    saveProgress({
+      units: {
+        hjkl: { aStatus: 'ready', bStatus: 'locked' },
+        insertModes: { aStatus: 'completed', bStatus: 'completed' },
+      },
+    })
+    const loaded = loadProgress(['hjkl', 'wbe', 'lineEdges', 'insertModes'])
+    expect(loaded.units.wbe.aStatus).toBe('ready')
+    expect(loaded.units.lineEdges.aStatus).toBe('ready')
+  })
+
+  it('drops persisted entries for units no longer in the curriculum', () => {
+    saveProgress({
+      units: {
+        hjkl: { aStatus: 'completed', bStatus: 'completed' },
+        removed: { aStatus: 'completed', bStatus: 'completed' },
+      },
+    })
+    const loaded = loadProgress(['hjkl'])
+    expect(loaded.units.removed).toBeUndefined()
+  })
+})
+
 describe('markStageCompleted', () => {
   it('marks A completed and unlocks B', () => {
     const p = initialProgressFor(['hjkl', 'wbe'])
