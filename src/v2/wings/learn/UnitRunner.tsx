@@ -106,28 +106,42 @@ export default function UnitRunner() {
             return <BCheckStageEdit key={replayKey} def={unit.bStage} onCompleted={handleBComplete} />
         }
       })()}
-      {active === 'done' && (
-        <div className="flex flex-col items-center gap-4 p-12 text-center">
-          <div className="text-2xl">✓ Unit complete</div>
-          <div className="text-sm text-gray-400">
-            More units arrive in the next release.
+      {active === 'done' && (() => {
+        const currentIdx = UNIT_IDS.indexOf(unit.id)
+        const nextUnit = currentIdx >= 0 ? units[currentIdx + 1] : undefined
+        return (
+          <div className="flex flex-col items-center gap-4 p-12 text-center">
+            <div className="text-2xl">✓ Unit complete</div>
+            <div className="text-sm text-gray-400">
+              {nextUnit
+                ? `Up next: ${nextUnit.title}.`
+                : 'You’ve cleared every unit currently in the curriculum.'}
+            </div>
+            <div className="mt-2 flex gap-3">
+              <button
+                className="rounded bg-orange-500 px-4 py-2 text-sm font-medium text-black hover:bg-orange-400"
+                onClick={handleReplay}
+              >
+                ↻ Replay unit
+              </button>
+              {nextUnit && (
+                <button
+                  className="rounded bg-orange-500/20 px-4 py-2 text-sm font-medium text-orange-200 hover:bg-orange-500/30"
+                  onClick={() => navigate(`/learn/${nextUnit.id}`)}
+                >
+                  Continue to {nextUnit.title} →
+                </button>
+              )}
+              <button
+                className="rounded border border-gray-700 px-4 py-2 text-sm text-gray-200 hover:bg-gray-900"
+                onClick={() => navigate('/learn')}
+              >
+                Back to Learn
+              </button>
+            </div>
           </div>
-          <div className="mt-2 flex gap-3">
-            <button
-              className="rounded bg-orange-500 px-4 py-2 text-sm font-medium text-black hover:bg-orange-400"
-              onClick={handleReplay}
-            >
-              ↻ Replay unit
-            </button>
-            <button
-              className="rounded border border-gray-700 px-4 py-2 text-sm text-gray-200 hover:bg-gray-900"
-              onClick={() => navigate('/learn')}
-            >
-              Back to Learn
-            </button>
-          </div>
-        </div>
-      )}
+        )
+      })()}
     </div>
   )
 }
