@@ -1,6 +1,6 @@
 import { tokens, fontMono } from '../../../design/tokens'
 import { useGsap } from '../../../design/useGsap'
-import { Pill, TermButton, PixelStar, Kbd } from '../../../design/primitives'
+import { Pill, TermButton, PixelStar, Kbd, BlockBar } from '../../../design/primitives'
 import type { Unit } from '../units/types'
 
 export interface LevelResult {
@@ -17,6 +17,11 @@ interface LevelCompleteProps {
   streak: number
   nextUnit?: Unit
   replayMode: boolean
+  /** Honest overworld progress (real units cleared / total). */
+  cleared: number
+  totalUnits: number
+  /** Fewest keystrokes recorded for this unit, if any. */
+  bestKeystrokes?: number
   onReplay: () => void
   onNext?: () => void
   onMap: () => void
@@ -28,11 +33,16 @@ export default function LevelComplete({
   streak,
   nextUnit,
   replayMode,
+  cleared,
+  totalUnits,
+  bestKeystrokes,
   onReplay,
   onNext,
   onMap,
 }: LevelCompleteProps) {
   const stars = result?.stars ?? 0
+  const baseScore = result ? result.stars * 1000 : 0
+  const efficiencyBonus = result ? Math.max(0, result.score - baseScore) : 0
 
   const root = useGsap<HTMLDivElement>(({ gsap, root, reducedMotion }) => {
     if (reducedMotion) return
@@ -126,12 +136,15 @@ export default function LevelComplete({
           <div style={{ fontSize: 11, color: tokens.dim, letterSpacing: '.3em', marginBottom: 12 }}>~/SCORE.LOG</div>
           {result ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14 }}>
-              <Row label={result.par === undefined ? 'Best keystrokes' : 'Keystrokes'} value={`${result.keystrokes}`} />
-              {result.par !== undefined && <Row label="Par" value={`${result.par}`} />}
               <Row
-                label="Stars"
-                value={`${result.stars} / 3`}
+                label={`Stars · ${result.stars}/3`}
+                value={`+${baseScore.toLocaleString()}`}
                 color={result.stars === 3 ? tokens.bright : tokens.amber}
+              />
+              <Row
+                label={result.par === undefined ? 'Best run bonus' : `Under-par · ${result.keystrokes} vs ${result.par}`}
+                value={`+${efficiencyBonus.toLocaleString()}`}
+                color={efficiencyBonus > 0 ? tokens.amber : tokens.dim}
               />
               <div data-breakdown style={{ display: 'flex', alignItems: 'baseline', gap: 14, paddingTop: 8, borderTop: `1px dashed ${tokens.line}` }}>
                 <span style={{ fontSize: 11, color: tokens.dim, letterSpacing: '.3em' }}>SCORE</span>
@@ -142,6 +155,11 @@ export default function LevelComplete({
                   {result.score.toLocaleString()}
                 </span>
               </div>
+              {bestKeystrokes !== undefined && (
+                <div style={{ fontSize: 11, color: tokens.dim, letterSpacing: '.06em' }}>
+                  personal best · {bestKeystrokes} keystrokes
+                </div>
+              )}
             </div>
           ) : (
             <div style={{ fontSize: 13, color: tokens.text }}>Drill complete — nicely done.</div>
@@ -159,8 +177,43 @@ export default function LevelComplete({
               {streak > 1 ? 'Streak alive. Your mouse is jealous.' : 'Day one. Come back tomorrow to build the streak.'}
             </div>
           </div>
+          <BlockBar label="Overworld" value={cleared} max={totalUnits} color={tokens.bright} style={{ marginTop: 18 }} />
         </div>
       </div>
+
+      {/* NEW MOTION UNLOCKED payoff */}
+      {nextUnit && !replayMode && (
+        <div
+          className="vs-frame-hot"
+          style={{
+            marginTop: 24,
+            width: 'min(720px, 92%)',
+            padding: '18px 24px',
+            background: tokens.bgPanel,
+            backgroundImage: 'linear-gradient(90deg, rgba(192,132,252,.08), transparent 60%, rgba(16,255,160,.08))',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 20,
+            position: 'relative',
+            zIndex: 2,
+          }}
+        >
+          <Pill tone="purple">★ NEW MOTIONS UNLOCKED</Pill>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {nextUnit.motionLabel.split(' ').map((k, i) => (
+              <Kbd key={i} hot>
+                {k}
+              </Kbd>
+            ))}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="vs-glow" style={{ fontSize: 16, fontWeight: 800, color: tokens.bright }}>
+              {nextUnit.title}
+            </div>
+            <div style={{ fontSize: 12.5, color: tokens.text }}>Up next on the overworld.</div>
+          </div>
+        </div>
+      )}
 
       {/* actions */}
       <div style={{ marginTop: 32, display: 'flex', gap: 14, position: 'relative', zIndex: 2, flexWrap: 'wrap', justifyContent: 'center' }}>

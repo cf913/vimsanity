@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { tokens, fontMono } from '../../../design/tokens'
 import { useGsap } from '../../../design/useGsap'
-import { Pill, TermButton, Kbd, CursorSprite, PixelStar, Stat } from '../../../design/primitives'
+import { Pill, TermButton, Kbd, CursorSprite, PixelStar, Stat, BlockBar } from '../../../design/primitives'
 import { orderedNodes, pathEdges, futureNodes } from '../progression'
 import { getUnitProgress } from '../../../state/progress'
 import type { Progress } from '../../../state/types'
@@ -115,6 +115,9 @@ export default function WorldMap({ progress, onEnterUnit, onBack }: WorldMapProp
           <Stat label="Cleared" value={`${completedCount}/${nodes.length}`} />
           <Stat label="Stars" value={totalStars} tone="amber" />
         </div>
+
+        {/* overworld progress (honest: units cleared) */}
+        <BlockBar label="Overworld" value={completedCount} max={nodes.length} />
 
         {/* streak */}
         <div>
@@ -339,6 +342,30 @@ export default function WorldMap({ progress, onEnterUnit, onBack }: WorldMapProp
               </button>
             )
           })}
+
+          {/* fog-of-war over the locked frontier (upper-right) */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              pointerEvents: 'none',
+              zIndex: 1,
+              background:
+                'radial-gradient(ellipse 55% 60% at 85% 15%, rgba(5,9,5,.82) 10%, rgba(5,9,5,.4) 45%, transparent 70%)',
+            }}
+          />
+
+          {/* compass / position readout */}
+          <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 3 }}>
+            <div className="vs-frame" style={{ padding: '8px 12px', background: 'rgba(5,9,5,.85)' }}>
+              <div style={{ fontSize: 10, color: tokens.dim, letterSpacing: '.2em', marginBottom: 2 }}>POS</div>
+              <div style={{ color: tokens.bright, fontWeight: 700, fontSize: 13, letterSpacing: '.04em' }}>
+                {selectedUnit
+                  ? `${nodes.findIndex((n) => n.unit.id === selectedUnit.unit.id) + 1} · ${selectedUnit.unit.id}`
+                  : (selectedFuture?.label ?? '—')}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -420,6 +447,25 @@ function SelectedUnitPanel(props: {
           <div style={{ fontSize: 13, color: tokens.text, lineHeight: 1.5 }}>{rewardBlurb}</div>
         </div>
       )}
+
+      {/* rewards preview */}
+      <div>
+        <div style={{ fontSize: 10, color: tokens.dim, letterSpacing: '.3em', marginBottom: 8 }}>★ REWARDS</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <div className="vs-frame" style={{ padding: '10px 12px', background: tokens.bgPanel2 }}>
+            <div style={{ display: 'flex', gap: 3 }}>
+              {[0, 1, 2].map((i) => (
+                <PixelStar key={i} size={14} filled color={tokens.amber} />
+              ))}
+            </div>
+            <div style={{ fontSize: 10, color: tokens.dim, letterSpacing: '.15em', marginTop: 6 }}>3-STAR GOAL</div>
+          </div>
+          <div className="vs-frame" style={{ padding: '10px 12px', background: tokens.bgPanel2 }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: tokens.purple }}>DEX</div>
+            <div style={{ fontSize: 10, color: tokens.dim, letterSpacing: '.15em', marginTop: 6 }}>ENTRY · SOON</div>
+          </div>
+        </div>
+      </div>
 
       {status === 'done' && (
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>

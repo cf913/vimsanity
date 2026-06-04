@@ -146,6 +146,7 @@ export default function UnitRunner() {
       (up.stars !== undefined
         ? { stars: up.stars, keystrokes: up.bestKeystrokes ?? 0, score: up.bestScore ?? 0 }
         : null)
+    const cleared = UNIT_IDS.filter((id) => getUnitProgress(progress, id).bStatus === 'completed').length
     return (
       <LevelComplete
         unit={unit}
@@ -153,6 +154,9 @@ export default function UnitRunner() {
         streak={progress.streak?.count ?? 0}
         nextUnit={nextUnit}
         replayMode={replayMode}
+        cleared={cleared}
+        totalUnits={UNIT_IDS.length}
+        bestKeystrokes={up.bestKeystrokes}
         onReplay={handleReplay}
         onNext={nextUnit ? () => navigate(`/learn/${nextUnit.id}`) : undefined}
         onMap={() => navigate('/learn')}

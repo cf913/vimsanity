@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
 import { tokens, fontMono } from '../../../design/tokens'
 import { useGsap } from '../../../design/useGsap'
-import { Pill, TermButton, Kbd } from '../../../design/primitives'
+import { Pill, TermButton, Kbd, Stat, StatusBar } from '../../../design/primitives'
+import { GridBoard } from '../level/views/GridBoard'
+import { units } from '../units/registry'
 
 interface HeroProps {
   /** Primary CTA — drop the player into the game (world map / next unit). */
@@ -24,9 +26,12 @@ const TAGLINES = [
   'No mouse. No mercy. Just :wq and chill.',
 ]
 
+// Honest stats derived from the real curriculum (no fabricated global numbers).
+const UNIT_COUNT = units.length
+const MOTION_COUNT = new Set(units.flatMap((u) => u.motionLabel.split(/\s+/))).size
+
 export default function Hero({ onEnter, onResume, resumeLabel }: HeroProps) {
   const root = useGsap<HTMLDivElement>(({ gsap, root, reducedMotion }) => {
-    // Typewriter taglines
     const lines = root.querySelectorAll<HTMLElement>('[data-typeline]')
     lines.forEach((line, i) => {
       const full = line.dataset.typeline ?? ''
@@ -52,7 +57,6 @@ export default function Hero({ onEnter, onResume, resumeLabel }: HeroProps) {
 
     if (reducedMotion) return
 
-    // Glyph rain in the background
     const rain = root.querySelector<HTMLElement>('[data-rain]')
     if (rain) {
       const chars = 'hjklwbe$0%fxdiapyrgu/?'.split('')
@@ -80,12 +84,10 @@ export default function Hero({ onEnter, onResume, resumeLabel }: HeroProps) {
       }
     }
 
-    // CTA breathe
     const cta = root.querySelector('[data-cta]')
     if (cta) gsap.to(cta, { scale: 1.02, duration: 1.4, repeat: -1, yoyo: true, ease: 'sine.inOut' })
   })
 
-  // Keyboard: i / Enter begins, r resumes.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement)?.tagName
@@ -110,70 +112,171 @@ export default function Hero({ onEnter, onResume, resumeLabel }: HeroProps) {
         minHeight: '100%',
         display: 'flex',
         flexDirection: 'column',
-        background: `radial-gradient(ellipse 60% 60% at 50% 30%, rgba(16,255,160,.06), transparent 70%), ${tokens.bg}`,
+        background: `radial-gradient(ellipse 60% 60% at 40% 30%, rgba(16,255,160,.06), transparent 70%), ${tokens.bg}`,
       }}
     >
-      {/* glyph rain */}
       <div data-rain style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }} />
 
+      {/* hero body: copy + live preview */}
       <div
         style={{
           flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 0.9fr)',
+          gap: 56,
           alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-          padding: '64px 32px',
+          padding: '56px clamp(32px, 6vw, 96px)',
           position: 'relative',
           zIndex: 2,
         }}
       >
-        <Pill tone="amber" style={{ marginBottom: 28 }}>
-          ◣ VIMSANITY 2.0 · LEARN VIM BY PLAYING
-        </Pill>
+        {/* LEFT — copy */}
+        <div>
+          <Pill tone="amber" style={{ marginBottom: 24 }}>
+            ◣ VIMSANITY 2.0 · LEARN VIM BY PLAYING
+          </Pill>
 
-        <h1
-          className="vs-glow-strong"
-          style={{
-            fontFamily: fontMono,
-            fontWeight: 800,
-            fontSize: 'clamp(56px, 11vw, 132px)',
-            lineHeight: 0.92,
-            color: tokens.bright,
-            letterSpacing: '-.04em',
-            margin: 0,
-          }}
-        >
-          LEARN VIM
-          <br />
-          BY <span className="vs-glow-amber" style={{ color: tokens.amber }}>PLAY</span>
-        </h1>
+          <h1
+            className="vs-glow-strong"
+            style={{
+              fontFamily: fontMono,
+              fontWeight: 800,
+              fontSize: 'clamp(48px, 8vw, 116px)',
+              lineHeight: 0.92,
+              color: tokens.bright,
+              letterSpacing: '-.04em',
+              margin: 0,
+            }}
+          >
+            LEARN VIM
+            <br />
+            BY <span className="vs-glow-amber" style={{ color: tokens.amber }}>PLAY</span>
+          </h1>
 
-        <div style={{ marginTop: 28, maxWidth: 560, fontSize: 17, lineHeight: 1.7, minHeight: 90 }}>
-          {TAGLINES.map((t, i) => (
-            <div
-              key={i}
-              data-typeline={t}
-              style={{ color: i === TAGLINES.length - 1 ? tokens.dim : tokens.text }}
-            >
-              {t}
-            </div>
-          ))}
+          <div style={{ marginTop: 24, maxWidth: 520, fontSize: 16, lineHeight: 1.7, minHeight: 84 }}>
+            {TAGLINES.map((t, i) => (
+              <div
+                key={i}
+                data-typeline={t}
+                style={{ color: i === TAGLINES.length - 1 ? tokens.dim : tokens.text }}
+              >
+                {t}
+              </div>
+            ))}
+          </div>
+
+          <div data-cta style={{ marginTop: 32, display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
+            <TermButton big hot onClick={onEnter}>
+              ▶ Press <span style={{ margin: '0 4px', color: tokens.bg }}>i</span> to begin
+            </TermButton>
+            {onResume && (
+              <TermButton big onClick={onResume}>
+                {resumeLabel ?? 'Resume'}
+              </TermButton>
+            )}
+          </div>
+
+          {/* honest stats strip */}
+          <div style={{ marginTop: 44, display: 'flex', gap: 40, flexWrap: 'wrap' }}>
+            <Stat label="Learn units" value={UNIT_COUNT} sub="more on the way" />
+            <Stat label="Motions" value={`${MOTION_COUNT}+`} tone="amber" sub="h to dd to ciw" />
+            <Stat label="Mouse" value="0" tone="purple" sub="keyboard only" />
+          </div>
         </div>
 
+        {/* RIGHT — tilted live-preview window */}
         <div
-          data-cta
-          style={{ marginTop: 40, display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}
+          className="vs-frame-hot"
+          style={{
+            background: tokens.bgPanel,
+            position: 'relative',
+            transform: 'perspective(1400px) rotateY(-7deg) rotateX(2deg)',
+            transformOrigin: 'right center',
+          }}
         >
-          <TermButton big hot onClick={onEnter}>
-            ▶ Press <span style={{ margin: '0 4px', color: tokens.bg }}>i</span> to begin
-          </TermButton>
-          {onResume && (
-            <TermButton big onClick={onResume}>
-              {resumeLabel ?? 'Resume'}
-            </TermButton>
-          )}
+          {/* tab strip */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: tokens.bgPanel2,
+              borderBottom: `1px solid ${tokens.line2}`,
+              padding: '8px 12px',
+              gap: 10,
+              fontSize: 11,
+              letterSpacing: '.12em',
+              color: tokens.dim,
+            }}
+          >
+            <span style={{ display: 'inline-flex', gap: 6 }}>
+              <span style={{ width: 8, height: 8, background: tokens.red }} />
+              <span style={{ width: 8, height: 8, background: tokens.amber }} />
+              <span style={{ width: 8, height: 8, background: tokens.bright }} />
+            </span>
+            <span style={{ marginLeft: 10, padding: '4px 10px', background: tokens.bg, border: `1px solid ${tokens.line2}`, color: tokens.bright }}>
+              ~/hjkl.vim
+            </span>
+            <span style={{ marginLeft: 'auto', color: tokens.amber }}>● live</span>
+          </div>
+
+          {/* mini play grid */}
+          <div style={{ position: 'relative', padding: 24, display: 'flex', justifyContent: 'center' }}>
+            <GridBoard width={8} height={6} cursor={{ x: 3, y: 2 }} target={{ x: 6, y: 4 }} cellSize={32} />
+            <div style={{ position: 'absolute', top: 14, left: 14, display: 'flex', gap: 8 }}>
+              <Pill tone="green">SCORE 7/10</Pill>
+            </div>
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 16,
+                left: 14,
+                right: 14,
+                display: 'flex',
+                gap: 6,
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: tokens.dim,
+                fontSize: 12,
+              }}
+            >
+              <Kbd hot>h</Kbd>
+              <Kbd hot>j</Kbd>
+              <Kbd hot>k</Kbd>
+              <Kbd hot>l</Kbd>
+              <span style={{ margin: '0 8px' }}>·</span>
+              <span>chase the ★</span>
+            </div>
+          </div>
+          <StatusBar mode="NORMAL" file="~/hjkl.vim" info="row 3, col 4" right={<span>vim 9.1</span>} />
+
+          {/* GAME FEEL™ sticker */}
+          <div
+            className="vs-spin"
+            style={{
+              position: 'absolute',
+              top: -22,
+              right: -22,
+              width: 110,
+              height: 110,
+              border: `2px dashed ${tokens.amber}`,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'column',
+              background: tokens.bg,
+            }}
+          >
+            <span className="vs-glow-amber" style={{ fontSize: 10, color: tokens.amber, letterSpacing: '.2em', fontWeight: 700 }}>
+              NOW WITH
+            </span>
+            <span className="vs-glow-amber" style={{ fontSize: 20, color: tokens.amber, fontWeight: 800 }}>
+              GAME
+            </span>
+            <span className="vs-glow-amber" style={{ fontSize: 10, color: tokens.amber, letterSpacing: '.2em', fontWeight: 700 }}>
+              FEEL™
+            </span>
+          </div>
         </div>
       </div>
 
@@ -189,13 +292,13 @@ export default function Hero({ onEnter, onResume, resumeLabel }: HeroProps) {
         }}
       >
         {FEATURES.map((f, i) => (
-          <div key={i} style={{ padding: '22px 24px', borderRight: i < 3 ? `1px solid ${tokens.line}` : 'none' }}>
+          <div key={i} style={{ padding: '20px 24px', borderRight: i < 3 ? `1px solid ${tokens.line}` : 'none' }}>
             <div style={{ fontSize: 11, color: tokens.amber, letterSpacing: '.3em', marginBottom: 6, fontWeight: 700 }}>
               {f.k}
             </div>
             <div
               className="vs-glow"
-              style={{ fontSize: 16, fontWeight: 700, color: tokens.bright, letterSpacing: '.06em', marginBottom: 6 }}
+              style={{ fontSize: 15, fontWeight: 700, color: tokens.bright, letterSpacing: '.06em', marginBottom: 6 }}
             >
               {f.t}
             </div>
