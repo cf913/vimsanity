@@ -1,13 +1,16 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { applyKey, motionRegistry } from '../../../engine/motions'
 import { isCursorAt } from '../../../engine/grader'
 import type { Point } from '../../../engine/grader'
 import type { GridState } from '../../../engine/types'
 import type { AGridDrillDef } from '../units/types'
+import { GridBoard } from '../level/views/GridBoard'
+import type { OnStageCompleted, OnTelemetry } from '../level/types'
 
 interface Props {
   def: AGridDrillDef
-  onCompleted: () => void
+  onCompleted: OnStageCompleted
+  onTelemetry?: OnTelemetry
 }
 
 function randomTarget(width: number, height: number, exclude: Point): Point {
@@ -18,7 +21,7 @@ function randomTarget(width: number, height: number, exclude: Point): Point {
   }
 }
 
-export default function ADrillStage({ def, onCompleted }: Props) {
+export default function ADrillStage({ def, onCompleted, onTelemetry }: Props) {
   const [state, setState] = useState<GridState>({
     width: def.gridWidth,
     height: def.gridHeight,
@@ -29,6 +32,7 @@ export default function ADrillStage({ def, onCompleted }: Props) {
     randomTarget(def.gridWidth, def.gridHeight, def.startCursor),
   )
   const [hits, setHits] = useState(0)
+  const [lastKey, setLastKey] = useState<string | undefined>(undefined)
   const completedRef = useRef(false)
 
   const handleKeyDown = useCallback(
@@ -36,6 +40,7 @@ export default function ADrillStage({ def, onCompleted }: Props) {
       if (completedRef.current) return
       if (!def.allowedKeys.includes(e.key)) return
       e.preventDefault()
+      setLastKey(e.key)
       const { state: next } = applyKey(state, { key: e.key }, motionRegistry)
       setState(next)
       if (isCursorAt(next, target)) {
@@ -43,7 +48,7 @@ export default function ADrillStage({ def, onCompleted }: Props) {
         setHits(nextHits)
         if (nextHits >= def.targetCount) {
           completedRef.current = true
-          queueMicrotask(onCompleted)
+          queueMicrotask(() => onCompleted())
         } else {
           setTarget(randomTarget(def.gridWidth, def.gridHeight, next.cursor))
         }
@@ -57,47 +62,22 @@ export default function ADrillStage({ def, onCompleted }: Props) {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleKeyDown])
 
-  const cells = useMemo(() => {
-    const rows = []
-    for (let y = 0; y < def.gridHeight; y++) {
-      const row = []
-      for (let x = 0; x < def.gridWidth; x++) {
-        const isCursor = state.cursor.x === x && state.cursor.y === y
-        const isTarget = target.x === x && target.y === y
-        row.push(
-          <div
-            key={`${x},${y}`}
-            className={`flex h-10 w-10 items-center justify-center rounded text-xs ${
-              isCursor
-                ? 'bg-orange-500 text-black'
-                : isTarget
-                  ? 'bg-green-500 text-black'
-                  : 'bg-gray-800 text-gray-700'
-            }`}
-          >
-            {isCursor ? '●' : isTarget ? '★' : ''}
-          </div>,
-        )
-      }
-      rows.push(
-        <div key={y} className="flex gap-1">
-          {row}
-        </div>,
-      )
-    }
-    return rows
-  }, [state.cursor.x, state.cursor.y, target, def.gridWidth, def.gridHeight])
+  // Publish live HUD telemetry.
+  useEffect(() => {
+    onTelemetry?.({
+      keystrokes: state.keystrokes,
+      lastKey,
+      mode: 'normal',
+      progress: { current: hits, total: def.targetCount, label: 'TARGETS' },
+    })
+  }, [state.keystrokes, hits, lastKey, def.targetCount, onTelemetry])
 
   return (
-    <div className="flex flex-col items-center gap-6 p-8">
-      <div className="text-sm text-gray-400">
-        Drill · Hit the <span className="text-green-400">★</span> with{' '}
-        <span className="font-mono text-orange-300">h j k l</span>
-      </div>
-      <div className="flex flex-col gap-1">{cells}</div>
-      <div className="text-sm text-gray-300">
-        <span className="font-mono">{hits}</span> / {def.targetCount} targets
-      </div>
-    </div>
+    <GridBoard
+      width={def.gridWidth}
+      height={def.gridHeight}
+      cursor={state.cursor}
+      target={target}
+    />
   )
 }

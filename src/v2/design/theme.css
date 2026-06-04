@@ -1,0 +1,24 @@
+/* Expose the phosphor palette to Tailwind v4 as `vs-*` color utilities
+   (e.g. bg-vs-bg, text-vs-bright, border-vs-line2). Additive — merges with
+   the existing @theme in index.css; classic zinc/orange vars are untouched.
+   Values mirror src/v2/design/tokens.ts and crt.css. */
+@theme {
+  --color-vs-bg: #050905;
+  --color-vs-panel: #0a120c;
+  --color-vs-panel2: #0e1812;
+  --color-vs-grid: #0f2418;
+  --color-vs-line: #1c3a26;
+  --color-vs-line2: #2a5840;
+  --color-vs-dim: #3a7d4f;
+  --color-vs-text: #9af0b8;
+  --color-vs-bright: #10ffa0;
+  --color-vs-hot: #5fffb8;
+  --color-vs-emerald: #10b981;
+  --color-vs-amber: #ffb547;
+  --color-vs-red: #ff5a5f;
+  --color-vs-purple: #c084fc;
+  --color-vs-cyan: #7ee9ff;
+  --color-vs-white: #eafff2;
+
+  --font-vs-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}

@@ -3,10 +3,13 @@ import { applyTextKey, textMotionRegistry } from '../../../engine/text-motions'
 import { moveToNextWordBoundary, moveToWordEnd } from '../../../engine/text-utils'
 import type { TextState } from '../../../engine/text-types'
 import type { ATextDrillDef } from '../units/types'
+import { TextBoard } from '../level/views/TextBoard'
+import type { OnStageCompleted, OnTelemetry } from '../level/types'
 
 interface Props {
   def: ATextDrillDef
-  onCompleted: () => void
+  onCompleted: OnStageCompleted
+  onTelemetry?: OnTelemetry
 }
 
 interface TargetRange {
@@ -101,7 +104,7 @@ function isCursorInRange(index: number, range: TargetRange): boolean {
   return index >= range.start && index <= range.end
 }
 
-export default function ADrillStageText({ def, onCompleted }: Props) {
+export default function ADrillStageText({ def, onCompleted, onTelemetry }: Props) {
   const reachable = useMemo(
     () => computeReachableIndices(def.text, def.startCursorIndex, def.allowedKeys),
     [def.text, def.startCursorIndex, def.allowedKeys],
@@ -115,6 +118,7 @@ export default function ADrillStageText({ def, onCompleted }: Props) {
     pickTargetRange(def.text, reachable, undefined, def.startCursorIndex),
   )
   const [hits, setHits] = useState(0)
+  const [lastKey, setLastKey] = useState<string | undefined>(undefined)
   const completedRef = useRef(false)
 
   const handleKeyDown = useCallback(
@@ -122,6 +126,7 @@ export default function ADrillStageText({ def, onCompleted }: Props) {
       if (completedRef.current) return
       if (!def.allowedKeys.includes(e.key)) return
       e.preventDefault()
+      setLastKey(e.key)
       const { state: next } = applyTextKey(state, { key: e.key }, textMotionRegistry)
       setState(next)
       if (isCursorInRange(next.cursorIndex, target)) {
@@ -129,7 +134,7 @@ export default function ADrillStageText({ def, onCompleted }: Props) {
         setHits(nextHits)
         if (nextHits >= def.targetCount) {
           completedRef.current = true
-          queueMicrotask(onCompleted)
+          queueMicrotask(() => onCompleted())
         } else {
           setTarget(pickTargetRange(def.text, reachable, target))
         }
@@ -143,43 +148,21 @@ export default function ADrillStageText({ def, onCompleted }: Props) {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleKeyDown])
 
-  const rendered = useMemo(() => {
-    const out: React.ReactNode[] = []
-    for (let i = 0; i < def.text.length; i++) {
-      const ch = def.text[i]
-      const isCursor = state.cursorIndex === i
-      const isTargetChar = isCursorInRange(i, target)
-      out.push(
-        <span
-          key={i}
-          className={
-            isCursor
-              ? 'bg-orange-500 text-black'
-              : isTargetChar
-              ? 'bg-green-500/40 text-gray-100'
-              : 'text-gray-300'
-          }
-        >
-          {ch === '\n' ? <br /> : ch === ' ' ? ' ' : ch}
-        </span>,
-      )
-    }
-    return out
-  }, [def.text, state.cursorIndex, target])
+  useEffect(() => {
+    onTelemetry?.({
+      keystrokes: state.keystrokes,
+      lastKey,
+      mode: 'normal',
+      progress: { current: hits, total: def.targetCount, label: 'TARGETS' },
+    })
+  }, [state.keystrokes, hits, lastKey, def.targetCount, onTelemetry])
 
   return (
-    <div className="flex flex-col items-center gap-6 p-8">
-      <div className="text-sm text-gray-400">
-        Drill · Land your cursor on the{' '}
-        <span className="text-green-400">highlighted word</span> using{' '}
-        <span className="font-mono text-orange-300">{def.allowedKeys.join(' ')}</span>
-      </div>
-      <div className="max-w-3xl whitespace-pre-wrap font-mono text-base leading-relaxed">
-        {rendered}
-      </div>
-      <div className="text-sm text-gray-300">
-        <span className="font-mono">{hits}</span> / {def.targetCount} targets
-      </div>
-    </div>
+    <TextBoard
+      text={def.text}
+      cursorIndex={state.cursorIndex}
+      isTarget={(i) => isCursorInRange(i, target)}
+      caption="Land on the highlighted word."
+    />
   )
 }

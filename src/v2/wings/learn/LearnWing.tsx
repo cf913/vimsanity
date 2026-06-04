@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import UnitSidebar from './UnitSidebar'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import Hero from './screens/Hero'
+import WorldMap from './screens/WorldMap'
 import { units } from './units/registry'
 import { loadProgress, getUnitProgress } from '../../state/progress'
 import type { Progress } from '../../state/types'
 
 const UNIT_IDS = units.map((u) => u.id)
+const HERO_SEEN_KEY = 'vimsanity-v2-seen-hero'
 
 function nextReadyUnitId(progress: Progress): string {
   for (const u of units) {
@@ -17,20 +19,39 @@ function nextReadyUnitId(progress: Progress): string {
 
 export default function LearnWing() {
   const [progress, setProgress] = useState<Progress>(() => loadProgress(UNIT_IDS))
+  const [showHero, setShowHero] = useState<boolean>(() => !localStorage.getItem(HERO_SEEN_KEY))
   const location = useLocation()
+  const navigate = useNavigate()
 
   useEffect(() => {
     setProgress(loadProgress(UNIT_IDS))
   }, [location.pathname])
 
-  if (location.pathname === '/learn' || location.pathname === '/learn/') {
-    return <Navigate to={`/learn/${nextReadyUnitId(progress)}`} replace />
+  const isIndex = location.pathname === '/learn' || location.pathname === '/learn/'
+
+  if (isIndex && showHero) {
+    const enterMap = () => {
+      localStorage.setItem(HERO_SEEN_KEY, '1')
+      setShowHero(false)
+    }
+    return (
+      <Hero
+        onEnter={enterMap}
+        onResume={() => navigate(`/learn/${nextReadyUnitId(progress)}`)}
+        resumeLabel="Resume"
+      />
+    )
   }
 
-  return (
-    <div className="flex flex-1">
-      <UnitSidebar progress={progress} />
-      <Outlet />
-    </div>
-  )
+  if (isIndex) {
+    return (
+      <WorldMap
+        progress={progress}
+        onEnterUnit={(id) => navigate(`/learn/${id}`)}
+        onBack={() => setShowHero(true)}
+      />
+    )
+  }
+
+  return <Outlet />
 }

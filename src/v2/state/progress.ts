@@ -54,7 +54,8 @@ function migrate(persisted: Progress, unitIds: string[]): Progress {
     }
   })
 
-  return { units }
+  // Preserve light-progression streak across migrations.
+  return persisted.streak ? { units, streak: persisted.streak } : { units }
 }
 
 export function saveProgress(progress: Progress): void {
@@ -92,5 +93,60 @@ export function markStageCompleted(
     }
   }
 
-  return { units: nextUnits }
+  return { ...progress, units: nextUnits }
+}
+
+// ─────────────────────────── Light progression ───────────────────────────
+
+export interface UnitResultInput {
+  stars: number
+  score: number
+  keystrokes: number
+}
+
+/**
+ * Merge a B-check result into a unit's record, keeping the best of each metric
+ * (highest stars, highest score, fewest keystrokes). Does not touch stage status.
+ */
+export function recordUnitResult(
+  progress: Progress,
+  unitId: string,
+  result: UnitResultInput,
+): Progress {
+  const current = getUnitProgress(progress, unitId)
+  const merged: UnitProgress = {
+    ...current,
+    stars: Math.max(current.stars ?? 0, result.stars),
+    bestScore: Math.max(current.bestScore ?? 0, result.score),
+    bestKeystrokes:
+      current.bestKeystrokes === undefined
+        ? result.keystrokes
+        : Math.min(current.bestKeystrokes, result.keystrokes),
+  }
+  return { ...progress, units: { ...progress.units, [unitId]: merged } }
+}
+
+/** Whole-day difference between two YYYY-MM-DD calendar dates (b - a). */
+function dayDiff(aISO: string, bISO: string): number {
+  const a = Date.parse(`${aISO}T00:00:00Z`)
+  const b = Date.parse(`${bISO}T00:00:00Z`)
+  if (Number.isNaN(a) || Number.isNaN(b)) return NaN
+  return Math.round((b - a) / 86_400_000)
+}
+
+/**
+ * Advance the daily streak for an activity on `todayISO` (YYYY-MM-DD):
+ * - same day as last → unchanged
+ * - exactly the next day → +1
+ * - any other gap (or first ever) → reset to 1
+ * Pure: the caller supplies today's date so this stays testable.
+ */
+export function touchStreak(progress: Progress, todayISO: string): Progress {
+  const prev = progress.streak
+  if (!prev) return { ...progress, streak: { count: 1, lastPlayedISO: todayISO } }
+
+  const diff = dayDiff(prev.lastPlayedISO, todayISO)
+  if (diff === 0) return progress
+  const count = diff === 1 ? prev.count + 1 : 1
+  return { ...progress, streak: { count, lastPlayedISO: todayISO } }
 }
