@@ -12,6 +12,7 @@ import {
   recentDays,
   buildDex,
   dexSummary,
+  bossUnlocked,
   type Badge,
 } from '../progression'
 import { getUnitProgress } from '../../../state/progress'
@@ -51,7 +52,9 @@ export default function WorldMap({ progress, onEnterUnit, onOpenDex, onBack }: W
   const left = (c: number) => ((c + 0.5) / cols) * 100
   const top = (r: number) => ((r + 0.5) / rows) * 100
 
-  // Navigation nodes (units playable, boss locked).
+  const bossReady = useMemo(() => bossUnlocked(progress, nodes.map((n) => n.unit.id)), [progress, nodes])
+
+  // Navigation nodes (units playable; boss playable once the overworld is cleared).
   const navNodes: NavNode[] = [
     ...nodes.map((n) => ({
       id: n.unit.id,
@@ -59,7 +62,7 @@ export default function WorldMap({ progress, onEnterUnit, onOpenDex, onBack }: W
       r: n.meta.node.r,
       locked: statusOf(progress, n.unit.id) === 'locked',
     })),
-    ...futureNodes.map((f) => ({ id: f.id, c: f.c, r: f.r, locked: true })),
+    ...futureNodes.map((f) => ({ id: f.id, c: f.c, r: f.r, locked: !(f.kind === 'boss' && bossReady) })),
   ]
 
   const { selectedId, setSelectedId } = useMapNavigation({
@@ -367,11 +370,13 @@ export default function WorldMap({ progress, onEnterUnit, onOpenDex, onBack }: W
           {/* future (boss) nodes */}
           {futureNodes.map((f) => {
             const isSelected = f.id === selectedId
+            const ready = f.kind === 'boss' && bossReady
             return (
               <button
                 key={f.id}
                 data-node
                 onClick={() => setSelectedId(f.id)}
+                onDoubleClick={() => ready && onEnterUnit(f.id)}
                 style={{
                   position: 'absolute',
                   left: `${left(f.c)}%`,
@@ -389,23 +394,23 @@ export default function WorldMap({ progress, onEnterUnit, onOpenDex, onBack }: W
                     style={{
                       width: 52,
                       height: 52,
-                      background: 'rgba(255,181,71,.12)',
-                      border: `2px solid ${tokens.amber}`,
+                      background: ready ? 'rgba(255,90,95,.18)' : 'rgba(255,181,71,.12)',
+                      border: `2px solid ${ready ? tokens.red : tokens.amber}`,
                       transform: 'rotate(45deg)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      boxShadow: isSelected ? `0 0 22px ${tokens.amber}` : 'none',
+                      boxShadow: ready ? `0 0 22px ${tokens.red}` : isSelected ? `0 0 22px ${tokens.amber}` : 'none',
                     }}
                   >
-                    <span style={{ transform: 'rotate(-45deg)', color: tokens.amber, fontWeight: 800 }}>※</span>
+                    <span style={{ transform: 'rotate(-45deg)', color: ready ? tokens.red : tokens.amber, fontWeight: 800 }}>※</span>
                   </div>
                 </div>
                 <div style={{ marginTop: 10, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                  <div className="vs-glow-amber" style={{ fontSize: 11, color: tokens.amber, fontWeight: 700 }}>
+                  <div className={ready ? 'vs-glow-red' : 'vs-glow-amber'} style={{ fontSize: 11, color: ready ? tokens.red : tokens.amber, fontWeight: 700 }}>
                     {f.label}
                   </div>
-                  <div style={{ fontSize: 10, color: tokens.dim, marginTop: 2 }}>soon™</div>
+                  <div style={{ fontSize: 10, color: ready ? tokens.red : tokens.dim, marginTop: 2 }}>{ready ? 'READY ▸' : 'soon™'}</div>
                 </div>
               </button>
             )
@@ -460,14 +465,23 @@ export default function WorldMap({ progress, onEnterUnit, onOpenDex, onBack }: W
             onOpenDex={onOpenDex}
           />
         ) : selectedFuture ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <Pill tone="amber">COMING SOON</Pill>
-            <div className="vs-glow-amber" style={{ fontSize: 28, fontWeight: 800, color: tokens.amber }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, height: '100%' }}>
+            <Pill tone={bossReady ? 'red' : 'amber'}>{bossReady ? '◢ BOSS READY' : 'COMING SOON'}</Pill>
+            <div className={bossReady ? 'vs-glow-red' : 'vs-glow-amber'} style={{ fontSize: 28, fontWeight: 800, color: bossReady ? tokens.red : tokens.amber }}>
               {selectedFuture.label}
             </div>
             <div style={{ fontSize: 13, color: tokens.text, lineHeight: 1.6 }}>
-              Boss runs — refactor a real file against the clock — land in a future update. Clear the overworld to be ready.
+              {bossReady
+                ? 'A timed gauntlet of refactors that combines every motion you have learned. Beat the clock.'
+                : 'A timed refactor gauntlet that combines every motion. Clear the whole overworld to unlock it.'}
             </div>
+            {bossReady && (
+              <div style={{ marginTop: 'auto' }}>
+                <TermButton hot big onClick={() => onEnterUnit(selectedFuture.id)} style={{ width: '100%' }}>
+                  ⏎ ENTER BOSS
+                </TermButton>
+              </div>
+            )}
           </div>
         ) : null}
       </div>
