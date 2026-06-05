@@ -10,7 +10,7 @@ import LevelChrome from './level/LevelChrome'
 import LevelComplete, { type LevelResult } from './level/LevelComplete'
 import type { StageTelemetry, StageResult } from './level/types'
 import { units, findUnit } from './units/registry'
-import { getMeta, starsForKeystrokes, scoreForResult } from './progression'
+import { getMeta, starsForKeystrokes, scoreForResult, playerLevel, totalXp } from './progression'
 import {
   loadProgress,
   saveProgress,
@@ -39,6 +39,8 @@ export default function UnitRunner() {
   const [replayKey, setReplayKey] = useState(0)
   const [telemetry, setTelemetry] = useState<StageTelemetry | null>(null)
   const [result, setResult] = useState<LevelResult | null>(null)
+  // XP gained + whether the player levelled up on the most recent B-check.
+  const [levelUp, setLevelUp] = useState<{ gained: number; leveled: boolean } | null>(null)
 
   useEffect(() => {
     if (!unit) return
@@ -95,6 +97,10 @@ export default function UnitRunner() {
         })
       }
       next = touchStreak(next, todayISO())
+      // Honest XP delta: total XP only moves when a new best score is recorded.
+      const before = playerLevel(progress)
+      const after = playerLevel(next)
+      setLevelUp({ gained: totalXp(next) - totalXp(progress), leveled: after.level > before.level })
       saveProgress(next)
       setProgress(next)
     },
@@ -105,6 +111,7 @@ export default function UnitRunner() {
     setReplayMode(true)
     setActive('a')
     setResult(null)
+    setLevelUp(null)
     setReplayKey((k) => k + 1)
   }, [])
 
@@ -157,6 +164,9 @@ export default function UnitRunner() {
         cleared={cleared}
         totalUnits={UNIT_IDS.length}
         bestKeystrokes={up.bestKeystrokes}
+        player={playerLevel(progress)}
+        xpGained={levelUp?.gained ?? 0}
+        leveledUp={levelUp?.leveled ?? false}
         onReplay={handleReplay}
         onNext={nextUnit ? () => navigate(`/learn/${nextUnit.id}`) : undefined}
         onMap={() => navigate('/learn')}

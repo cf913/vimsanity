@@ -3,6 +3,9 @@ import { worldMapMeta, type WorldMapMeta } from './worldMap'
 import type { Unit } from '../units/types'
 
 export * from './score'
+export * from './xp'
+export * from './badges'
+export * from './calendar'
 export { worldMapMeta, futureNodes, type WorldMapMeta, type MapNode, type FutureNode } from './worldMap'
 
 export function getMeta(unitId: string): WorldMapMeta | undefined {

@@ -2,7 +2,16 @@ import { useMemo } from 'react'
 import { tokens, fontMono } from '../../../design/tokens'
 import { useGsap } from '../../../design/useGsap'
 import { Pill, TermButton, Kbd, CursorSprite, PixelStar, Stat, BlockBar } from '../../../design/primitives'
-import { orderedNodes, pathEdges, futureNodes } from '../progression'
+import {
+  orderedNodes,
+  pathEdges,
+  futureNodes,
+  playerLevel,
+  computeBadges,
+  activeStreakDays,
+  recentDays,
+  type Badge,
+} from '../progression'
 import { getUnitProgress } from '../../../state/progress'
 import type { Progress } from '../../../state/types'
 import { useMapNavigation, type NavNode } from './useMapNavigation'
@@ -73,7 +82,15 @@ export default function WorldMap({ progress, onEnterUnit, onBack }: WorldMapProp
   const selectedFuture = futureNodes.find((f) => f.id === selectedId)
   const completedCount = nodes.filter((n) => statusOf(progress, n.unit.id) === 'done').length
   const totalStars = nodes.reduce((s, n) => s + (getUnitProgress(progress, n.unit.id).stars ?? 0), 0)
-  const streak = progress.streak?.count ?? 0
+
+  // Honest player progression derived from persisted scores/stars/streak.
+  const player = useMemo(() => playerLevel(progress), [progress])
+  const unitIds = useMemo(() => nodes.map((n) => n.unit.id), [nodes])
+  const badges = useMemo(() => computeBadges(progress, unitIds), [progress, unitIds])
+  const earnedCount = badges.filter((b) => b.earned).length
+  const todayISO = new Date().toISOString().slice(0, 10)
+  const streakSet = useMemo(() => new Set(activeStreakDays(progress.streak, todayISO)), [progress.streak, todayISO])
+  const calendarDays = useMemo(() => recentDays(todayISO, 14), [todayISO])
 
   return (
     <div
@@ -93,22 +110,48 @@ export default function WorldMap({ progress, onEnterUnit, onBack }: WorldMapProp
           padding: '28px 24px',
           display: 'flex',
           flexDirection: 'column',
-          gap: 24,
+          gap: 22,
           background: tokens.bgPanel,
+          overflowY: 'auto',
         }}
       >
+        {/* level + title */}
         <div>
-          <div style={{ fontSize: 11, color: tokens.dim, letterSpacing: '.3em', marginBottom: 6 }}>~/PLAYER</div>
-          <div className="vs-glow" style={{ fontSize: 22, fontWeight: 800, color: tokens.bright, letterSpacing: '.02em' }}>
-            modal wanderer
+          <div style={{ fontSize: 11, color: tokens.dim, letterSpacing: '.3em', marginBottom: 10 }}>~/PLAYER</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div
+              className="vs-frame"
+              style={{
+                width: 56,
+                height: 56,
+                flex: '0 0 auto',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: tokens.bg,
+              }}
+            >
+              <CursorSprite size={36} />
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div className="vs-glow" style={{ fontSize: 18, fontWeight: 800, color: tokens.bright, lineHeight: 1.15 }}>
+                {player.title}
+              </div>
+              <div style={{ fontSize: 11, color: tokens.dim, letterSpacing: '.12em', marginTop: 3 }}>
+                LEVEL {player.level}
+                {player.atMax && <span style={{ color: tokens.amber }}> · MAX</span>}
+              </div>
+            </div>
           </div>
-        </div>
-
-        <div
-          className="vs-frame"
-          style={{ padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', background: tokens.bg }}
-        >
-          <CursorSprite size={88} />
+          <div style={{ marginTop: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: tokens.dim, letterSpacing: '.12em', marginBottom: 4 }}>
+              <span>XP</span>
+              <span style={{ color: tokens.cyan }}>
+                {player.atMax ? player.xp.toLocaleString() : `${player.xpIntoLevel}/${player.xpForLevel}`}
+              </span>
+            </div>
+            <BlockBar value={player.atMax ? 1 : player.xpIntoLevel} max={player.atMax ? 1 : player.xpForLevel} color={tokens.cyan} />
+          </div>
         </div>
 
         <div style={{ display: 'flex', gap: 18 }}>
@@ -119,28 +162,42 @@ export default function WorldMap({ progress, onEnterUnit, onBack }: WorldMapProp
         {/* overworld progress (honest: units cleared) */}
         <BlockBar label="Overworld" value={completedCount} max={nodes.length} />
 
-        {/* streak */}
+        {/* badges */}
+        <div>
+          <div style={{ fontSize: 10, color: tokens.dim, letterSpacing: '.3em', marginBottom: 8 }}>
+            ★ BADGES · {earnedCount}/{badges.length}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+            {badges.map((b) => (
+              <BadgeChip key={b.id} badge={b} />
+            ))}
+          </div>
+        </div>
+
+        {/* streak calendar (honest: the active run as of today) */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div className="vs-glow-amber" style={{ fontSize: 34, color: tokens.amber, fontWeight: 800, lineHeight: 1 }}>
-              {streak}
-              <span style={{ fontSize: 14, opacity: 0.7 }}>d</span>
+            <div className="vs-glow-amber" style={{ fontSize: 30, color: tokens.amber, fontWeight: 800, lineHeight: 1 }}>
+              {streakSet.size}
+              <span style={{ fontSize: 13, opacity: 0.7 }}>d</span>
             </div>
-            <div style={{ fontSize: 12, color: tokens.dim, letterSpacing: '.1em' }}>
-              <div style={{ color: tokens.amber }}>{streak > 0 ? 'STREAK ALIVE' : 'NO STREAK YET'}</div>
+            <div style={{ fontSize: 11, color: tokens.dim, letterSpacing: '.1em' }}>
+              <div style={{ color: tokens.amber }}>{streakSet.size > 0 ? 'STREAK ALIVE' : 'NO STREAK YET'}</div>
               <div>finish a unit today</div>
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(14,1fr)', gap: 3, marginTop: 14 }}>
-            {Array.from({ length: 14 }).map((_, i) => {
-              const filled = i >= 14 - Math.min(streak, 14)
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(14,1fr)', gap: 3, marginTop: 12 }}>
+            {calendarDays.map((d) => {
+              const filled = streakSet.has(d)
+              const isToday = d === todayISO
               return (
                 <div
-                  key={i}
+                  key={d}
+                  title={d}
                   style={{
                     aspectRatio: '1',
                     background: filled ? tokens.amber : tokens.bgPanel2,
-                    border: `1px solid ${filled ? tokens.amber : tokens.line}`,
+                    border: `1px solid ${filled ? tokens.amber : isToday ? tokens.line2 : tokens.line}`,
                   }}
                 />
               )
@@ -402,6 +459,51 @@ export default function WorldMap({ progress, onEnterUnit, onBack }: WorldMapProp
           </div>
         ) : null}
       </div>
+    </div>
+  )
+}
+
+function BadgeChip({ badge }: { badge: Badge }) {
+  const { earned, icon, label, desc, progress } = badge
+  const tip = earned ? `${label} — ${desc}` : `${label} — ${desc} (${progress?.current ?? 0}/${progress?.target ?? 0})`
+  return (
+    <div
+      title={tip}
+      className={earned ? 'vs-frame-hot' : 'vs-frame'}
+      style={{
+        aspectRatio: '1',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: earned ? 'rgba(255,181,71,.1)' : tokens.bgPanel2,
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      <span
+        className={earned ? 'vs-glow-amber' : undefined}
+        style={{
+          fontSize: 18,
+          fontWeight: 800,
+          color: earned ? tokens.amber : tokens.dim,
+          opacity: earned ? 1 : 0.5,
+          lineHeight: 1,
+        }}
+      >
+        {icon}
+      </span>
+      {!earned && progress && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            bottom: 0,
+            height: 3,
+            width: `${(progress.current / progress.target) * 100}%`,
+            background: tokens.line2,
+          }}
+        />
+      )}
     </div>
   )
 }

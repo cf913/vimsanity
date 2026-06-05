@@ -2,6 +2,7 @@ import { tokens, fontMono } from '../../../design/tokens'
 import { useGsap } from '../../../design/useGsap'
 import { Pill, TermButton, PixelStar, Kbd, BlockBar } from '../../../design/primitives'
 import type { Unit } from '../units/types'
+import type { PlayerLevel } from '../progression'
 
 export interface LevelResult {
   stars: number
@@ -22,6 +23,12 @@ interface LevelCompleteProps {
   totalUnits: number
   /** Fewest keystrokes recorded for this unit, if any. */
   bestKeystrokes?: number
+  /** Current player level (after this run is recorded). */
+  player?: PlayerLevel
+  /** XP added by this run (0 on a revisit / no new best). */
+  xpGained?: number
+  /** True when this run pushed the player to a new level. */
+  leveledUp?: boolean
   onReplay: () => void
   onNext?: () => void
   onMap: () => void
@@ -36,6 +43,9 @@ export default function LevelComplete({
   cleared,
   totalUnits,
   bestKeystrokes,
+  player,
+  xpGained = 0,
+  leveledUp = false,
   onReplay,
   onNext,
   onMap,
@@ -50,6 +60,8 @@ export default function LevelComplete({
     tl.from('[data-banner]', { y: -80, scale: 1.3, opacity: 0, duration: 0.5, ease: 'back.out(2)' })
     tl.from('[data-bigstar]', { scale: 0, opacity: 0, duration: 0.4, stagger: 0.22, ease: 'back.out(3)' }, '-=.1')
     tl.from('[data-breakdown]', { x: -16, opacity: 0, duration: 0.3, stagger: 0.08 }, '<.2')
+    tl.from('[data-xpfill]', { scaleX: 0, transformOrigin: 'left center', duration: 0.6, ease: 'power2.out' }, '<.1')
+    tl.from('[data-levelup]', { scale: 0, opacity: 0, duration: 0.5, ease: 'back.out(3)' }, '<.1')
     // glyph confetti
     const conf = root.querySelector<HTMLElement>('[data-conf]')
     if (conf) {
@@ -180,6 +192,73 @@ export default function LevelComplete({
           <BlockBar label="Overworld" value={cleared} max={totalUnits} color={tokens.bright} style={{ marginTop: 18 }} />
         </div>
       </div>
+
+      {/* player level + XP */}
+      {player && (
+        <div
+          className="vs-frame"
+          style={{
+            marginTop: 24,
+            width: 'min(720px, 92%)',
+            padding: '16px 20px',
+            background: tokens.bgPanel,
+            position: 'relative',
+            zIndex: 2,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+            <div style={{ fontSize: 11, color: tokens.dim, letterSpacing: '.3em' }}>
+              ~/PLAYER · LV {player.level} · {player.title.toUpperCase()}
+            </div>
+            {leveledUp && (
+              <span
+                data-levelup
+                className="vs-glow-amber"
+                style={{
+                  fontSize: 12,
+                  fontWeight: 800,
+                  letterSpacing: '.18em',
+                  color: tokens.amber,
+                  border: `1px solid ${tokens.amber}`,
+                  padding: '3px 8px',
+                }}
+              >
+                ▲ LEVEL UP
+              </span>
+            )}
+            {xpGained > 0 && (
+              <span className="vs-glow" style={{ marginLeft: 'auto', fontFamily: fontMono, fontWeight: 800, color: tokens.cyan }}>
+                +{xpGained.toLocaleString()} XP
+              </span>
+            )}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: tokens.dim, letterSpacing: '.12em', marginBottom: 4 }}>
+            <span>XP</span>
+            <span style={{ color: tokens.cyan }}>
+              {player.atMax ? player.xp.toLocaleString() : `${player.xpIntoLevel}/${player.xpForLevel}`}
+            </span>
+          </div>
+          <div style={{ position: 'relative', height: 12, background: tokens.bgPanel2, border: `1px solid ${tokens.line}`, overflow: 'hidden' }}>
+            <div
+              data-xpfill
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: `${player.atMax ? 100 : player.pct}%`,
+                background: `linear-gradient(90deg, ${tokens.cyan}88, ${tokens.cyan})`,
+                boxShadow: `0 0 8px ${tokens.cyan}99`,
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                backgroundImage: `repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), ${tokens.bg} calc(10% - 1px) 10%)`,
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* NEW MOTION UNLOCKED payoff */}
       {nextUnit && !replayMode && (
