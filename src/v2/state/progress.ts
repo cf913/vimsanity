@@ -126,6 +126,22 @@ export function recordUnitResult(
   return { ...progress, units: { ...progress.units, [unitId]: merged } }
 }
 
+/**
+ * Open every unit up to (and including) `index` that is still locked, by setting
+ * its A-stage to 'ready'. Used by onboarding placement to let a self-reported
+ * intermediate start partway in. Does NOT mark anything completed — it only
+ * makes earlier units available, so progress stays honest.
+ */
+export function unlockUpTo(progress: Progress, unitIds: string[], index: number): Progress {
+  const units = { ...progress.units }
+  for (let i = 0; i <= index && i < unitIds.length; i++) {
+    const id = unitIds[i]
+    const cur = units[id] ?? { ...LOCKED }
+    if (cur.aStatus === 'locked') units[id] = { ...cur, aStatus: 'ready' }
+  }
+  return { ...progress, units }
+}
+
 /** Whole-day difference between two YYYY-MM-DD calendar dates (b - a). */
 function dayDiff(aISO: string, bISO: string): number {
   const a = Date.parse(`${aISO}T00:00:00Z`)

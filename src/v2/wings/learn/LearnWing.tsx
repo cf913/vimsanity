@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Hero from './screens/Hero'
 import WorldMap from './screens/WorldMap'
+import Onboarding from './onboarding/Onboarding'
 import { units } from './units/registry'
-import { loadProgress, getUnitProgress } from '../../state/progress'
+import { loadProgress, saveProgress, getUnitProgress, unlockUpTo } from '../../state/progress'
 import type { Progress } from '../../state/types'
 
 const UNIT_IDS = units.map((u) => u.id)
 const HERO_SEEN_KEY = 'vimsanity-v2-seen-hero'
+const ONBOARDED_KEY = 'vimsanity-v2-onboarded'
 
 function nextReadyUnitId(progress: Progress): string {
   for (const u of units) {
@@ -20,6 +22,7 @@ function nextReadyUnitId(progress: Progress): string {
 export default function LearnWing() {
   const [progress, setProgress] = useState<Progress>(() => loadProgress(UNIT_IDS))
   const [showHero, setShowHero] = useState<boolean>(() => !localStorage.getItem(HERO_SEEN_KEY))
+  const [onboarding, setOnboarding] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -33,12 +36,35 @@ export default function LearnWing() {
     const enterMap = () => {
       localStorage.setItem(HERO_SEEN_KEY, '1')
       setShowHero(false)
+      // First-timers get placement before the map.
+      if (!localStorage.getItem(ONBOARDED_KEY)) setOnboarding(true)
     }
     return (
       <Hero
         onEnter={enterMap}
         onResume={() => navigate(`/learn/${nextReadyUnitId(progress)}`)}
         resumeLabel="Resume"
+      />
+    )
+  }
+
+  if (isIndex && onboarding) {
+    const finishOnboarding = (unitId: string) => {
+      localStorage.setItem(ONBOARDED_KEY, '1')
+      const idx = UNIT_IDS.indexOf(unitId)
+      const next = unlockUpTo(loadProgress(UNIT_IDS), UNIT_IDS, idx)
+      saveProgress(next)
+      setProgress(next)
+      setOnboarding(false)
+      navigate(`/learn/${unitId}`)
+    }
+    return (
+      <Onboarding
+        onFinish={finishOnboarding}
+        onSkip={() => {
+          localStorage.setItem(ONBOARDED_KEY, '1')
+          setOnboarding(false)
+        }}
       />
     )
   }

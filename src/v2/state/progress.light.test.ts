@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { recordUnitResult, touchStreak, initialProgressFor, markStageCompleted } from './progress'
+import { recordUnitResult, touchStreak, initialProgressFor, markStageCompleted, unlockUpTo, getUnitProgress } from './progress'
 
 describe('recordUnitResult', () => {
   it('records stars/score/keystrokes on first result', () => {
@@ -62,5 +62,25 @@ describe('touchStreak', () => {
     let p = touchStreak(initialProgressFor(['hjkl']), '2026-01-31')
     p = touchStreak(p, '2026-02-01')
     expect(p.streak).toEqual({ count: 2, lastPlayedISO: '2026-02-01' })
+  })
+})
+
+describe('unlockUpTo', () => {
+  const ids = ['a', 'b', 'c', 'd']
+
+  it('opens locked units up to the index without completing them', () => {
+    const p = unlockUpTo(initialProgressFor(ids), ids, 2)
+    expect(getUnitProgress(p, 'a').aStatus).toBe('ready')
+    expect(getUnitProgress(p, 'b').aStatus).toBe('ready')
+    expect(getUnitProgress(p, 'c').aStatus).toBe('ready')
+    expect(getUnitProgress(p, 'd').aStatus).toBe('locked')
+    // nothing is marked completed
+    expect(getUnitProgress(p, 'b').bStatus).toBe('locked')
+  })
+
+  it('leaves already-progressed units untouched', () => {
+    let p = markStageCompleted(initialProgressFor(ids), 'a', 'a', ids)
+    p = unlockUpTo(p, ids, 2)
+    expect(getUnitProgress(p, 'a').aStatus).toBe('completed')
   })
 })
