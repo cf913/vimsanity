@@ -198,6 +198,7 @@ export default function UnitRunner() {
       stage={stage}
       stageName={stageName}
       replayMode={replayMode}
+      runKey={`${active}-${replayKey}`}
       telemetry={telemetry}
       allowedKeys={allowedKeys}
       hint={hint}
