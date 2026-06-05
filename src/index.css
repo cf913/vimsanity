@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+/* VimSanity 2.0 phosphor CRT design system (scoped under .vs-crt-root). */
+@import './v2/design/crt.css';
+@import './v2/design/theme.css';
+
 /* ============================================
    THEME SYSTEM - CSS Variables
    ============================================ */

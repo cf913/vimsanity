@@ -1,20 +1,17 @@
-/**
- * @jest-environment jsdom
- */
 import { renderHook } from '@testing-library/react'
 import { useKeyboardHandler } from '../useKeyboardHandler'
 
 describe('useKeyboardHandler', () => {
   beforeEach(() => {
     // Clear any existing event listeners
-    document.removeEventListener = jest.fn()
-    document.addEventListener = jest.fn()
-    window.removeEventListener = jest.fn()
-    window.addEventListener = jest.fn()
+    document.removeEventListener = vi.fn()
+    document.addEventListener = vi.fn()
+    window.removeEventListener = vi.fn()
+    window.addEventListener = vi.fn()
   })
 
   it('should detect ctrl+r key combination', () => {
-    const mockHandler = jest.fn()
+    const mockHandler = vi.fn()
     const keyActionMap = {
       'ctrl+r': mockHandler,
     }
@@ -22,7 +19,7 @@ describe('useKeyboardHandler', () => {
     renderHook(() => useKeyboardHandler({ keyActionMap }))
 
     // Get the event listener that was added
-    const addEventListener = window.addEventListener as jest.Mock
+    const addEventListener = window.addEventListener as vi.Mock
     expect(addEventListener).toHaveBeenCalledWith('keydown', expect.any(Function))
     
     const keydownHandler = addEventListener.mock.calls[0][1]
@@ -35,7 +32,7 @@ describe('useKeyboardHandler', () => {
     })
 
     // Mock preventDefault
-    event.preventDefault = jest.fn()
+    event.preventDefault = vi.fn()
 
     keydownHandler(event)
 
@@ -44,14 +41,14 @@ describe('useKeyboardHandler', () => {
   })
 
   it('should detect normal keys without modifiers', () => {
-    const mockHandler = jest.fn()
+    const mockHandler = vi.fn()
     const keyActionMap = {
       'u': mockHandler,
     }
 
     renderHook(() => useKeyboardHandler({ keyActionMap }))
 
-    const addEventListener = window.addEventListener as jest.Mock
+    const addEventListener = window.addEventListener as vi.Mock
     const keydownHandler = addEventListener.mock.calls[0][1]
 
     // Simulate 'u' keydown event
@@ -61,7 +58,7 @@ describe('useKeyboardHandler', () => {
       bubbles: true,
     })
 
-    event.preventDefault = jest.fn()
+    event.preventDefault = vi.fn()
     keydownHandler(event)
 
     expect(event.preventDefault).toHaveBeenCalled()
@@ -69,8 +66,8 @@ describe('useKeyboardHandler', () => {
   })
 
   it('should prioritize combination keys over single keys', () => {
-    const mockCtrlHandler = jest.fn()
-    const mockRegularHandler = jest.fn()
+    const mockCtrlHandler = vi.fn()
+    const mockRegularHandler = vi.fn()
     const keyActionMap = {
       'ctrl+r': mockCtrlHandler,
       'r': mockRegularHandler,
@@ -78,7 +75,7 @@ describe('useKeyboardHandler', () => {
 
     renderHook(() => useKeyboardHandler({ keyActionMap }))
 
-    const addEventListener = window.addEventListener as jest.Mock
+    const addEventListener = window.addEventListener as vi.Mock
     const keydownHandler = addEventListener.mock.calls[0][1]
 
     // Simulate Ctrl+R - should call ctrl+r handler, not r handler
@@ -88,7 +85,7 @@ describe('useKeyboardHandler', () => {
       bubbles: true,
     })
 
-    event.preventDefault = jest.fn()
+    event.preventDefault = vi.fn()
     keydownHandler(event)
 
     expect(mockCtrlHandler).toHaveBeenCalled()
