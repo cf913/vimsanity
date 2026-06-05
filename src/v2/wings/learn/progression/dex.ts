@@ -11,7 +11,7 @@
 import type { Progress } from '../../../state/types'
 
 export type DexStatus = 'mastered' | 'learning' | 'locked'
-export type DexCategory = 'move' | 'word' | 'line' | 'mode' | 'edit' | 'yank'
+export type DexCategory = 'move' | 'word' | 'line' | 'mode' | 'edit' | 'yank' | 'object'
 
 export interface DexMotion {
   /** The motion keys, e.g. 'h', 'dw', 'ciw'. */
@@ -34,6 +34,7 @@ export const CATEGORY_LABEL: Record<DexCategory, string> = {
   mode: 'Modes',
   edit: 'Editing',
   yank: 'Yank & Put',
+  object: 'Text objects',
 }
 
 export const dexCatalog: DexMotion[] = [
@@ -68,6 +69,11 @@ export const dexCatalog: DexMotion[] = [
   { motion: 'yw', name: 'Yank word', desc: 'Copy from the cursor to the next word.', category: 'yank', unitId: 'yankPut' },
   { motion: 'p', name: 'Put after', desc: 'Paste after the cursor / below the line.', category: 'yank', unitId: 'yankPut' },
   { motion: 'P', name: 'Put before', desc: 'Paste before the cursor / above the line.', category: 'yank', unitId: 'yankPut' },
+  // textObjects — Text objects
+  { motion: 'diw', name: 'Delete inner word', desc: 'Delete the word under the cursor — no need to aim at its start.', category: 'object', unitId: 'textObjects' },
+  { motion: 'daw', name: 'Delete a word', desc: 'Delete the word plus its trailing space.', category: 'object', unitId: 'textObjects' },
+  { motion: 'ciw', name: 'Change inner word', desc: 'Change the whole word under the cursor.', category: 'object', unitId: 'textObjects' },
+  { motion: 'caw', name: 'Change a word', desc: 'Change the word and its surrounding space.', category: 'object', unitId: 'textObjects' },
 ]
 
 /** Derive each motion's discovery status from persisted unit progress. */

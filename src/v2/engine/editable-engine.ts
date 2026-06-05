@@ -10,6 +10,7 @@ import {
 } from './mode-motions'
 import {
   applyOperatorWithMotion,
+  applyOperatorOverRange,
   changeToEndOfLine,
   clearLine,
   deleteLine,
@@ -19,7 +20,7 @@ import {
 } from './operators'
 import { putAfter, putBefore } from './put'
 import { deleteRange, insertAt } from './edits'
-import { findLineStart } from './text-utils'
+import { findLineStart, innerWordRange, aWordRange } from './text-utils'
 
 export function freshNormal(text: string, cursorIndex: number): EditableState {
   return {
@@ -27,6 +28,7 @@ export function freshNormal(text: string, cursorIndex: number): EditableState {
     cursorIndex,
     mode: 'normal',
     pendingOperator: null,
+    pendingTextObject: null,
     keystrokes: 0,
     register: null,
   }
@@ -81,6 +83,22 @@ function handlePendingOperator(
   key: string,
 ): EditableResult {
   const op = state.pendingOperator as OperatorKind
+
+  // Resolving a text object: an operator + 'i'/'a' has been captured; this key
+  // selects the object (e.g. the 'w' in diw / caw).
+  if (state.pendingTextObject) {
+    const sel = state.pendingTextObject
+    const cleared: EditableState = { ...state, pendingOperator: null, pendingTextObject: null }
+    if (key === 'Escape') return { state: inc(cleared), consumed: true }
+    if (key === 'w') {
+      const { start, end } =
+        sel === 'i' ? innerWordRange(state.text, state.cursorIndex) : aWordRange(state.text, state.cursorIndex)
+      return { state: inc(applyOperatorOverRange(cleared, op, start, end)), consumed: true }
+    }
+    // Unsupported object — abort the operator without consuming the key.
+    return { state: cleared, consumed: false }
+  }
+
   if (key === 'Escape') {
     return {
       state: inc({ ...state, pendingOperator: null }),
@@ -102,6 +120,10 @@ function handlePendingOperator(
       state: inc({ ...lineCleared, mode: 'insert' }),
       consumed: true,
     }
+  }
+  // Operator + text-object selector (e.g. di… / ca…). Capture i/a, await object.
+  if (key === 'i' || key === 'a') {
+    return { state: inc({ ...state, pendingTextObject: key }), consumed: true }
   }
   // Operator + motion (e.g. dw, cw, d$).
   const motion = findTextMotion(textMotionRegistry, key)

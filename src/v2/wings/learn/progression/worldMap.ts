@@ -51,6 +51,11 @@ export const worldMapMeta: Record<string, WorldMapMeta> = {
     blurb: 'Copy and paste, vim style. Yank a line or word, put it before or after.',
     rewardBlurb: 'Move and duplicate without ever touching the mouse.',
   },
+  textObjects: {
+    node: { c: 11, r: 3 },
+    blurb: 'Operate on a whole word wherever the cursor sits: diw, daw, ciw, caw.',
+    rewardBlurb: 'Edit a word without aiming at its edges.',
+  },
 }
 
 // Future, non-unit decorative nodes (rendered as locked "coming soon").

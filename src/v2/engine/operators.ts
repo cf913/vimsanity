@@ -81,6 +81,35 @@ export function yankCurrentLine(state: EditableState): EditableState {
   return { ...state, register: { text: lineContent, linewise: true } }
 }
 
+/**
+ * Apply an operator over an explicit half-open [start, end) range — the basis
+ * for text objects (diw/daw/ciw/caw). `c` enters insert mode at the range start.
+ */
+export function applyOperatorOverRange(
+  state: EditableState,
+  op: OperatorKind,
+  start: number,
+  end: number,
+): EditableState {
+  if (start >= end) {
+    if (op === 'y') return state
+    return { ...state, mode: op === 'c' ? 'insert' : 'normal' }
+  }
+  const yanked = state.text.slice(start, end)
+  const register = { text: yanked, linewise: false }
+  if (op === 'y') {
+    return { ...state, cursorIndex: start, register }
+  }
+  const text = deleteRange(state.text, start, end)
+  if (op === 'c') {
+    // Insert mode types at the range start exactly — never clamp it back (which
+    // would corrupt a change whose object sits at the end of the line).
+    return { ...state, text, cursorIndex: start, mode: 'insert', register }
+  }
+  const cursorIndex = clampToLine(text, start)
+  return { ...state, text, cursorIndex, mode: 'normal', register }
+}
+
 export function applyOperatorWithMotion(
   state: EditableState,
   op: OperatorKind,

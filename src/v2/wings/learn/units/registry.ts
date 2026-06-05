@@ -5,6 +5,7 @@ import { lineEdgesUnit } from './lineEdges'
 import { insertModesUnit } from './insertModes'
 import { changeDeleteUnit } from './changeDelete'
 import { yankPutUnit } from './yankPut'
+import { textObjectsUnit } from './textObjects'
 
 export const units: Unit[] = [
   hjklUnit,
@@ -13,6 +14,7 @@ export const units: Unit[] = [
   insertModesUnit,
   changeDeleteUnit,
   yankPutUnit,
+  textObjectsUnit,
 ]
 
 export function findUnit(id: string): Unit | undefined {

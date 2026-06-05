@@ -51,6 +51,55 @@ export function moveToWordEnd(text: string, pos: number): number {
   return pos
 }
 
+// ── Text objects (iw / aw) ──────────────────────────────────────────────
+// A char belongs to one of three classes; an "inner word" is the maximal run
+// of the same class around the cursor (matching vim's w/b/e word model).
+type CharKind = 'space' | 'punct' | 'word'
+
+function charKind(c: string | undefined): CharKind {
+  if (c === undefined || isSpace(c)) return 'space'
+  if (isPunct(c)) return 'punct'
+  return 'word'
+}
+
+/** Half-open [start, end) character range. */
+export interface TextRange {
+  start: number
+  end: number
+}
+
+/** `iw` — the run of same-class characters under the cursor (end-exclusive). */
+export function innerWordRange(text: string, index: number): TextRange {
+  if (text.length === 0) return { start: 0, end: 0 }
+  const i = Math.max(0, Math.min(index, text.length - 1))
+  const kind = charKind(text[i])
+  let start = i
+  let end = i + 1
+  while (start > 0 && charKind(text[start - 1]) === kind) start--
+  while (end < text.length && charKind(text[end]) === kind) end++
+  return { start, end }
+}
+
+/**
+ * `aw` — the inner word plus its trailing whitespace (same line). If there's no
+ * trailing whitespace, the leading whitespace is taken instead, matching vim.
+ */
+export function aWordRange(text: string, index: number): TextRange {
+  const inner = innerWordRange(text, index)
+  if (text.length === 0) return inner
+  let { start } = inner
+  let end = inner.end
+  let extended = false
+  while (end < text.length && text[end] !== '\n' && isSpace(text[end])) {
+    end++
+    extended = true
+  }
+  if (!extended) {
+    while (start > 0 && text[start - 1] !== '\n' && isSpace(text[start - 1])) start--
+  }
+  return { start, end }
+}
+
 export function findLineStart(text: string, pos: number): number {
   return text.lastIndexOf('\n', pos - 1) + 1
 }

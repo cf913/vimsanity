@@ -13,6 +13,8 @@ export interface EditableState {
   cursorIndex: number
   mode: Mode
   pendingOperator: OperatorKind | null
+  /** A captured text-object selector ('i' or 'a') awaiting its object key. */
+  pendingTextObject?: 'i' | 'a' | null
   keystrokes: number
   register: Register | null
 }

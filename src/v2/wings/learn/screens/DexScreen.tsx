@@ -25,6 +25,7 @@ const CATEGORY_COLOR: Record<DexCategory, string> = {
   mode: tokens.amber,
   edit: tokens.red,
   yank: tokens.hot,
+  object: tokens.emerald,
 }
 
 export default function DexScreen() {
