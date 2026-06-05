@@ -60,8 +60,12 @@ export default function LevelComplete({
     tl.from('[data-banner]', { y: -80, scale: 1.3, opacity: 0, duration: 0.5, ease: 'back.out(2)' })
     tl.from('[data-bigstar]', { scale: 0, opacity: 0, duration: 0.4, stagger: 0.22, ease: 'back.out(3)' }, '-=.1')
     tl.from('[data-breakdown]', { x: -16, opacity: 0, duration: 0.3, stagger: 0.08 }, '<.2')
-    tl.from('[data-xpfill]', { scaleX: 0, transformOrigin: 'left center', duration: 0.6, ease: 'power2.out' }, '<.1')
-    tl.from('[data-levelup]', { scale: 0, opacity: 0, duration: 0.5, ease: 'back.out(3)' }, '<.1')
+    if (root.querySelector('[data-xpfill]')) {
+      tl.from('[data-xpfill]', { scaleX: 0, transformOrigin: 'left center', duration: 0.6, ease: 'power2.out' }, '<.1')
+    }
+    if (root.querySelector('[data-levelup]')) {
+      tl.from('[data-levelup]', { scale: 0, opacity: 0, duration: 0.5, ease: 'back.out(3)' }, '<.1')
+    }
     // glyph confetti
     const conf = root.querySelector<HTMLElement>('[data-conf]')
     if (conf) {
