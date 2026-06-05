@@ -6,6 +6,7 @@ export * from './score'
 export * from './xp'
 export * from './badges'
 export * from './calendar'
+export * from './dex'
 export { worldMapMeta, futureNodes, type WorldMapMeta, type MapNode, type FutureNode } from './worldMap'
 
 export function getMeta(unitId: string): WorldMapMeta | undefined {

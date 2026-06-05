@@ -48,6 +48,7 @@ export default function LearnWing() {
       <WorldMap
         progress={progress}
         onEnterUnit={(id) => navigate(`/learn/${id}`)}
+        onOpenDex={() => navigate('/learn/dex')}
         onBack={() => setShowHero(true)}
       />
     )

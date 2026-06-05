@@ -10,6 +10,8 @@ import {
   computeBadges,
   activeStreakDays,
   recentDays,
+  buildDex,
+  dexSummary,
   type Badge,
 } from '../progression'
 import { getUnitProgress } from '../../../state/progress'
@@ -21,6 +23,7 @@ type NodeStatus = 'locked' | 'ready' | 'current' | 'done'
 interface WorldMapProps {
   progress: Progress
   onEnterUnit: (unitId: string) => void
+  onOpenDex?: () => void
   onBack?: () => void
 }
 
@@ -31,7 +34,7 @@ function statusOf(progress: Progress, unitId: string): NodeStatus {
   return 'ready'
 }
 
-export default function WorldMap({ progress, onEnterUnit, onBack }: WorldMapProps) {
+export default function WorldMap({ progress, onEnterUnit, onOpenDex, onBack }: WorldMapProps) {
   const nodes = useMemo(() => orderedNodes(), [])
   const edges = useMemo(() => pathEdges(), [])
 
@@ -91,6 +94,7 @@ export default function WorldMap({ progress, onEnterUnit, onBack }: WorldMapProp
   const todayISO = new Date().toISOString().slice(0, 10)
   const streakSet = useMemo(() => new Set(activeStreakDays(progress.streak, todayISO)), [progress.streak, todayISO])
   const calendarDays = useMemo(() => recentDays(todayISO, 14), [todayISO])
+  const dex = useMemo(() => dexSummary(buildDex(progress)), [progress])
 
   return (
     <div
@@ -235,9 +239,16 @@ export default function WorldMap({ progress, onEnterUnit, onBack }: WorldMapProp
               LEARN OVERWORLD
             </span>
           </div>
-          <Pill tone="dim">
-            {completedCount}/{nodes.length} cleared
-          </Pill>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {onOpenDex && (
+              <TermButton onClick={onOpenDex}>
+                ▣ MOTION DEX · {dex.discovered}/{dex.total}
+              </TermButton>
+            )}
+            <Pill tone="dim">
+              {completedCount}/{nodes.length} cleared
+            </Pill>
+          </div>
         </div>
 
         {/* the board */}
@@ -446,6 +457,7 @@ export default function WorldMap({ progress, onEnterUnit, onBack }: WorldMapProp
             status={statusOf(progress, selectedUnit.unit.id)}
             stars={getUnitProgress(progress, selectedUnit.unit.id).stars ?? 0}
             onEnter={() => onEnterUnit(selectedUnit.unit.id)}
+            onOpenDex={onOpenDex}
           />
         ) : selectedFuture ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -516,8 +528,9 @@ function SelectedUnitPanel(props: {
   status: NodeStatus
   stars: number
   onEnter: () => void
+  onOpenDex?: () => void
 }) {
-  const { title, motionLabel, blurb, rewardBlurb, status, stars, onEnter } = props
+  const { title, motionLabel, blurb, rewardBlurb, status, stars, onEnter, onOpenDex } = props
   const locked = status === 'locked'
   const tone = status === 'done' ? 'green' : status === 'locked' ? 'dim' : 'amber'
   const label = status === 'done' ? 'CLEARED' : status === 'locked' ? 'LOCKED' : 'READY'
@@ -562,10 +575,23 @@ function SelectedUnitPanel(props: {
             </div>
             <div style={{ fontSize: 10, color: tokens.dim, letterSpacing: '.15em', marginTop: 6 }}>3-STAR GOAL</div>
           </div>
-          <div className="vs-frame" style={{ padding: '10px 12px', background: tokens.bgPanel2 }}>
+          <button
+            onClick={onOpenDex}
+            disabled={!onOpenDex}
+            className="vs-frame"
+            style={{
+              padding: '10px 12px',
+              background: tokens.bgPanel2,
+              textAlign: 'left',
+              cursor: onOpenDex ? 'pointer' : 'default',
+              color: 'inherit',
+            }}
+          >
             <div style={{ fontSize: 16, fontWeight: 800, color: tokens.purple }}>DEX</div>
-            <div style={{ fontSize: 10, color: tokens.dim, letterSpacing: '.15em', marginTop: 6 }}>ENTRY · SOON</div>
-          </div>
+            <div style={{ fontSize: 10, color: tokens.dim, letterSpacing: '.15em', marginTop: 6 }}>
+              {onOpenDex ? 'VIEW ENTRIES ▸' : 'ENTRY'}
+            </div>
+          </button>
         </div>
       </div>
 
