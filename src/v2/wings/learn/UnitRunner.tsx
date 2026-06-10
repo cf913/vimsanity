@@ -18,7 +18,9 @@ import {
   recordUnitResult,
   touchStreak,
   getUnitProgress,
+  justGraduated,
 } from '../../state/progress'
+import { track } from '../../analytics'
 
 const UNIT_IDS = units.map((u) => u.id)
 
@@ -55,6 +57,15 @@ export default function UnitRunner() {
   useEffect(() => {
     setTelemetry(null)
   }, [active, replayKey])
+
+  // Funnel: mounting a not-yet-completed unit counts as a start. In-session
+  // replays don't re-fire (deps don't change), and revisiting a finished
+  // unit's completion screen isn't a start.
+  useEffect(() => {
+    if (!unit) return
+    const up = getUnitProgress(loadProgress(UNIT_IDS), unit.id)
+    if (up.bStatus !== 'completed') track('v2_unit_started', { unit_id: unit.id })
+  }, [unit])
 
   const handleAComplete = useCallback(() => {
     if (!unit) return
@@ -97,6 +108,15 @@ export default function UnitRunner() {
         })
       }
       next = touchStreak(next, todayISO())
+      track('v2_unit_completed', {
+        unit_id: unit.id,
+        keystrokes: levelResult?.keystrokes ?? 0,
+        par: levelResult?.par ?? 0,
+        stars: levelResult?.stars ?? 0,
+      })
+      if (justGraduated(progress, next, UNIT_IDS)) {
+        track('v2_graduated', { units_total: UNIT_IDS.length })
+      }
       // Honest XP delta: total XP only moves when a new best score is recorded.
       const before = playerLevel(progress)
       const after = playerLevel(next)
