@@ -6,8 +6,10 @@ import {
   markStageCompleted,
   getUnitProgress,
   initialProgressFor,
+  justGraduated,
 } from './progress'
 import { STORAGE_KEY } from './types'
+import type { Progress } from './types'
 
 beforeEach(() => {
   localStorage.clear()
@@ -147,5 +149,40 @@ describe('getUnitProgress', () => {
   it('returns a locked record for unknown ids', () => {
     const p = initialProgressFor(['hjkl'])
     expect(getUnitProgress(p, 'unknown')).toEqual({ aStatus: 'locked', bStatus: 'locked' })
+  })
+})
+
+describe('justGraduated', () => {
+  const ids = ['hjkl', 'wbe']
+  const done = { aStatus: 'completed', bStatus: 'completed' } as const
+
+  it('is true on the not-graduated → graduated transition', () => {
+    const before: Progress = {
+      units: { hjkl: done, wbe: { aStatus: 'completed', bStatus: 'ready' } },
+    }
+    const after: Progress = { units: { hjkl: done, wbe: done } }
+    expect(justGraduated(before, after, ids)).toBe(true)
+  })
+
+  it('is false when the player was already graduated (e.g. replay)', () => {
+    const grad: Progress = { units: { hjkl: done, wbe: done } }
+    expect(justGraduated(grad, grad, ids)).toBe(false)
+  })
+
+  it('is false when an earlier unit completes but others remain', () => {
+    const before: Progress = {
+      units: {
+        hjkl: { aStatus: 'completed', bStatus: 'ready' },
+        wbe: { aStatus: 'locked', bStatus: 'locked' },
+      },
+    }
+    const after: Progress = {
+      units: { hjkl: done, wbe: { aStatus: 'ready', bStatus: 'locked' } },
+    }
+    expect(justGraduated(before, after, ids)).toBe(false)
+  })
+
+  it('is false for an empty curriculum', () => {
+    expect(justGraduated({ units: {} }, { units: {} }, [])).toBe(false)
   })
 })

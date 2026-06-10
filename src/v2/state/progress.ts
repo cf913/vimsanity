@@ -166,3 +166,15 @@ export function touchStreak(progress: Progress, todayISO: string): Progress {
   const count = diff === 1 ? prev.count + 1 : 1
   return { ...progress, streak: { count, lastPlayedISO: todayISO } }
 }
+
+/**
+ * True only on the transition where `after` has every unit's B-check completed
+ * but `before` does not — i.e. the exact moment the player graduates. Used to
+ * fire the v2_graduated analytics event exactly once without extra storage.
+ */
+export function justGraduated(before: Progress, after: Progress, unitIds: string[]): boolean {
+  if (unitIds.length === 0) return false
+  const allDone = (p: Progress) =>
+    unitIds.every((id) => getUnitProgress(p, id).bStatus === 'completed')
+  return allDone(after) && !allDone(before)
+}
