@@ -10,9 +10,7 @@ This file is the at-a-glance snapshot for resuming work on the VimSanity redesig
 
 We're rebuilding VimSanity around a **Three Wings** game model (Learn / Practice / Apply) with an **A→B→C** pedagogical loop. The rebuild lives under `src/v2/`. The classic app stays untouched at `/classic`.
 
-Plans 1, 2, 3, and 4 are implemented. Working software today: a full Learn wing with **six units** — `hjkl`, `wbe`, `lineEdges`, `insertModes`, `changeDelete`, `yankPut` — each running through a drill stage + a fluency-check stage with par-based scoring. Replay button on completion. Insert mode, change/delete, and now yank/put are live — users can do real text editing including register-based paste flows (including the `dd`+`p` "paste deleted line back" and `xp` swap idioms).
-
-Plans 5-9 are not yet written.
+All nine plans are implemented. Working software today: a full Learn wing with **seven units** (`hjkl` through `textObjects`), each running through a drill stage + a fluency-check stage with par-based scoring; a Practice wing daily challenge; Apply capstone missions; onboarding (demo + placement); boss level, Motion Dex, XP/badges/streak progression; the phosphor CRT facelift; and minimal-funnel analytics. See "Plans 5–9 + facelift" below for the catch-up summary.
 
 ---
 
