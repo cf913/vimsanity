@@ -6,6 +6,7 @@ import Onboarding from './onboarding/Onboarding'
 import { units } from './units/registry'
 import { loadProgress, saveProgress, getUnitProgress, unlockUpTo } from '../../state/progress'
 import type { Progress } from '../../state/types'
+import { track } from '../../analytics'
 
 const UNIT_IDS = units.map((u) => u.id)
 const HERO_SEEN_KEY = 'vimsanity-v2-seen-hero'
@@ -37,7 +38,10 @@ export default function LearnWing() {
       localStorage.setItem(HERO_SEEN_KEY, '1')
       setShowHero(false)
       // First-timers get placement before the map.
-      if (!localStorage.getItem(ONBOARDED_KEY)) setOnboarding(true)
+      if (!localStorage.getItem(ONBOARDED_KEY)) {
+        setOnboarding(true)
+        track('v2_onboarding_started')
+      }
     }
     return (
       <Hero
@@ -56,6 +60,7 @@ export default function LearnWing() {
       saveProgress(next)
       setProgress(next)
       setOnboarding(false)
+      track('v2_onboarding_completed', { placement_unit: unitId, skipped: false })
       navigate(`/learn/${unitId}`)
     }
     return (
@@ -63,6 +68,7 @@ export default function LearnWing() {
         onFinish={finishOnboarding}
         onSkip={() => {
           localStorage.setItem(ONBOARDED_KEY, '1')
+          track('v2_onboarding_completed', { placement_unit: UNIT_IDS[0], skipped: true })
           setOnboarding(false)
         }}
       />
