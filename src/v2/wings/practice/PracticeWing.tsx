@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { tokens, fontMono } from '../../design/tokens'
 import { useGsap } from '../../design/useGsap'
@@ -9,6 +9,7 @@ import type { StageTelemetry, StageResult } from '../learn/level/types'
 import { dailyPool } from './dailyPuzzles'
 import { dailyIndex, dailyNumber, shareString, dailyStreak } from './daily'
 import { loadDailyStore, recordDaily, solvedDates } from '../../state/daily'
+import { track } from '../../analytics'
 
 const MODE_MAP: Record<NonNullable<StageTelemetry['mode']>, StatusMode> = {
   normal: 'NORMAL',
@@ -37,9 +38,21 @@ export default function PracticeWing() {
   const [stageKey, setStageKey] = useState(0)
   const [copied, setCopied] = useState(false)
 
+  // Funnel: showing today's unsolved puzzle counts as a start. Mount-only so
+  // post-solve replays don't re-fire.
+  useEffect(() => {
+    if (!store.results[todayISO]) track('v2_daily_started', { puzzle_id: todayISO })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   function handleComplete(r?: StageResult) {
     if (r) {
       const stars = starsForKeystrokes(r.keystrokes, r.par)
+      // Only the first solve of the day is a funnel event — replays to beat
+      // your own keystrokes aren't new solves.
+      if (!store.results[todayISO]) {
+        track('v2_daily_solved', { puzzle_id: todayISO, keystrokes: r.keystrokes, par: r.par, stars })
+      }
       setStore(recordDaily(todayISO, r.keystrokes, r.par, stars))
     }
     setPhase('done')
