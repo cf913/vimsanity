@@ -1,6 +1,6 @@
 # VimSanity Redesign — Status & Next Session
 
-**Last updated:** 2026-05-19
+**Last updated:** 2026-06-11
 
 This file is the at-a-glance snapshot for resuming work on the VimSanity redesign. Read it first when starting a new session.
 
@@ -18,7 +18,7 @@ Plans 5-9 are not yet written.
 
 ## Where the code lives
 
-**Active branch:** `feat/v2-foundation-plan-1` — contains Plans 1 + 2 + 3 + 4 + post-playtest fixes.
+**Active branch:** `rebuild` — all V2 work consolidated here (see merge `b0a8d52`).
 
 | Branch | Purpose | Status |
 |---|---|---|
@@ -76,6 +76,16 @@ The user's stated long-term plan: collapse `feat/v2-foundation-plan-1` into a `r
 | `dd5e268` | No replay after finishing a unit | Added ↻ Replay button |
 | `31061f1` | A-drill could pick unreachable targets | BFS-based reachability filter on target candidates |
 | `0da37ab` | `h`/`l` silently did nothing in unit 4/5 | Added h/l text motions clamped to line boundaries |
+
+### Plans 5–9 + facelift (merged into `rebuild`, 2026-05/06)
+
+Implemented after this doc's last full update: Text Objects unit, Practice
+daily challenge, Apply capstones, onboarding (demo + placement), boss level,
+Motion Dex, XP/badges/streak progression, phosphor CRT facelift, the progress
+migration fix (`0e0ecbc`, closing the pre-launch must-fix), and V2 analytics
+(minimal funnel — 7 typed `v2_*` events via `src/v2/analytics.ts`, eager
+PostHog init in `src/main.tsx`; spec at
+`docs/superpowers/specs/2026-06-10-v2-analytics-design.md`).
 
 ---
 
@@ -156,11 +166,11 @@ Three viable paths:
 | 2 | Text engine + word/line nav (units 2, 3) | ✅ done |
 | 3 | Insert modes + change/delete (units 4, 5) | ✅ done |
 | 4 | Yank/put (unit 6) | ✅ done |
-| 5 | Text objects (unit 7) | not started |
-| 6 | Practice wing — daily puzzle (Quiet Wordle v1) | not started |
-| 7 | Apply wing — 5 capstone missions | not started |
-| 8 | Onboarding (demo + placement + drop) | not started |
-| 9 | Analytics instrumentation | not started — could thread into others |
+| 5 | Text objects (unit 7) | ✅ done (`04f38ad`) |
+| 6 | Practice wing — daily puzzle (Quiet Wordle v1) | ✅ done (`18a91f6`) |
+| 7 | Apply wing — 5 capstone missions | ✅ done (`28d1ac0`) |
+| 8 | Onboarding (demo + placement + drop) | ✅ done (`cdaf546`) |
+| 9 | Analytics instrumentation | ✅ done — minimal funnel (spec: `2026-06-10-v2-analytics-design.md`) |
 
 ### Pre-launch must-fix before any real ship
 
